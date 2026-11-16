@@ -1,28 +1,14 @@
 ---
-// Temporary page so the scaffold builds. Replaced by the shared layout (#6) and Home page (#7).
-import '../brand/brand.css';
-import { brand } from '../brand/brand.config';
+// Temporary Home so the shared layout can be reviewed on its own. Replaced
+// when the content collections land (#6, part 2), then by the Home page (#7).
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href={brand.favicon} type="image/svg+xml" />
-    <title>{brand.name}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{brand.name}</h1>
-      <p>Scaffold only. Pages arrive with the shared layout.</p>
-    </main>
-  </body>
-</html>
-
-<style>
-  body {
-    background: var(--color-bg);
-    color: var(--color-text);
-    font-family: var(--font-body);
-  }
-</style>
+<BaseLayout description="[TK: one-sentence description of who we are, for search results]">
+  <div class="prose">
+    <h1>[TK: hero text saying who we are]</h1>
+    <p>
+      Shared layout only. Page content arrives with the content collections.
+    </p>
+  </div>
+</BaseLayout>
