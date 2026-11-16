@@ -1,14 +1,17 @@
 ---
-// Temporary Home so the shared layout can be reviewed on its own. Replaced
-// when the content collections land (#6, part 2), then by the Home page (#7).
+// Home. Its section-by-section layout comes with #7; this is the frame and
+// the content wiring. The <title> is the organization name alone.
+import { render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('home');
+const { Content } = await render(page);
 ---
 
-<BaseLayout description="[TK: one-sentence description of who we are, for search results]">
+<BaseLayout description={page.data.description}>
   <div class="prose">
-    <h1>[TK: hero text saying who we are]</h1>
-    <p>
-      Shared layout only. Page content arrives with the content collections.
-    </p>
+    <h1>{page.data.heading ?? page.data.title}</h1>
+    <Content />
   </div>
 </BaseLayout>

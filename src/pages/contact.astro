@@ -1,0 +1,13 @@
+---
+import EmailLink from '../components/EmailLink.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('contact');
+---
+
+<PageLayout page={page}>
+  <p class="prose">
+    Email: <EmailLink />
+  </p>
+</PageLayout>
