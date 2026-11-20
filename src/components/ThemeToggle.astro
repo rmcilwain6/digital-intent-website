@@ -4,6 +4,8 @@
 // The stored value is the visitor's theme preference only, kept in their own
 // browser (rule 2). A choice that matches the system setting is not stored,
 // so the site goes back to following the system.
+// The visible label names the "on" state, so screen readers announce
+// "Dark theme, switch, on/off". No aria-label: the visible text is the name.
 ---
 
 <button
@@ -11,10 +13,9 @@
   class="theme-toggle"
   role="switch"
   aria-checked="false"
-  aria-label="Toggle Theme: dark"
   data-theme-toggle
 >
-  <span class="label">Toggle Theme</span>
+  <span class="label">Dark theme</span>
   <span class="track" aria-hidden="true">
     <span class="thumb"></span>
   </span>
