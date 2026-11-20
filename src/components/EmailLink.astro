@@ -1,0 +1,12 @@
+---
+// The organization email from brand config. Shows the placeholder as plain
+// text until the address exists (D21), so there is no broken mailto: link.
+import { brand } from '../brand/brand.config';
+import { isPlaceholder } from '../lib/placeholder';
+---
+
+{isPlaceholder(brand.email) ? (
+  <span>{brand.email}</span>
+) : (
+  <a href={`mailto:${brand.email}`}>{brand.email}</a>
+)}

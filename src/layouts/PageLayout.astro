@@ -1,0 +1,30 @@
+---
+// Text-first page: heading and Markdown body from content/pages/<id>.md, at
+// reading width. Routes can add extra content (data-driven sections) through
+// the slot, which gets the full page width.
+import type { CollectionEntry } from 'astro:content';
+import { render } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  page: CollectionEntry<'pages'>;
+  noindex?: boolean;
+}
+
+const { page, noindex } = Astro.props;
+const { Content } = await render(page);
+---
+
+<BaseLayout
+  title={page.data.title}
+  description={page.data.description}
+  noindex={noindex}
+>
+  <article>
+    <div class="prose">
+      <h1>{page.data.heading ?? page.data.title}</h1>
+      <Content />
+    </div>
+    <slot />
+  </article>
+</BaseLayout>

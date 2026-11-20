@@ -1,0 +1,39 @@
+---
+// Labelled image slot at its final aspect ratio, with an art-direction note.
+// Stays until original photography exists (SPEC rule 8, 8.2).
+interface Props {
+  /** CSS aspect ratio, e.g. "4 / 5". */
+  ratio: string;
+  /** What the image is, e.g. "Portrait". */
+  label: string;
+  /** One-line art-direction note. */
+  note: string;
+}
+
+const { ratio, label, note } = Astro.props;
+---
+
+<div class="image-placeholder" style={`aspect-ratio: ${ratio};`}>
+  <p>
+    <strong>Image placeholder: {label}</strong>
+  </p>
+  <p>{note}</p>
+</div>
+
+<style>
+  .image-placeholder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--space-4);
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  p {
+    margin: 0;
+  }
+</style>

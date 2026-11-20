@@ -1,0 +1,85 @@
+---
+import { site } from '../../content/site';
+import { brand } from '../brand/brand.config';
+import ThemeToggle from './ThemeToggle.astro';
+
+const trim = (path: string) => path.replace(/\/+$/, '') || '/';
+const currentPath = trim(Astro.url.pathname);
+---
+
+<header class="site-header">
+  <div class="container inner">
+    <a class="site-name" href="/">
+      <img src={brand.logo.mark} alt="" width="32" height="32" />
+      <span>{brand.name}</span>
+    </a>
+    {brand.placeholder && <p class="placeholder-label">Placeholder brand</p>}
+    <nav aria-label="Primary">
+      <ul>
+        {site.primaryNav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={
+                trim(item.href) === currentPath ? 'page' : undefined
+              }
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-block-end: var(--border-width) solid var(--color-border);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+    padding-block: var(--space-4);
+  }
+
+  .site-name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+  }
+
+  .placeholder-label {
+    margin: 0;
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  nav {
+    margin-inline-start: auto;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  [aria-current='page'] {
+    font-weight: var(--font-weight-bold);
+    text-decoration-thickness: var(--focus-width);
+  }
+</style>

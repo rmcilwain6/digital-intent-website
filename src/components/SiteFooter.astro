@@ -1,0 +1,57 @@
+---
+import { site } from '../../content/site';
+import { brand } from '../brand/brand.config';
+import EmailLink from './EmailLink.astro';
+
+const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
+  brand.regions,
+);
+---
+
+<footer class="site-footer">
+  <div class="container inner">
+    <p class="site-name">{brand.name}</p>
+    <p>
+      {site.regionsIntro} {regions}.
+    </p>
+    <p>
+      <EmailLink />
+    </p>
+    <nav aria-label="Footer">
+      <ul>
+        {site.footerNav.map((item) => (
+          <li>
+            <a href={item.href}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-block-start: var(--space-8);
+    border-block-start: var(--border-width) solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .inner {
+    padding-block: var(--space-6);
+  }
+
+  .site-name {
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

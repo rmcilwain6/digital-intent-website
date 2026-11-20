@@ -1,0 +1,10 @@
+---
+// Built as dist/404.html, which Cloudflare serves for unknown routes
+// (wrangler.jsonc: not_found_handling "404-page").
+import PageLayout from '../layouts/PageLayout.astro';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('404');
+---
+
+<PageLayout page={page} noindex />

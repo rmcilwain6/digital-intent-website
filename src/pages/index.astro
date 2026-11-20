@@ -1,28 +1,17 @@
 ---
-// Temporary page so the scaffold builds. Replaced by the shared layout (#6) and Home page (#7).
-import '../brand/brand.css';
-import { brand } from '../brand/brand.config';
+// Home. Its section-by-section layout comes with #7; this is the frame and
+// the content wiring. The <title> is the organization name alone.
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('home');
+const { Content } = await render(page);
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href={brand.favicon} type="image/svg+xml" />
-    <title>{brand.name}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{brand.name}</h1>
-      <p>Scaffold only. Pages arrive with the shared layout.</p>
-    </main>
-  </body>
-</html>
-
-<style>
-  body {
-    background: var(--color-bg);
-    color: var(--color-text);
-    font-family: var(--font-body);
-  }
-</style>
+<BaseLayout description={page.data.description}>
+  <div class="prose">
+    <h1>{page.data.heading ?? page.data.title}</h1>
+    <Content />
+  </div>
+</BaseLayout>
