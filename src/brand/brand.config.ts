@@ -35,12 +35,12 @@ export interface Brand {
   };
 }
 
-const name = '[TK: organization name, pending board decision]';
+const name = 'Digital Intent Learning Society';
 
 export const brand = {
   placeholder: true,
   name,
-  shortName: '[TK: short name]',
+  shortName: 'Digital Intent',
   tagline: '[TK: tagline, from the brand work]',
   domain: 'digitalintent.ca',
   email: '[TK: organization email, created with the domain (D21)]',

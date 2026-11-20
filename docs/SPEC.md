@@ -14,7 +14,7 @@ Source material: 2026-10-15 requirements meeting minutes; strategic framework dr
 
 ## 1. Purpose
 
-Build the public website for a BC technology education nonprofit (name not yet chosen). The site exists to:
+Build the public website for Digital Intent Learning Society ("Digital Intent" for short), a BC technology education nonprofit (D31). The site exists to:
 
 1. Give teachers, school leaders and district staff a credible place to land after a conversation with us.
 2. Give students a findable home for the Valleyview Social Innovation Grant. Last year the application was only reachable by direct link.
@@ -497,6 +497,7 @@ Write these once the patterns they describe have settled in real code. `add-page
 | D28 | Terms of service                                        | Open                   | Reed checks whether one is legally needed. If so, bare bones, like Privacy                                                                                                                                |
 | D29 | Policy map projections from trustees' public statements | Open (board)           | Decided before the policy map spec is written (Phase 4)                                                                                                                                                   |
 | D30 | Home order: teachers above or below Valleyview          | Open                   | Lean: teachers above. Nicole and Reed decide during the build                                                                                                                                             |
+| D31 | Organization name                                       | Decided                | Full legal name: Digital Intent Learning Society. Short form: Digital Intent. Recorded Nov 19, 2026                                                                                                       |
 
 ## 15. Research tasks
 

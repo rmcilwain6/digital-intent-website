@@ -23,8 +23,8 @@ Changes here need approval from a person (AGENTS.md).
 | Key           | Current value                             | Notes                                                                                     |
 | ------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `placeholder` | `true`                                    | Set to `false` with the final brand. While `true`, pages show a "Placeholder brand" label |
-| `name`        | `[TK]`                                    | Full organization name                                                                    |
-| `shortName`   | `[TK]`                                    | For tight spaces                                                                          |
+| `name`        | `Digital Intent Learning Society`         | Full legal name (D31)                                                                     |
+| `shortName`   | `Digital Intent`                          | Usual short form; for tight spaces (D31)                                                  |
 | `tagline`     | `[TK]`                                    | One line, plain language                                                                  |
 | `domain`      | `digitalintent.ca`                        | Bare `.ca` domain, no `https://`. Also sets `site` in `astro.config.mjs` (D2)             |
 | `email`       | `[TK]`                                    | Organization email, created with the domain (D21)                                         |
