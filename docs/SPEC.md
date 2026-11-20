@@ -80,7 +80,7 @@ Open for launch: the Indigenous outreach page (section 7.9, D13), a Partnerships
 ### Phase 2: Brand and launch
 
 - Apply name, logo, colours, type and motion language as section 6 describes.
-- Register the domain, set up the organization email, connect the domain, make production public, remove `noindex`.
+- Set up the organization email, connect the domain (`digitalintent.ca`, registered; D2), make production public, remove `noindex`.
 - Pre-launch checks (section 9.2) and launch checklist (section 13).
 - Stretch goals: anonymous page view counts (D7) and the page receipt (section 8.2).
 
@@ -304,7 +304,7 @@ Candidates considered: Next.js (static export), Astro, SvelteKit. Next.js remain
 Fixed regardless of stack:
 
 - No database in Phases 0 to 2.
-- `.ca` domain at a Canadian registrar once the name is chosen.
+- `.ca` domain: `digitalintent.ca` (D2).
 - $0 per month operating cost target; only the domain is paid.
 - Until launch, the production and preview deploys sit behind Cloudflare Access (free tier), so only allowlisted team members can see them (D23). This is account configuration, not code. Never commit the allowlist or team email addresses. At launch, Access comes off the production domain; it may stay on previews.
 
@@ -468,7 +468,7 @@ Write these once the patterns they describe have settled in real code. `add-page
 | ID  | Decision                                                | Status                 | Resolution or default                                                                                                                                                                                     |
 | --- | ------------------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | Stack and hosting                                       | Decided                | Astro on Cloudflare Workers (static assets), free tier. Oct 20, 2026. Record 0001                                                                                                                         |
-| D2  | Domain                                                  | Open (board)           | `.ca`, after the name is chosen                                                                                                                                                                           |
+| D2  | Domain                                                  | Decided                | `digitalintent.ca`. Registered; not yet connected to the deploy (see the launch checklist)                                                                                                                |
 | D3  | GitHub home                                             | Decided                | Reed's personal account, transferable later                                                                                                                                                               |
 | D4  | Home calls to action                                    | Decided                | Two above the fold: one for teachers (destination D26), one for students and parents (`/valleyview`). Nov 11, 2026 (record 0004)                                                                          |
 | D5  | Where Valleyview applications are collected             | Open (board)           | Decided outside the website, in board discussions; R4 informs it. Likely an outbound link to a Canadian-hosted form tool. The information page can launch without it; student promotion and intake cannot |

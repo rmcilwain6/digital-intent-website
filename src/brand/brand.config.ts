@@ -42,7 +42,7 @@ export const brand = {
   name,
   shortName: '[TK: short name]',
   tagline: '[TK: tagline, from the brand work]',
-  domain: '[TK: .ca domain, registered at launch]',
+  domain: 'digitalintent.ca',
   email: '[TK: organization email, created with the domain (D21)]',
   social: [],
   regions: ['Kamloops', 'Victoria', 'Vancouver'],

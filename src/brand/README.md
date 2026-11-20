@@ -26,7 +26,7 @@ Changes here need approval from a person (AGENTS.md).
 | `name`        | `[TK]`                                    | Full organization name                                                                    |
 | `shortName`   | `[TK]`                                    | For tight spaces                                                                          |
 | `tagline`     | `[TK]`                                    | One line, plain language                                                                  |
-| `domain`      | `[TK]`                                    | Bare `.ca` domain, no `https://`                                                          |
+| `domain`      | `digitalintent.ca`                        | Bare `.ca` domain, no `https://`. Also sets `site` in `astro.config.mjs` (D2)             |
 | `email`       | `[TK]`                                    | Organization email, created with the domain (D21)                                         |
 | `social`      | none                                      | List of `{ label, href }`                                                                 |
 | `regions`     | Kamloops, Victoria, Vancouver             | Starting regions (SPEC section 2)                                                         |
