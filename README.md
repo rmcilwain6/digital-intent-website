@@ -1,6 +1,6 @@
 # Website
 
-Public website for a BC technology education nonprofit. The organization name and brand are not final yet, so the site runs on a deliberately plain placeholder brand until then.
+Public website for Digital Intent Learning Society ("Digital Intent"), a BC technology education nonprofit. The name and domain are decided, but the rest of the brand is not final yet, so the site runs on a deliberately plain placeholder brand until then.
 
 Built with [Astro](https://astro.build), deployed as static files to Cloudflare. No cookies, no tracking, no personal information collected.
 

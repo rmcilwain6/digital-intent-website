@@ -10,7 +10,7 @@ Instructions for every AI agent working in this repository, whatever tool you ru
 
 ## Project in one paragraph
 
-Public website for a BC technology education nonprofit whose name and brand are not final. Built with Astro (TypeScript, strict), prerendered to static files, deployed to Cloudflare Workers static assets on the free tier. Content lives in `content/` as Markdown/MDX and typed data, validated at build. Interactive pieces are Astro islands loaded only where used. No database, no server code, no cookies, no personal information.
+Public website for Digital Intent Learning Society ("Digital Intent"), a BC technology education nonprofit. The name and domain are decided; the rest of the brand is not final. Built with Astro (TypeScript, strict), prerendered to static files, deployed to Cloudflare Workers static assets on the free tier. Content lives in `content/` as Markdown/MDX and typed data, validated at build. Interactive pieces are Astro islands loaded only where used. No database, no server code, no cookies, no personal information.
 
 ## MVP mode
 
