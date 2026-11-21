@@ -12,7 +12,7 @@ import BoardMap, {
 } from '../components/board/BoardMap.astro';
 import ImagePlaceholder from '../components/ImagePlaceholder.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { district, pathBounds, placePoint, union, viewFor } from '../lib/map';
+import { district, focusFor, pathBounds, placePoint, union } from '../lib/map';
 import { getPage } from '../lib/pages';
 
 const page = await getPage('board');
@@ -33,7 +33,7 @@ const members = board.map((member) => {
     ? (member.leads ?? []).map((n) => district(n))
     : [];
   // A gentle zoom: never closer than about 2.5 times the overview.
-  const view = viewFor(
+  const focus = focusFor(
     union(
       districts.map((d) => pathBounds(d.d)),
       [point],
@@ -41,7 +41,7 @@ const members = board.map((member) => {
     420,
     2.5,
   );
-  return { member, id, point, districts, view };
+  return { member, id, point, districts, focus };
 });
 
 // One marker per place, shared by everyone who lives there.
@@ -86,9 +86,6 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
           technology, which reads the cards themselves.
         */}
         <div class="people" aria-hidden="true">
-          <p class="person prompt is-active" data-person="">
-            Scroll to meet the board
-          </p>
           {members.map(({ member, id }) => (
             <div class="person" data-person={id}>
               {'placeholder' in member.photo ? (
@@ -111,13 +108,13 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
 
       <div class="list">
         <ol class="members">
-          {members.map(({ member, id, districts, view }) => (
+          {members.map(({ member, id, districts, focus }) => (
             <li
               class="card"
               id={id}
               data-card
               data-member={id}
-              data-view={JSON.stringify(view)}
+              data-focus={JSON.stringify(focus)}
             >
               <div class="photo">
                 {'placeholder' in member.photo ? (
@@ -218,43 +215,82 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
 </BaseLayout>
 
 <script>
-  // Eases the board map towards the member being read. An enhancement only: the
-  // page is complete without it. Moves the map by transform; the motion
+  // Eases the board map towards the member being read. An enhancement only:
+  // the page is complete without it. Moves the map by transform; the motion
   // tokens make the change instant under prefers-reduced-motion.
-  interface View {
+  interface Focus {
     scale: number;
-    x: number;
-    y: number;
+    cx: number;
+    cy: number;
   }
 
-  const overview: View = { scale: 1, x: 0, y: 0 };
+  // Phones get the app-like view; must match the CSS breakpoint.
+  const phone = window.matchMedia('(max-width: 63.99rem)');
 
   function init(root: HTMLElement) {
+    const svg = root.querySelector<SVGSVGElement>('.board-map svg');
     const camera = root.querySelector<SVGGElement>('[data-camera]');
     const reset = root.querySelector<HTMLButtonElement>('[data-map-reset]');
-    if (!camera || !reset) return;
+    const panel = root.querySelector<HTMLElement>('.map-panel');
+    const peopleBox = root.querySelector<HTMLElement>('.people');
+    const header = document.querySelector<HTMLElement>('.site-header');
+    if (!svg || !camera || !reset || !panel || !peopleBox) return;
     const markers = [...root.querySelectorAll<SVGGElement>('.marker')];
     const districts = [...root.querySelectorAll<SVGPathElement>('.district')];
     const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
     const people = [...root.querySelectorAll<HTMLElement>('[data-person]')];
-    const views = new Map(
+    const focuses = new Map(
       cards.map((card) => [
         card.dataset.member ?? '',
-        JSON.parse(card.dataset.view ?? 'null') as View,
+        JSON.parse(card.dataset.focus ?? 'null') as Focus,
       ]),
     );
+    const [, , mapWidth = 1000, mapHeight = 866] = (
+      svg.getAttribute('viewBox') ?? ''
+    )
+      .split(' ')
+      .map(Number);
 
     let active: string | null | undefined;
+
+    // The screen point, in map units, where the focus should land: the middle
+    // of the map, or on phones the middle of the area right of the person.
+    function target(): [number, number] {
+      const box = svg!.getBoundingClientRect();
+      const k = Math.min(box.width / mapWidth, box.height / mapHeight);
+      const offsetX = (box.width - mapWidth * k) / 2;
+      const offsetY = (box.height - mapHeight * k) / 2;
+      let x = box.width / 2;
+      if (phone.matches && active) {
+        const covered = peopleBox!.getBoundingClientRect().right - box.left;
+        x = covered + (box.width - covered) / 2;
+      }
+      return [(x - offsetX) / k, (box.height / 2 - offsetY) / k];
+    }
+
+    function place() {
+      const focus = active ? focuses.get(active) : undefined;
+      let scale = 1;
+      let x = 0;
+      let y = 0;
+      if (focus) {
+        const [tx, ty] = target();
+        scale = focus.scale;
+        x = tx - scale * focus.cx;
+        y = ty - scale * focus.cy;
+      }
+      camera!.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+      for (const marker of markers) {
+        const mx = Number(marker.dataset.x) * scale + x;
+        const my = Number(marker.dataset.y) * scale + y;
+        marker.style.transform = `translate(${mx}px, ${my}px)`;
+      }
+    }
 
     function show(id: string | null) {
       if (id === active) return;
       active = id;
-      const view = (id && views.get(id)) || overview;
-      camera!.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
       for (const marker of markers) {
-        const x = Number(marker.dataset.x) * view.scale + view.x;
-        const y = Number(marker.dataset.y) * view.scale + view.y;
-        marker.style.transform = `translate(${x}px, ${y}px)`;
         const here = (marker.dataset.members ?? '').split(' ');
         marker.classList.toggle('is-active', id !== null && here.includes(id));
       }
@@ -265,33 +301,47 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
         card.classList.toggle('is-active', card.dataset.member === id);
       }
       for (const person of people) {
-        person.classList.toggle(
-          'is-active',
-          person.dataset.person === (id ?? ''),
-        );
+        person.classList.toggle('is-active', person.dataset.person === id);
       }
+      peopleBox!.classList.toggle('has-person', id !== null);
       reset!.hidden = id === null;
+      place();
+    }
+
+    // Scrolling: the card crossing a thin band just below the pinned panel
+    // on phones, or near the middle of the screen on wide ones, is the one
+    // being read. Ignored until the visitor scrolls, so the page opens on
+    // the whole province.
+    let scrolled = false;
+    let observer: IntersectionObserver | undefined;
+
+    function watch() {
+      // Phones: pin the panel under the pinned header.
+      const headerHeight = phone.matches && header ? header.offsetHeight : 0;
+      root.style.setProperty('--board-header-height', `${headerHeight}px`);
+      const top = phone.matches
+        ? headerHeight + panel!.offsetHeight + 16
+        : window.innerHeight * 0.45;
+      const bottom = Math.max(window.innerHeight - top - 48, 0);
+      observer?.disconnect();
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (!scrolled) return;
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              show((entry.target as HTMLElement).dataset.member ?? null);
+            }
+          }
+        },
+        { rootMargin: `-${top}px 0px -${bottom}px 0px` },
+      );
+      cards.forEach((card) => observer!.observe(card));
+      place();
     }
 
     show(null);
-
-    // Scrolling: the card crossing a band just below the pinned panel on
-    // phones, or near the middle of the screen on wide ones, is the one being
-    // read. Ignored until the visitor scrolls, so the
-    // page opens on the whole province.
-    let scrolled = false;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!scrolled) return;
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            show((entry.target as HTMLElement).dataset.member ?? null);
-          }
-        }
-      },
-      { rootMargin: '-45% 0px -50% 0px' },
-    );
-    cards.forEach((card) => observer.observe(card));
+    watch();
+    window.addEventListener('resize', watch);
 
     window.addEventListener(
       'scroll',
@@ -409,23 +459,44 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
   }
 
   /*
-   * Phones with JavaScript: an app-like view. The pinned panel shows the
-   * person being read beside the map; below it, only their details scroll.
-   * Each card's photo, name, role and location are visually hidden but stay
-   * in place for assistive technology. Without JavaScript, the full cards
-   * show as normal.
+   * Phones with JavaScript: an app-like view. The site header and the map
+   * panel stay pinned; only the details below them scroll. The map starts as
+   * the whole province, full width. When a member is being read, their
+   * photo, name, role and town fade in over the left of the map, and the
+   * script centres the map in the space beside them. Each card's photo, name,
+   * role and location are visually hidden but stay in place for assistive
+   * technology. Without JavaScript, the full cards show as normal.
    */
   @media (max-width: 63.99rem) {
+    :global(.js .site-header) {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 2;
+      background: var(--color-bg);
+    }
+
     :global(.js) .map-panel {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-      gap: var(--space-3);
-      height: 42vh;
+      inset-block-start: var(--board-header-height, 0);
+      height: clamp(12rem, 30vh, 17rem);
+      border-block-end: var(--border-width) solid var(--color-border);
     }
 
     :global(.js) .people {
+      position: absolute;
+      inset-block: var(--space-2);
+      inset-inline-start: 0;
+      z-index: 1;
       display: grid;
-      align-items: start;
+      inline-size: 38%;
+      padding: var(--space-3);
+      border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+      background: var(--color-bg);
+      opacity: 0;
+      transition: opacity var(--duration-slow) var(--ease-standard);
+    }
+
+    :global(.js) .people.has-person {
+      opacity: 1;
     }
 
     :global(.js) .person {
@@ -437,6 +508,10 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
 
     :global(.js) .person.is-active {
       opacity: 1;
+    }
+
+    :global(.js) .person-photo {
+      inline-size: 4.5rem;
     }
 
     :global(.js) .card {
@@ -496,12 +571,6 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
 
   .person-meta {
     margin: 0;
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-  }
-
-  .prompt {
-    align-self: center;
     color: var(--color-text-muted);
     font-size: var(--text-sm);
   }

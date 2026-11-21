@@ -16,6 +16,13 @@ export interface View {
   y: number;
 }
 
+/** What to look at: a centre point in map units and how far to zoom in. */
+export interface Focus {
+  scale: number;
+  cx: number;
+  cy: number;
+}
+
 export const [mapWidth, mapHeight] = map.viewBox as [number, number];
 
 /** Map position of a named town or city, failing the build if it is unknown. */
@@ -77,6 +84,19 @@ export function viewFor(box: Box, minSize = 240, maxScale = 5): View {
     scale,
     x: mapWidth / 2 - scale * cx,
     y: mapHeight / 2 - scale * cy,
+  };
+}
+
+/**
+ * Like `viewFor`, but leaves the centring to the page, which knows how much
+ * of the map is visible (for example beside an overlay on phones).
+ */
+export function focusFor(box: Box, minSize = 240, maxScale = 5): Focus {
+  const { scale } = viewFor(box, minSize, maxScale);
+  return {
+    scale,
+    cx: box.x + box.width / 2,
+    cy: box.y + box.height / 2,
   };
 }
 
