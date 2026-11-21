@@ -1,0 +1,187 @@
+---
+// Board map (SPEC 7.3): the province with every board member's town marked
+// and, while D14 allows, the school districts they lead shaded. Drawn at
+// build time as inline SVG: no tiles, no map service, no runtime requests.
+//
+// Without JavaScript it is a still overview. The Board page script moves the
+// "camera" group to zoom in on one member. Markers sit outside the camera so
+// they keep their size; the script moves them to match. Both move by
+// transform only, and the motion tokens make it instant under reduced motion.
+// The page shows the data credits (data/map/README.md) below the list.
+import { map, mapHeight, mapWidth } from '../../lib/map';
+
+export interface MapMember {
+  id: string;
+  name: string;
+  point: [number, number];
+  districts: { number: number; d: string }[];
+}
+
+interface Props {
+  members: MapMember[];
+}
+
+const { members } = Astro.props;
+
+// Labels go west of the marker (towards the coast) unless that would run off
+// the map, and east unless that would. Width is a rough estimate for the
+// label size used below.
+const labelLeft = ({ name, point: [x] }: MapMember) => {
+  const width = name.length * 17 + 18;
+  if (x - width < 0) return false;
+  if (x + width > mapWidth) return true;
+  return x < mapWidth * 0.64;
+};
+---
+
+<div class="board-map">
+  <div class="frame">
+    <svg
+      viewBox={`0 0 ${mapWidth} ${mapHeight}`}
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+      aria-label="Map of British Columbia showing the town each board member lives in"
+    >
+      <g class="camera" data-camera>
+        <path class="neighbours" d={map.neighbours} />
+        <path class="province" d={map.bc} />
+        {members.map((m) =>
+          m.districts.map((district) => (
+            <path class="district" d={district.d} data-member={m.id} />
+          )),
+        )}
+      </g>
+      {members.map((m) => (
+        <g
+          class="marker"
+          data-member={m.id}
+          data-x={m.point[0]}
+          data-y={m.point[1]}
+          transform={`translate(${m.point[0]} ${m.point[1]})`}
+        >
+          <circle r="9" />
+          <text
+            x={labelLeft(m) ? -18 : 18}
+            dy="0.35em"
+            text-anchor={labelLeft(m) ? 'end' : 'start'}
+          >
+            {m.name}
+          </text>
+        </g>
+      ))}
+    </svg>
+    <button type="button" class="reset" data-map-reset hidden>
+      Show all of BC
+    </button>
+  </div>
+</div>
+
+<style>
+  .board-map {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+  }
+
+  .frame {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .camera {
+    transform-origin: 0 0;
+  }
+
+  .camera,
+  .marker {
+    transition:
+      transform var(--duration-slow) var(--ease-standard),
+      opacity var(--duration-slow) var(--ease-standard);
+  }
+
+  .neighbours {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-opacity: 0.35;
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .province {
+    fill: var(--color-bg);
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* Animate opacity only (SPEC 8.2): the paint stays fixed. */
+  .district {
+    fill: var(--color-accent);
+    fill-opacity: 0.4;
+    stroke: var(--color-accent);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.3;
+    transition: opacity var(--duration-slow) var(--ease-standard);
+  }
+
+  .district.is-active {
+    opacity: 1;
+  }
+
+  .marker circle {
+    fill: var(--color-text);
+    stroke: var(--color-bg);
+    stroke-width: 4;
+  }
+
+  .marker text {
+    fill: var(--color-text);
+    font-size: 30px;
+    font-weight: var(--font-weight-bold);
+    paint-order: stroke;
+    stroke: var(--color-bg);
+    stroke-width: 8;
+    stroke-linejoin: round;
+  }
+
+  .marker.is-active circle {
+    fill: var(--color-accent);
+  }
+
+  .marker.is-dimmed {
+    opacity: 0.35;
+  }
+
+  .reset {
+    position: absolute;
+    inset-block-start: var(--space-3);
+    inset-inline-end: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-width) solid var(--color-accent);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    color: var(--color-link);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+  }
+
+  .reset[hidden] {
+    display: none;
+  }
+</style>

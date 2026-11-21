@@ -1,64 +1,413 @@
 ---
-import { board } from '../../content/board';
+// Board (SPEC 7.3): member cards beside a map of BC. Without JavaScript the
+// map is a still overview and every card is readable. With it, scrolling to a
+// card, opening its background or focusing it zooms the map to that member's
+// town and the districts they lead (D14 permitting).
+import { render } from 'astro:content';
+import { board, boardSettings } from '../../content/board';
+import BoardMap, { type MapMember } from '../components/board/BoardMap.astro';
 import ImagePlaceholder from '../components/ImagePlaceholder.astro';
-import PageLayout from '../layouts/PageLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { district, pathBounds, placePoint, union, viewFor } from '../lib/map';
 import { getPage } from '../lib/pages';
 
 const page = await getPage('board');
+const { Content } = await render(page);
+const { showRegionalLeads } = boardSettings;
+const listFormat = new Intl.ListFormat('en-CA', { type: 'conjunction' });
+
+const slug = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const members = board.map((member) => {
+  const id = slug(member.name);
+  const point = placePoint(member.place);
+  const districts = showRegionalLeads
+    ? (member.leads ?? []).map((n) => district(n))
+    : [];
+  const view = viewFor(
+    union(
+      districts.map((d) => pathBounds(d.d)),
+      [point],
+    ),
+  );
+  return { member, id, point, districts, view };
+});
+
+const mapMembers: MapMember[] = members.map((m) => ({
+  id: m.id,
+  name: m.member.name,
+  point: m.point,
+  districts: m.districts.map((d) => ({ number: d.number, d: d.d })),
+}));
 ---
 
-<PageLayout page={page}>
-  <ul class="cards">
-    {board.map((member) => (
-      <li class="card">
-        {'placeholder' in member.photo ? (
-          <ImagePlaceholder
-            ratio="4 / 5"
-            label="Portrait"
-            note={member.photo.note}
-          />
-        ) : (
-          <img
-            class="portrait"
-            src={member.photo.src}
-            loading="lazy"
-            alt={member.photo.alt}
-          />
+<BaseLayout
+  title={page.data.title}
+  description={page.data.description}
+  fullWidth
+>
+  <div class="board-page" data-board>
+    <div class="layout">
+      <header class="intro">
+        <p class="tk-marker">
+          [TK: fictional placeholder board members for the map prototype. Real
+          details are added only with each member's agreement.]
+        </p>
+        {showRegionalLeads && (
+          <p class="tk-marker">
+            [TK: regional leads are shown for the prototype. Not public until
+            the board decides D14.]
+          </p>
         )}
-        <h2>{member.name}</h2>
-        <p>{member.role}</p>
-        <p>{member.region}</p>
-        {member.industry && <p>{member.industry}</p>}
-        {member.expertise && <p>{member.expertise.join(', ')}</p>}
-        {member.bio && <p>{member.bio}</p>}
-        {member.link && <a href={member.link.href}>{member.link.label}</a>}
-      </li>
-    ))}
-  </ul>
-</PageLayout>
+        <h1>{page.data.heading ?? page.data.title}</h1>
+        <Content />
+      </header>
+
+      <div class="map-panel">
+        <BoardMap members={mapMembers} />
+      </div>
+
+      <div class="list">
+        <ol class="members">
+          {members.map(({ member, id, districts, view }) => (
+            <li
+              class="card"
+              id={id}
+              data-card
+              data-member={id}
+              data-view={JSON.stringify(view)}
+            >
+              <div class="photo">
+                {'placeholder' in member.photo ? (
+                  <ImagePlaceholder
+                    ratio="4 / 5"
+                    label="Portrait"
+                    note={member.photo.note}
+                  />
+                ) : (
+                  <img
+                    class="portrait"
+                    src={member.photo.src}
+                    loading="lazy"
+                    alt={member.photo.alt}
+                  />
+                )}
+              </div>
+              <div class="text">
+                <h2>{member.name}</h2>
+                <p class="meta">
+                  {member.role}, {member.region}
+                </p>
+                {member.portfolio && (
+                  <>
+                    <h3 class="visually-hidden">Looks after</h3>
+                    <ul class="tags">
+                      {member.portfolio.map((area) => (
+                        <li>{area}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                {districts.length > 0 && (
+                  <p class="leads">
+                    Leads for School Districts{' '}
+                    {listFormat.format(
+                      districts.map((d) => `${d.number} ${d.name}`),
+                    )}
+                  </p>
+                )}
+                {(member.industry ||
+                  member.expertise ||
+                  member.bio ||
+                  member.link) && (
+                  <details>
+                    <summary>Background</summary>
+                    {member.industry && <p>{member.industry}</p>}
+                    {member.expertise && (
+                      <p>Expertise: {listFormat.format(member.expertise)}</p>
+                    )}
+                    {member.bio && <p>{member.bio}</p>}
+                    {member.link && (
+                      <p>
+                        <a href={member.link.href}>{member.link.label}</a>
+                      </p>
+                    )}
+                  </details>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p class="credits">
+          Map data: Natural Earth (public domain).
+          {showRegionalLeads &&
+            ' School district boundaries: DataBC. Contains information licensed under the Open Government Licence – British Columbia.'}
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Zooms the board map to the member being read. An enhancement only: the
+  // page is complete without it. Moves the map by transform; the motion
+  // tokens make the change instant under prefers-reduced-motion.
+  interface View {
+    scale: number;
+    x: number;
+    y: number;
+  }
+
+  const overview: View = { scale: 1, x: 0, y: 0 };
+
+  function init(root: HTMLElement) {
+    const camera = root.querySelector<SVGGElement>('[data-camera]');
+    const reset = root.querySelector<HTMLButtonElement>('[data-map-reset]');
+    if (!camera || !reset) return;
+    const markers = [...root.querySelectorAll<SVGGElement>('.marker')];
+    const districts = [...root.querySelectorAll<SVGPathElement>('.district')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
+    const views = new Map(
+      cards.map((card) => [
+        card.dataset.member ?? '',
+        JSON.parse(card.dataset.view ?? 'null') as View,
+      ]),
+    );
+
+    let active: string | null | undefined;
+
+    function show(id: string | null) {
+      if (id === active) return;
+      active = id;
+      const view = (id && views.get(id)) || overview;
+      camera!.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+      for (const marker of markers) {
+        const x = Number(marker.dataset.x) * view.scale + view.x;
+        const y = Number(marker.dataset.y) * view.scale + view.y;
+        marker.style.transform = `translate(${x}px, ${y}px)`;
+        marker.classList.toggle('is-active', marker.dataset.member === id);
+        marker.classList.toggle(
+          'is-dimmed',
+          id !== null && marker.dataset.member !== id,
+        );
+      }
+      for (const d of districts) {
+        d.classList.toggle('is-active', d.dataset.member === id);
+      }
+      for (const card of cards) {
+        card.classList.toggle('is-active', card.dataset.member === id);
+      }
+      reset!.hidden = id === null;
+    }
+
+    show(null);
+
+    // Scrolling: the card crossing a band just below the middle of the
+    // screen is the one being read. Ignored until the visitor scrolls, so the
+    // page opens on the whole province.
+    let scrolled = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!scrolled) return;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            show((entry.target as HTMLElement).dataset.member ?? null);
+          }
+        }
+      },
+      { rootMargin: '-55% 0px -40% 0px' },
+    );
+    cards.forEach((card) => observer.observe(card));
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        scrolled = true;
+        if (window.scrollY < 80) show(null);
+      },
+      { passive: true },
+    );
+
+    // Opening a member's background or moving focus into their card.
+    for (const card of cards) {
+      const id = card.dataset.member ?? null;
+      card.querySelector('details')?.addEventListener('toggle', (event) => {
+        if ((event.target as HTMLDetailsElement).open) show(id);
+      });
+      card.addEventListener('focusin', () => show(id));
+    }
+
+    reset.addEventListener('click', () => show(null));
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-board]');
+  if (root) init(root);
+</script>
 
 <style>
-  .cards {
+  .board-page {
+    padding-inline: var(--space-4);
+  }
+
+  @media (min-width: 64rem) {
+    .board-page {
+      padding-inline: var(--space-6);
+    }
+  }
+
+  .intro {
+    max-width: var(--width-prose);
+    padding-block: var(--space-6) var(--space-5);
+  }
+
+  .tk-marker {
+    display: inline-block;
+    margin-block: 0 var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .layout {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
     gap: var(--space-5);
+  }
+
+  /* Phones: a short strip pinned to the top while the list scrolls under it. */
+  .map-panel {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    height: 38vh;
+    padding-block: var(--space-2);
+    background: var(--color-bg);
+  }
+
+  /*
+   * Wide screens: intro and list on the left, the map filling the right side
+   * from the top of the page, so the whole province shows on arrival. The
+   * panel height leaves room for the site header above it.
+   */
+  @media (min-width: 64rem) {
+    .layout {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      grid-template-areas:
+        'intro map'
+        'list map';
+      grid-template-rows: auto 1fr;
+      column-gap: var(--space-7);
+      row-gap: 0;
+    }
+
+    .intro {
+      grid-area: intro;
+    }
+
+    .map-panel {
+      grid-area: map;
+      align-self: start;
+      height: calc(100vh - var(--space-8));
+      padding-block: var(--space-5);
+    }
+
+    .list {
+      grid-area: list;
+    }
+  }
+
+  .members {
+    display: grid;
+    gap: var(--space-5);
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  h2 {
-    font-size: var(--text-lg);
+  /* Room after the last card so it can reach the middle of the screen. */
+  .list {
+    padding-block-end: 40vh;
   }
 
-  /*
-   * Same 4:5 frame as the placeholder, so the card does not shift while the
-   * photo loads and any portrait size crops to fit.
-   */
+  .card {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    scroll-margin-block-start: 40vh;
+  }
+
+  .card.is-active {
+    border-color: var(--color-accent);
+    box-shadow: inset 0 0 0 1px var(--color-accent);
+  }
+
+  .text > :first-child {
+    margin-block-start: 0;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+  }
+
+  .meta {
+    margin-block: var(--space-1) var(--space-3);
+    color: var(--color-text-muted);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .tags li {
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-size: var(--text-sm);
+  }
+
+  .leads {
+    font-size: var(--text-sm);
+  }
+
+  summary {
+    color: var(--color-link);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+  }
+
   .portrait {
     display: block;
     inline-size: 100%;
     aspect-ratio: 4 / 5;
     object-fit: cover;
     border-radius: var(--radius-md);
+  }
+
+  .credits {
+    margin-block-start: var(--space-6);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 </style>
