@@ -5,8 +5,10 @@ import { homeSchema } from '../src/schemas/home';
 
 export const home = homeSchema.parse({
   hero: {
-    heading: 'Connecting technology and education in British Columbia',
-    lede: 'Technology companies and schools often want different things. We are an independent BC nonprofit that works between them, with teachers, students and communities.',
+    // The team's own line, not an agent draft.
+    heading:
+      'Every student learns how the natural world works. What about the digital one?',
+    lede: 'We are a BC nonprofit that brings people who work in technology together with teachers and schools. We help classrooms stay grounded in the analog world while teaching the digital one on purpose.',
     ctas: [
       {
         label: 'For teachers',
@@ -17,11 +19,24 @@ export const home = homeSchema.parse({
         href: '/valleyview/',
       },
     ],
-    image: {
-      ratio: '4 / 5',
-      label: 'Hero photograph',
-      note: 'Original BC photography: a bridge in Kamloops, Vancouver or Victoria.',
-    },
+    // Original photography (SPEC 8.2): one bridge per starting region.
+    images: [
+      {
+        ratio: '2 / 3',
+        label: 'Kamloops bridge',
+        note: 'Original photo of a bridge in Kamloops.',
+      },
+      {
+        ratio: '2 / 3',
+        label: 'Vancouver bridge',
+        note: 'Original photo of a bridge in Vancouver.',
+      },
+      {
+        ratio: '2 / 3',
+        label: 'Victoria bridge',
+        note: 'Original photo of a bridge in Victoria.',
+      },
+    ],
     draft: true,
   },
 

@@ -1,7 +1,8 @@
 ---
 // Home hero, above the fold (SPEC 7.1, D4): who we are, the bridge idea, and
-// two primary calls to action. Text beside an image slot on wide screens,
-// stacked on narrow ones, text first.
+// two primary calls to action. Text beside a row of photo slots (one bridge
+// per starting region) on wide screens; on narrow ones the text and calls to
+// action come first so both stay near the top.
 import type { Home } from '../../schemas/home';
 import CallToAction from '../CallToAction.astro';
 import ImagePlaceholder from '../ImagePlaceholder.astro';
@@ -28,26 +29,37 @@ const { hero } = Astro.props;
         ))}
       </ul>
     </div>
-    <div class="image">
-      <ImagePlaceholder {...hero.image} />
-    </div>
+    <ul class="images" style={`--count: ${hero.images.length};`}>
+      {hero.images.map((image) => (
+        <li>
+          <ImagePlaceholder {...image} />
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
 <style>
   .hero {
-    padding-block: var(--space-7) var(--space-8);
+    padding-block: var(--space-5) var(--space-7);
   }
 
+  /* minmax(0, ...) stops the photo row from widening the column on phones. */
   .layout {
     display: grid;
-    gap: var(--space-7);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
     align-items: center;
   }
 
-  @media (min-width: 48rem) {
+  @media (min-width: 56rem) {
+    .hero {
+      padding-block: var(--space-7) var(--space-8);
+    }
+
     .layout {
-      grid-template-columns: 3fr 2fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-7);
     }
   }
 
@@ -69,7 +81,12 @@ const { hero } = Astro.props;
     list-style: none;
   }
 
-  .image {
-    max-width: 24rem;
+  .images {
+    display: grid;
+    grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 </style>

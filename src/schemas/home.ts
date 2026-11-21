@@ -46,11 +46,18 @@ export const homeSchema = z.strictObject({
     lede: z.string().min(1),
     /** Teachers first, then students and parents (D4). */
     ctas: z.tuple([callToAction, callToAction]),
-    image: z.strictObject({
-      ratio: z.string().min(1),
-      label: z.string().min(1),
-      note: z.string().min(1),
-    }),
+    /** One to three photo slots, shown side by side. */
+    images: z
+      .array(
+        z.strictObject({
+          ratio: z.string().min(1),
+          label: z.string().min(1),
+          note: z.string().min(1),
+        }),
+      )
+      .min(1)
+      .max(3),
+    /** True while the lede is an agent draft (the headline is the team's own). */
     draft: z.boolean(),
   }),
   sections: z.strictObject({
