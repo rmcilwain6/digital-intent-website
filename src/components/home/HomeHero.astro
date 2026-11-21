@@ -1,0 +1,75 @@
+---
+// Home hero, above the fold (SPEC 7.1, D4): who we are, the bridge idea, and
+// two primary calls to action. Text beside an image slot on wide screens,
+// stacked on narrow ones, text first.
+import type { Home } from '../../schemas/home';
+import CallToAction from '../CallToAction.astro';
+import ImagePlaceholder from '../ImagePlaceholder.astro';
+import DraftMarker from './DraftMarker.astro';
+
+interface Props {
+  hero: Home['hero'];
+}
+
+const { hero } = Astro.props;
+---
+
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="container layout">
+    <div class="text">
+      {hero.draft && <DraftMarker />}
+      <h1 id="hero-heading">{hero.heading}</h1>
+      <p class="lede">{hero.lede}</p>
+      <ul class="ctas">
+        {hero.ctas.map((cta) => (
+          <li>
+            <CallToAction cta={cta} />
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="image">
+      <ImagePlaceholder {...hero.image} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-7) var(--space-8);
+  }
+
+  .layout {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+
+  @media (min-width: 48rem) {
+    .layout {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+
+  h1 {
+    margin-block-start: 0;
+  }
+
+  .lede {
+    max-width: var(--width-prose);
+    font-size: var(--text-lg);
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .image {
+    max-width: 24rem;
+  }
+</style>

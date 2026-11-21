@@ -1,0 +1,62 @@
+---
+// One full-width band on Home (SPEC 7.1). Bands alternate between two
+// background tones so each section reads as its own step. Heading, body and
+// call to action come from content/home.ts; the slot holds anything extra
+// (pillars, the map, a list), placed between the body and the call to action.
+import type { CallToAction as Cta } from '../../schemas/home';
+import CallToAction from '../CallToAction.astro';
+import DraftMarker from './DraftMarker.astro';
+
+interface Props {
+  id: string;
+  heading: string;
+  body: readonly string[];
+  cta?: Cta | undefined;
+  draft: boolean;
+  tone: 'base' | 'surface';
+}
+
+const { id, heading, body, cta, draft, tone } = Astro.props;
+const headingId = `${id}-heading`;
+---
+
+<section class:list={['band', tone]} aria-labelledby={headingId}>
+  <div class="container">
+    {draft && <DraftMarker />}
+    <div class="prose">
+      <h2 id={headingId}>{heading}</h2>
+      {body.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+    </div>
+    <slot />
+    {cta && (
+      <p class="cta-row">
+        <CallToAction cta={cta} variant="secondary" />
+      </p>
+    )}
+  </div>
+</section>
+
+<style>
+  .band {
+    padding-block: var(--space-8);
+    background: var(--band-bg);
+  }
+
+  .base {
+    --band-bg: var(--color-bg);
+  }
+
+  .surface {
+    --band-bg: var(--color-surface);
+  }
+
+  h2 {
+    margin-block-start: 0;
+  }
+
+  .cta-row {
+    margin-block: var(--space-6) 0;
+  }
+</style>

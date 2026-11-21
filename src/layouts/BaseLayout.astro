@@ -15,9 +15,11 @@ interface Props {
   description: string;
   /** Keep the page out of search results, e.g. fixtures. */
   noindex?: boolean;
+  /** Let sections span the full width and set their own containers, as on Home. */
+  fullWidth?: boolean;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, fullWidth = false } = Astro.props;
 const documentTitle = title ? `${title} | ${brand.name}` : brand.name;
 const lang = Astro.currentLocale ?? 'en';
 // Absolute URLs from `site` (set from brand.domain in astro.config.mjs).
@@ -63,7 +65,7 @@ const socialImage = new URL(brand.socialImage.src, Astro.site).href;
       Skip to main content
     </a>
     <SiteHeader />
-    <main id="main" class="container">
+    <main id="main" class:list={[{ container: !fullWidth }]}>
       <slot />
     </main>
     <SiteFooter />

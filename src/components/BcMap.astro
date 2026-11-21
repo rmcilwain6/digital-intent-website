@@ -1,0 +1,102 @@
+---
+// Map of British Columbia with the starting regions marked (SPEC 7.1, #34).
+// Drawn at build time as inline SVG from data/map/bc-map.json: no map tiles,
+// no map service, no runtime requests, no JavaScript. The regions are named
+// in the page text too, so the map is never the only way to learn them.
+import map from '../../data/map/bc-map.json';
+import { brand } from '../brand/brand.config';
+
+const [width, height] = map.viewBox;
+
+// Positions come from the Natural Earth places layer. A region with no match
+// fails the build rather than being left off the map silently.
+const markers = brand.regions.map((name) => {
+  const place = map.places.find((p) => p.name === name);
+  if (!place) {
+    throw new Error(`BcMap: no map position for region "${name}"`);
+  }
+  const [x, y] = place.at;
+  // Label on the side with more room: the coast is to the west.
+  const labelLeft = x < width * 0.64;
+  return { name, x, y, labelLeft };
+});
+
+const regionList = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
+  brand.regions,
+);
+---
+
+<figure class="bc-map">
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    role="img"
+    aria-label={`Map of British Columbia with ${regionList} marked`}
+  >
+    <path class="neighbours" d={map.neighbours} />
+    <path class="province" d={map.bc} />
+    {markers.map((m) => (
+      <g class="marker">
+        <circle cx={m.x} cy={m.y} r="9" />
+        <text
+          x={m.labelLeft ? m.x - 20 : m.x + 20}
+          y={m.y}
+          dy="0.35em"
+          text-anchor={m.labelLeft ? 'end' : 'start'}
+        >
+          {m.name}
+        </text>
+      </g>
+    ))}
+  </svg>
+  <figcaption>Map data: Natural Earth (public domain).</figcaption>
+</figure>
+
+<style>
+  .bc-map {
+    max-width: 36rem;
+    margin: var(--space-6) 0 0;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .neighbours {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-opacity: 0.35;
+    stroke-width: 1.5;
+  }
+
+  .province {
+    fill: var(--color-accent);
+    fill-opacity: 0.14;
+    stroke: var(--color-accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .marker circle {
+    fill: var(--color-text);
+    stroke: var(--band-bg, var(--color-bg));
+    stroke-width: 4;
+  }
+
+  .marker text {
+    fill: var(--color-text);
+    font-size: 42px;
+    font-weight: var(--font-weight-bold);
+    paint-order: stroke;
+    stroke: var(--band-bg, var(--color-bg));
+    stroke-width: 8;
+    stroke-linejoin: round;
+  }
+
+  figcaption {
+    margin-block-start: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>
