@@ -80,7 +80,33 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
       </header>
 
       <div class="map-panel">
-        <BoardMap places={places} districts={mapDistricts} />
+        {/*
+          Phones with JavaScript: the person being read, beside the map. A
+          visual copy of each card's heading, so it is hidden from assistive
+          technology, which reads the cards themselves.
+        */}
+        <div class="people" aria-hidden="true">
+          <p class="person prompt is-active" data-person="">
+            Scroll to meet the board
+          </p>
+          {members.map(({ member, id }) => (
+            <div class="person" data-person={id}>
+              {'placeholder' in member.photo ? (
+                <span class="person-photo person-photo-placeholder">
+                  Portrait
+                </span>
+              ) : (
+                <img class="person-photo" src={member.photo.src} alt="" />
+              )}
+              <p class="person-name">{member.name}</p>
+              <p class="person-meta">{member.role}</p>
+              <p class="person-meta">{member.region}</p>
+            </div>
+          ))}
+        </div>
+        <div class="map-slot">
+          <BoardMap places={places} districts={mapDistricts} />
+        </div>
       </div>
 
       <div class="list">
@@ -111,7 +137,7 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
               </div>
               <div class="text">
                 <h2>{member.name}</h2>
-                <dl class="facts">
+                <dl class="facts identity">
                   <div>
                     <dt>Board role</dt>
                     <dd>{member.role}</dd>
@@ -120,6 +146,8 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
                     <dt>Location</dt>
                     <dd>{member.region}</dd>
                   </div>
+                </dl>
+                <dl class="facts">
                   {member.focus && (
                     <div class="wide">
                       <dt>Focus</dt>
@@ -208,6 +236,7 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
     const markers = [...root.querySelectorAll<SVGGElement>('.marker')];
     const districts = [...root.querySelectorAll<SVGPathElement>('.district')];
     const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
+    const people = [...root.querySelectorAll<HTMLElement>('[data-person]')];
     const views = new Map(
       cards.map((card) => [
         card.dataset.member ?? '',
@@ -235,13 +264,20 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
       for (const card of cards) {
         card.classList.toggle('is-active', card.dataset.member === id);
       }
+      for (const person of people) {
+        person.classList.toggle(
+          'is-active',
+          person.dataset.person === (id ?? ''),
+        );
+      }
       reset!.hidden = id === null;
     }
 
     show(null);
 
-    // Scrolling: the card crossing a band just below the middle of the
-    // screen is the one being read. Ignored until the visitor scrolls, so the
+    // Scrolling: the card crossing a band just below the pinned panel on
+    // phones, or near the middle of the screen on wide ones, is the one being
+    // read. Ignored until the visitor scrolls, so the
     // page opens on the whole province.
     let scrolled = false;
     const observer = new IntersectionObserver(
@@ -253,7 +289,7 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
           }
         }
       },
-      { rootMargin: '-55% 0px -40% 0px' },
+      { rootMargin: '-45% 0px -50% 0px' },
     );
     cards.forEach((card) => observer.observe(card));
 
@@ -361,6 +397,113 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  /* The person stack exists for phones with JavaScript only. */
+  .people {
+    display: none;
+  }
+
+  .map-slot {
+    height: 100%;
+  }
+
+  /*
+   * Phones with JavaScript: an app-like view. The pinned panel shows the
+   * person being read beside the map; below it, only their details scroll.
+   * Each card's photo, name, role and location are visually hidden but stay
+   * in place for assistive technology. Without JavaScript, the full cards
+   * show as normal.
+   */
+  @media (max-width: 63.99rem) {
+    :global(.js) .map-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: var(--space-3);
+      height: 42vh;
+    }
+
+    :global(.js) .people {
+      display: grid;
+      align-items: start;
+    }
+
+    :global(.js) .person {
+      grid-area: 1 / 1;
+      margin: 0;
+      opacity: 0;
+      transition: opacity var(--duration-slow) var(--ease-standard);
+    }
+
+    :global(.js) .person.is-active {
+      opacity: 1;
+    }
+
+    :global(.js) .card {
+      grid-template-columns: minmax(0, 1fr);
+      padding: var(--space-2) 0 0;
+      border: 0;
+      border-radius: 0;
+    }
+
+    :global(.js) .card + .card {
+      border-block-start: var(--border-width) solid var(--color-border);
+      padding-block-start: var(--space-5);
+    }
+
+    :global(.js) .card .photo {
+      display: none;
+    }
+
+    :global(.js) .card h2,
+    :global(.js) .card .identity {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    :global(.js) .card.is-active {
+      border-color: var(--color-border);
+    }
+  }
+
+  .person-photo {
+    display: block;
+    inline-size: 100%;
+    max-block-size: 22vh;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+  }
+
+  .person-photo-placeholder {
+    display: grid;
+    place-items: center;
+    border: var(--border-width) dashed var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .person-name {
+    margin: var(--space-2) 0 0;
+    font-weight: var(--font-weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .person-meta {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .prompt {
+    align-self: center;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
   }
 
   /* Room after the last card so it can reach the middle of the screen. */

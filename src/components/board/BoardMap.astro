@@ -31,14 +31,10 @@ interface Props {
 
 const { places, districts } = Astro.props;
 
-// Labels go west of the marker (towards the coast) unless that would run off
-// the map, and east unless that would. Width is a rough estimate.
-const labelLeft = ({ name, point: [x] }: MapPlace) => {
-  const width = name.length * 23 + 20; // sized for the larger phone labels
-  if (x - width < 0) return false;
-  if (x + width > mapWidth) return true;
-  return x < mapWidth * 0.64;
-};
+// Labels sit east of the marker unless they would run off the map. Width is
+// a rough estimate, sized for the largest (phone) labels.
+const labelLeft = ({ name, point: [x] }: MapPlace) =>
+  x + name.length * 32 + 24 > mapWidth;
 ---
 
 <div class="board-map">
@@ -156,14 +152,35 @@ const labelLeft = ({ name, point: [x] }: MapPlace) => {
     stroke-linejoin: round;
   }
 
-  /* The map is drawn smaller on phones: keep labels readable. */
-  @media (max-width: 64rem) {
+  /*
+   * The map is drawn small on phones: larger markers, and with JavaScript only
+   * the current place is labelled, so the small map stays readable and calm.
+   */
+  @media (max-width: 63.99rem) {
     .marker circle {
-      r: 10px;
+      r: 9px;
     }
 
     .marker text {
-      font-size: 40px;
+      font-size: 36px;
+    }
+
+    /* With JavaScript the map shares the width with the person: smaller still. */
+    :global(.js) .marker circle {
+      r: 14px;
+    }
+
+    :global(.js) .marker text {
+      font-size: 60px;
+      opacity: 0;
+    }
+
+    :global(.js) .marker.is-active text {
+      opacity: 1;
+    }
+
+    :global(.js) .reset {
+      display: none;
     }
   }
 
