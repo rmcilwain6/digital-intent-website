@@ -112,12 +112,12 @@ Any font must render the orthography fixture correctly (SPEC section 6). If you 
 
 Animate `transform` and `opacity` only. Under `prefers-reduced-motion: reduce`, durations and distances drop to zero; components still provide their own still alternative.
 
-| Token                                                   | Use                  |
-| ------------------------------------------------------- | -------------------- |
-| `--duration-press`                                      | 80ms, a keycap press |
-| `--duration-fast`, `--duration-base`, `--duration-slow` | 120ms, 200ms, 400ms  |
-| `--ease-standard`, `--ease-enter`, `--ease-exit`        | Easing curves        |
-| `--motion-distance-sm`, `--motion-distance-md`          | How far things move  |
+| Token                                                                        | Use                                                                      |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `--duration-press`                                                           | 80ms, a keycap press                                                     |
+| `--duration-fast`, `--duration-base`, `--duration-slow`, `--duration-slower` | 120ms, 200ms, 400ms, 900ms (large, calm movements such as the board map) |
+| `--ease-standard`, `--ease-enter`, `--ease-exit`                             | Easing curves                                                            |
+| `--motion-distance-sm`, `--motion-distance-md`                               | How far things move                                                      |
 
 ## Fonts
 

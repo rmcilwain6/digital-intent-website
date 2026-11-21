@@ -1,6 +1,20 @@
 // Schema for board member cards (content/board.ts, SPEC 7.3).
 import { z } from 'astro/zod';
 
+const logo = z.union([
+  z.strictObject({
+    /**
+     * Path under `public/`. Self-hosted, never hot-linked (rule 3). No alt
+     * text: the organization's name is always shown beside it.
+     */
+    src: z.string().startsWith('/'),
+  }),
+  z.strictObject({
+    /** Placeholder until the logo is provided, with permission to use it. */
+    placeholder: z.literal(true),
+  }),
+]);
+
 const photo = z.union([
   z.strictObject({
     /** Path under `public/`. */
@@ -27,8 +41,21 @@ export const boardMemberSchema = z.strictObject({
    * places layer. Town level only, never anything more precise.
    */
   place: z.string().min(1),
-  /** Parts of the organization this member looks after. */
-  portfolio: z.array(z.string().min(1)).min(1).optional(),
+  /** What this member handles for the board, in a sentence or two. */
+  focus: z.string().min(1).optional(),
+  /** Up to two organizations shown with a small logo, e.g. employer or school district. */
+  affiliations: z
+    .array(
+      z.strictObject({
+        /** What the link is, e.g. "Works at" or "School district". */
+        label: z.string().min(1),
+        name: z.string().min(1),
+        logo,
+      }),
+    )
+    .min(1)
+    .max(2)
+    .optional(),
   /**
    * School district numbers this member leads for. Regional lead designations
    * are not public until the board decides D14; they show only while

@@ -19,7 +19,20 @@ export const board = boardSchema.parse([
     role: 'Chair',
     region: 'Kamloops',
     place: 'Kamloops',
-    portfolio: ['Strategy', 'Teacher programs'],
+    focus:
+      "Sets the board's agenda and supports our work with teachers, from Pro-D sessions to classroom visits.",
+    affiliations: [
+      {
+        label: 'Works at',
+        name: 'Example Secondary School (fictional)',
+        logo: { placeholder: true },
+      },
+      {
+        label: 'School district',
+        name: 'SD 73 Kamloops-Thompson',
+        logo: { placeholder: true },
+      },
+    ],
     leads: [73, 83, 58],
     industry: 'Secondary teacher (fictional)',
     expertise: ['Classroom technology', 'Pro-D facilitation'],
@@ -31,7 +44,15 @@ export const board = boardSchema.parse([
     role: 'Vice-chair',
     region: 'Vancouver',
     place: 'Vancouver',
-    portfolio: ['Partnerships'],
+    focus:
+      'Builds partnerships with people and companies in tech who want to help their local schools.',
+    affiliations: [
+      {
+        label: 'Works at',
+        name: 'Sample Software Co. (fictional)',
+        logo: { placeholder: true },
+      },
+    ],
     leads: [39, 41, 44],
     industry: 'Software engineer (fictional)',
     expertise: ['Privacy', 'Volunteer programs'],
@@ -44,7 +65,15 @@ export const board = boardSchema.parse([
     role: 'Treasurer',
     region: 'Victoria',
     place: 'Victoria',
-    portfolio: ['Finance', 'Valleyview Grant'],
+    focus:
+      'Looks after our finances and runs the Valleyview Grant, from the call for applications to follow-up.',
+    affiliations: [
+      {
+        label: 'Works at',
+        name: 'Placeholder Accounting (fictional)',
+        logo: { placeholder: true },
+      },
+    ],
     leads: [61, 63, 62],
     industry: 'Accountant (fictional)',
     expertise: ['Non-profit finance', 'Grant programs'],
@@ -56,7 +85,20 @@ export const board = boardSchema.parse([
     role: 'Secretary',
     region: 'Prince George',
     place: 'Prince George',
-    portfolio: ['Communications'],
+    focus:
+      'Keeps our writing plain and clear, and looks after how we share our work.',
+    affiliations: [
+      {
+        label: 'Works at',
+        name: 'Mockup Elementary Library (fictional)',
+        logo: { placeholder: true },
+      },
+      {
+        label: 'School district',
+        name: 'SD 57 Prince George',
+        logo: { placeholder: true },
+      },
+    ],
     leads: [57, 28, 91],
     industry: 'School librarian (fictional)',
     expertise: ['Information literacy', 'Writing'],
@@ -68,7 +110,15 @@ export const board = boardSchema.parse([
     role: 'Director',
     region: 'Nelson',
     place: 'Nelson',
-    portfolio: ['Indigenous outreach'],
+    focus:
+      'Leads our Indigenous outreach, building relationships in person, one community at a time.',
+    affiliations: [
+      {
+        label: 'School district',
+        name: 'SD 8 Kootenay Lake',
+        logo: { placeholder: true },
+      },
+    ],
     leads: [8, 10, 20],
     industry: 'District staff (fictional)',
     expertise: ['Community relationships', 'Rural schools'],
@@ -80,10 +130,36 @@ export const board = boardSchema.parse([
     role: 'Director',
     region: 'Terrace',
     place: 'Terrace',
-    portfolio: ['Rural and remote schools'],
+    focus:
+      'Speaks for rural and remote schools, and what it takes to make technology work far from a city.',
+    affiliations: [
+      {
+        label: 'Works at',
+        name: 'Testcase Networks (fictional)',
+        logo: { placeholder: true },
+      },
+    ],
     leads: [82, 54],
     industry: 'Network technician (fictional)',
     expertise: ['School networks', 'Device programs'],
     bio: 'Taylor is a made-up board member. Sample Taylor keeps school networks running in the Northwest and knows what it takes to make technology work far from a city.',
+  },
+  {
+    name: 'Sydney Sketch',
+    photo: { placeholder: true, note: portraitNote },
+    role: 'Director',
+    region: 'Vancouver',
+    place: 'Vancouver',
+    focus:
+      'Brings the student view to the board and helps shape how we talk with young people.',
+    affiliations: [
+      {
+        label: 'Studies at',
+        name: 'Sketch University (fictional)',
+        logo: { placeholder: true },
+      },
+    ],
+    industry: 'University student (fictional)',
+    bio: 'Sydney is fictional. In this placeholder, Sydney was a high school student in BC not long ago and remembers which lessons about technology stuck.',
   },
 ]);

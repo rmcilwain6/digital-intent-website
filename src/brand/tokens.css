@@ -97,6 +97,8 @@
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 400ms;
+  /* Large, calm movements such as a map moving to a new place. */
+  --duration-slower: 900ms;
   /* One on-off cycle of the text cursor, which blinks twice then stays solid. */
   --duration-blink: 1060ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -156,6 +158,7 @@
     --duration-fast: 0ms;
     --duration-base: 0ms;
     --duration-slow: 0ms;
+    --duration-slower: 0ms;
     --duration-blink: 0ms;
     --motion-distance-sm: 0;
     --motion-distance-md: 0;
