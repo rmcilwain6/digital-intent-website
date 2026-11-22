@@ -1,19 +1,19 @@
 ---
-// Board (SPEC 7.3): member cards beside a map of BC. Without JavaScript the
-// map is a still overview and every card is readable. With it, scrolling to a
-// card, opening its background or focusing it eases the map towards that
-// member's town and the districts they lead (D14 permitting). The map is
-// labelled with place names; several members can share a place.
+// Board (SPEC 7.3): member cards beside a paper map of BC. Without
+// JavaScript the map is a still overview and every card is readable. With it,
+// scrolling to a card, opening its background or focusing it lays that
+// member's own sheet of the map over the last one: their town and the
+// districts they lead (D14 permitting). Several members can share a place.
 import { render } from 'astro:content';
 import { board, boardSettings } from '../../content/board';
 import BoardMap, {
-  type MapDistricts,
   type MapPlace,
-  type MapWorld,
+  type MapSheet,
+  type MapTurn,
 } from '../components/board/BoardMap.astro';
 import ImagePlaceholder from '../components/ImagePlaceholder.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { district, focusFor, pathBounds, placePoint, union } from '../lib/map';
+import { district, pathBounds, placePoint, sheetFor, union } from '../lib/map';
 import { getPage } from '../lib/pages';
 
 const page = await getPage('board');
@@ -21,9 +21,8 @@ const { Content } = await render(page);
 const { showRegionalLeads } = boardSettings;
 const listFormat = new Intl.ListFormat('en-CA', { type: 'conjunction' });
 
-// The map you can zoom is the Digital map (design system: Map), a navy object
-// on this Analog page, like the Valleyview window on Home.
-const mapWorld: MapWorld = 'digital';
+// How the next sheet of the map arrives (prototype: try 'roll' or 'flip').
+const mapTurn: MapTurn = 'roll';
 
 const slug = (name: string) =>
   name
@@ -37,29 +36,35 @@ const members = board.map((member) => {
   const districts = showRegionalLeads
     ? (member.leads ?? []).map((n) => district(n))
     : [];
-  // A gentle zoom: never closer than about 2.5 times the overview.
-  const focus = focusFor(
-    union(
-      districts.map((d) => pathBounds(d.d)),
-      [point],
-    ),
-    420,
-    2.5,
-  );
-  return { member, id, point, districts, focus };
+  return { member, id, point, districts };
 });
 
 // One marker per place, shared by everyone who lives there.
 const places: MapPlace[] = [];
 for (const m of members) {
-  const existing = places.find((p) => p.name === m.member.place);
-  if (existing) existing.members.push(m.id);
-  else places.push({ name: m.member.place, point: m.point, members: [m.id] });
+  if (!places.some((p) => p.name === m.member.place)) {
+    places.push({ name: m.member.place, point: m.point });
+  }
 }
 
-const mapDistricts: MapDistricts[] = members.flatMap((m) =>
-  m.districts.map((d) => ({ member: m.id, d: d.d })),
-);
+// Each member's sheet is cut around their town and the districts they lead,
+// as close as that needs: Greater Vancouver fills the sheet.
+const sheets: MapSheet[] = members.map((m) => ({
+  member: m.id,
+  place: m.member.place,
+  box: sheetFor(
+    union(
+      m.districts.map((d) => pathBounds(d.d)),
+      [m.point],
+    ),
+  ),
+  leads: m.districts.map((d) => ({
+    number: d.number,
+    name: d.name,
+    d: d.d,
+    label: d.label as [number, number],
+  })),
+}));
 ---
 
 <BaseLayout
@@ -84,7 +89,7 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
         <Content />
       </header>
 
-      <div class="map-panel" data-theme={mapWorld}>
+      <div class="map-panel">
         {/*
           Phones with JavaScript: the person being read, beside the map. A
           visual copy of each card's heading, so it is hidden from assistive
@@ -107,20 +112,14 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
           ))}
         </div>
         <div class="map-slot">
-          <BoardMap places={places} districts={mapDistricts} world={mapWorld} />
+          <BoardMap places={places} sheets={sheets} turn={mapTurn} />
         </div>
       </div>
 
       <div class="list">
         <ol class="members">
-          {members.map(({ member, id, districts, focus }) => (
-            <li
-              class="card"
-              id={id}
-              data-card
-              data-member={id}
-              data-focus={JSON.stringify(focus)}
-            >
+          {members.map(({ member, id, districts }) => (
+            <li class="card" id={id} data-card data-member={id}>
               <div class="photo">
                 {'placeholder' in member.photo ? (
                   <ImagePlaceholder
@@ -210,9 +209,9 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
           ))}
         </ol>
         <p class="credits">
-          Map data: Natural Earth (public domain).
-          {showRegionalLeads &&
-            ' School district boundaries: DataBC. Contains information licensed under the Open Government Licence – British Columbia.'}
+          Map data: Natural Earth (public domain). School district boundaries
+          and the close-up coastline: DataBC. Contains information licensed
+          under the Open Government Licence – British Columbia.
         </p>
       </div>
     </div>
@@ -220,91 +219,46 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
 </BaseLayout>
 
 <script>
-  // Eases the board map towards the member being read. An enhancement only:
-  // the page is complete without it. Moves the map by transform; the motion
-  // tokens make the change instant under prefers-reduced-motion.
-  interface Focus {
-    scale: number;
-    cx: number;
-    cy: number;
-  }
+  // Lays each member's sheet of the map over the last as the visitor reads.
+  // An enhancement only: the page is complete without it. Sheets move by
+  // transform; the motion tokens make the change instant under
+  // prefers-reduced-motion.
 
   // Phones get the app-like view; must match the CSS breakpoint.
   const phone = window.matchMedia('(max-width: 63.99rem)');
 
   function init(root: HTMLElement) {
-    const svg = root.querySelector<SVGSVGElement>('.board-map svg');
-    const camera = root.querySelector<SVGGElement>('[data-camera]');
-    const reset = root.querySelector<HTMLButtonElement>('[data-map-reset]');
     const panel = root.querySelector<HTMLElement>('.map-panel');
     const peopleBox = root.querySelector<HTMLElement>('.people');
     const header = document.querySelector<HTMLElement>('.site-header');
-    if (!svg || !camera || !reset || !panel || !peopleBox) return;
-    const markers = [...root.querySelectorAll<SVGGElement>('.marker')];
-    const districts = [...root.querySelectorAll<SVGPathElement>('.district')];
+    if (!panel || !peopleBox) return;
     const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
     const people = [...root.querySelectorAll<HTMLElement>('[data-person]')];
-    const focuses = new Map(
-      cards.map((card) => [
-        card.dataset.member ?? '',
-        JSON.parse(card.dataset.focus ?? 'null') as Focus,
+    const sheets = new Map(
+      [...root.querySelectorAll<HTMLElement>('[data-sheet]')].map((sheet) => [
+        sheet.dataset.sheet ?? '',
+        sheet,
       ]),
     );
-    const [originX = 0, originY = 0, mapWidth = 1000, mapHeight = 866] = (
-      svg.getAttribute('viewBox') ?? ''
-    )
-      .split(' ')
-      .map(Number);
 
-    let active: string | null | undefined;
+    let active: string | null = null;
+    let top = 1;
 
-    // The screen point, in map units, where the focus should land: the middle
-    // of the map, or on phones the middle of the area right of the person.
-    function target(): [number, number] {
-      const box = svg!.getBoundingClientRect();
-      const k = Math.min(box.width / mapWidth, box.height / mapHeight);
-      const offsetX = (box.width - mapWidth * k) / 2;
-      const offsetY = (box.height - mapHeight * k) / 2;
-      let x = box.width / 2;
-      if (phone.matches && active) {
-        const covered = peopleBox!.getBoundingClientRect().right - box.left;
-        x = covered + (box.width - covered) / 2;
-      }
-      return [
-        originX + (x - offsetX) / k,
-        originY + (box.height / 2 - offsetY) / k,
-      ];
-    }
-
-    function place() {
-      const focus = active ? focuses.get(active) : undefined;
-      let scale = 1;
-      let x = 0;
-      let y = 0;
-      if (focus) {
-        const [tx, ty] = target();
-        scale = focus.scale;
-        x = tx - scale * focus.cx;
-        y = ty - scale * focus.cy;
-      }
-      camera!.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
-      for (const marker of markers) {
-        const mx = Number(marker.dataset.x) * scale + x;
-        const my = Number(marker.dataset.y) * scale + y;
-        marker.style.transform = `translate(${mx}px, ${my}px)`;
-      }
+    // Put a sheet on top of the stack: it starts off the stack (see the
+    // map's styles) and settles onto it.
+    function layDown(key: string) {
+      const sheet = sheets.get(key);
+      if (!sheet) return;
+      sheet.style.zIndex = String(++top);
+      sheet.classList.add('is-in', 'is-entering');
+      sheet.getBoundingClientRect();
+      sheet.classList.remove('is-entering');
     }
 
     function show(id: string | null) {
       if (id === active) return;
       active = id;
-      for (const marker of markers) {
-        const here = (marker.dataset.members ?? '').split(' ');
-        marker.classList.toggle('is-active', id !== null && here.includes(id));
-      }
-      for (const d of districts) {
-        d.classList.toggle('is-active', d.dataset.member === id);
-      }
+      layDown(id ?? 'all');
       for (const card of cards) {
         card.classList.toggle('is-active', card.dataset.member === id);
       }
@@ -312,14 +266,25 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
         person.classList.toggle('is-active', person.dataset.person === id);
       }
       peopleBox!.classList.toggle('has-person', id !== null);
-      reset!.hidden = id === null;
-      place();
+    }
+
+    // Phones: a member's sheet keeps their area right of the person shown
+    // over the left of the map.
+    function fit() {
+      for (const [key, sheet] of sheets) {
+        sheet
+          .querySelector('svg')
+          ?.setAttribute(
+            'preserveAspectRatio',
+            phone.matches && key !== 'all' ? 'xMaxYMid meet' : 'xMidYMid meet',
+          );
+      }
     }
 
     // Scrolling: the card crossing a thin band just below the pinned panel
-    // on phones, or near the middle of the screen on wide ones, is the one
-    // being read. Ignored until the visitor scrolls, so the page opens on
-    // the whole province.
+    // on phones, or a little above the middle of the screen on wide ones, is
+    // the one being read. Ignored until the visitor scrolls, so the page
+    // opens on the whole province.
     let scrolled = false;
     let observer: IntersectionObserver | undefined;
 
@@ -331,10 +296,10 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
           ? header.offsetHeight
           : 0;
       root.style.setProperty('--board-header-height', `${headerHeight}px`);
-      const top = phone.matches
+      const bandTop = phone.matches
         ? headerHeight + panel!.offsetHeight + 16
         : headerHeight + (window.innerHeight - headerHeight) * 0.4;
-      const bottom = Math.max(window.innerHeight - top - 48, 0);
+      const bandBottom = Math.max(window.innerHeight - bandTop - 48, 0);
       observer?.disconnect();
       observer = new IntersectionObserver(
         (entries) => {
@@ -345,13 +310,12 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
             }
           }
         },
-        { rootMargin: `-${top}px 0px -${bottom}px 0px` },
+        { rootMargin: `-${bandTop}px 0px -${bandBottom}px 0px` },
       );
       cards.forEach((card) => observer!.observe(card));
-      place();
+      fit();
     }
 
-    show(null);
     watch();
     window.addEventListener('resize', watch);
 
@@ -372,8 +336,6 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
       });
       card.addEventListener('focusin', () => show(id));
     }
-
-    reset.addEventListener('click', () => show(null));
   }
 
   const root = document.querySelector<HTMLElement>('[data-board]');
@@ -449,8 +411,6 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
       height: calc(100dvh - var(--panel-top) - var(--space-5));
       margin-block-start: var(--space-5);
       margin-inline: 0;
-      overflow: hidden;
-      border-radius: var(--radius-lg);
     }
 
     .list {
@@ -477,10 +437,10 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
 
   /*
    * Phones with JavaScript: an app-like view. The map panel stays pinned
-   * under the site header; only the details below them scroll. The map starts as
-   * the whole province, full width. When a member is being read, their
-   * photo, name, role and town fade in over the left of the map, and the
-   * script centres the map in the space beside them. Each card's photo, name,
+   * under the site header; only the details below it scroll. The map starts
+   * as the whole province, full width. When a member is being read, their
+   * photo, name, role and town fade in over the left of the map, and their
+   * sheet keeps its area in the space beside them. Each card's photo, name,
    * role and location are visually hidden but stay in place for assistive
    * technology. Without JavaScript, the full cards show as normal.
    */

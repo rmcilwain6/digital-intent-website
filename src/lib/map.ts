@@ -9,20 +9,6 @@ export interface Box {
   height: number;
 }
 
-/** A camera position: scale, then translate, in map units. */
-export interface View {
-  scale: number;
-  x: number;
-  y: number;
-}
-
-/** What to look at: a centre point in map units and how far to zoom in. */
-export interface Focus {
-  scale: number;
-  cx: number;
-  cy: number;
-}
-
 export const [mapWidth, mapHeight] = map.viewBox as [number, number];
 
 /**
@@ -85,34 +71,31 @@ export function union(boxes: Box[], points: [number, number][] = []): Box {
 }
 
 /**
- * The camera view that fits a box in the whole map with some padding. The
- * box never shrinks below `minSize`, so a single town does not zoom too far.
+ * A sheet of the map: a view with the same shape as the whole-province frame
+ * that holds the box with a margin. It is never narrower than `minWidth` map
+ * units (about 86 km at 50), so a sheet always shows some surroundings.
  */
-export function viewFor(box: Box, minSize = 240, maxScale = 5): View {
-  const pad = 1.3;
-  const width = Math.max(box.width * pad, minSize);
-  const height = Math.max(box.height * pad, minSize * (mapHeight / mapWidth));
-  const scale = Math.min(mapWidth / width, mapHeight / height, maxScale);
-  const cx = box.x + box.width / 2;
-  const cy = box.y + box.height / 2;
+export function sheetFor(box: Box, minWidth = 50, pad = 1.35): Box {
+  const aspect = bcFrame.width / bcFrame.height;
+  const width = Math.max(box.width * pad, box.height * pad * aspect, minWidth);
+  const height = width / aspect;
   return {
-    scale,
-    x: mapWidth / 2 - scale * cx,
-    y: mapHeight / 2 - scale * cy,
+    x: box.x + box.width / 2 - width / 2,
+    y: box.y + box.height / 2 - height / 2,
+    width,
+    height,
   };
 }
 
-/**
- * Like `viewFor`, but leaves the centring to the page, which knows how much
- * of the map is visible (for example beside an overlay on phones).
- */
-export function focusFor(box: Box, minSize = 240, maxScale = 5): Focus {
-  const { scale } = viewFor(box, minSize, maxScale);
-  return {
-    scale,
-    cx: box.x + box.width / 2,
-    cy: box.y + box.height / 2,
-  };
+/** Kilometres per map unit, from the map build. */
+export const kmPerUnit: number = map.kmPerUnit;
+
+/** A round length for a scale bar about a fifth of the given width, in km. */
+export function scaleBarKm(widthKm: number): number {
+  const target = widthKm / 5;
+  const power = 10 ** Math.floor(Math.log10(target));
+  const step = [5, 2, 1].find((n) => n * power <= target) ?? 1;
+  return step * power;
 }
 
 export { map };
