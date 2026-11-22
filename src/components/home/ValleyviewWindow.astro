@@ -1,0 +1,319 @@
+---
+// The Valleyview route on Home: a small window on navy, the hero's one
+// Digital object (design system: RouteCards). Without JavaScript it is a
+// plain link to the grant page. With it, the title bar buttons work:
+// minimize folds the window to its title bar, maximize shows the grant
+// details, close leaves a note with a reopen button and the link. On hover
+// or focus the command line types itself out; under reduced motion it is
+// already typed and the cursor does not blink.
+//
+// Information only (D5): the window links to the grant page and never to an
+// application.
+import { valleyview } from '../../../content/valleyview';
+import { site } from '../../../content/site';
+import { brand } from '../../brand/brand.config';
+import type { Home } from '../../schemas/home';
+
+interface Props {
+  card: Home['hero']['valleyview'];
+}
+
+const { card } = Astro.props;
+const labels = card.detailLabels;
+const list = (items: readonly string[]) =>
+  new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(items);
+const details = [
+  { term: labels.who, value: valleyview.eligibility },
+  { term: labels.what, value: list(valleyview.recipientsGet) },
+  { term: labels.asks, value: valleyview.questions.join(' ') },
+  { term: labels.when, value: valleyview.howToApply },
+];
+const pageLabel =
+  site.primaryNav.find((item) => item.href === card.href)?.label ?? card.title;
+---
+
+<div class="window" data-theme="digital" data-window data-state="normal">
+  <div class="bar">
+    <img src={brand.logo.mark} alt="" width="16" height="16" />
+    <span class="window-title">{card.windowTitle}</span>
+    <span class="controls" data-controls hidden>
+      <button type="button" data-action="min" aria-label="Minimize window">
+        –
+      </button>
+      <button type="button" data-action="max" aria-label="Maximize window">
+        □
+      </button>
+      <button type="button" data-action="close" aria-label="Close window">
+        ×
+      </button>
+    </span>
+  </div>
+
+  <div class="body" data-body>
+    <a class="go" href={card.href}>
+      <span class="go-title">{card.title}</span>
+      <span class="command" aria-hidden="true">
+        &gt; <span data-typed>{card.command}</span>
+        <span class="cursor"></span>
+      </span>
+    </a>
+    <dl class="details" data-details hidden>
+      {details.map((item) => (
+        <>
+          <dt>{item.term}</dt>
+          <dd>{item.value}</dd>
+        </>
+      ))}
+    </dl>
+  </div>
+
+  <div class="closed" data-closed hidden>
+    <span>&gt; {card.closedNote}</span>
+    <button type="button" class="reopen" data-action="reopen">
+      reopen
+    </button>
+    <a href={card.href}>{pageLabel}</a>
+  </div>
+</div>
+
+<script>
+  type State = 'normal' | 'min' | 'max' | 'closed';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-window]').forEach((win) => {
+    const q = <T extends HTMLElement>(selector: string) =>
+      win.querySelector<T>(selector);
+    const controls = q('[data-controls]');
+    const body = q('[data-body]');
+    const details = q('[data-details]');
+    const closed = q('[data-closed]');
+    const minButton = q<HTMLButtonElement>('[data-action="min"]');
+    const maxButton = q<HTMLButtonElement>('[data-action="max"]');
+    const reopen = q<HTMLButtonElement>('[data-action="reopen"]');
+    const link = q<HTMLAnchorElement>('.go');
+    const typed = q('[data-typed]');
+    if (!controls || !body || !details || !closed || !link || !typed) return;
+
+    controls.hidden = false;
+
+    const setState = (state: State) => {
+      win.dataset.state = state;
+      body.hidden = state === 'min' || state === 'closed';
+      details.hidden = state !== 'max';
+      closed.hidden = state !== 'closed';
+      minButton?.setAttribute(
+        'aria-label',
+        state === 'min' ? 'Restore window' : 'Minimize window',
+      );
+      maxButton?.setAttribute(
+        'aria-label',
+        state === 'max' ? 'Restore window size' : 'Maximize window',
+      );
+    };
+
+    win.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>(
+        '[data-action]',
+      );
+      if (!button) return;
+      const current = win.dataset.state as State;
+      switch (button.dataset.action) {
+        case 'min':
+          setState(current === 'min' ? 'normal' : 'min');
+          break;
+        case 'max':
+          setState(current === 'max' ? 'normal' : 'max');
+          break;
+        case 'close':
+          setState('closed');
+          reopen?.focus();
+          break;
+        case 'reopen':
+          setState('normal');
+          link.focus();
+          break;
+      }
+    });
+
+    // Type the command out quickly on hover or focus.
+    const full = typed.textContent ?? '';
+    let timer: number | undefined;
+    const type = () => {
+      if (reduceMotion.matches) return;
+      window.clearInterval(timer);
+      let i = 0;
+      typed.textContent = '';
+      timer = window.setInterval(() => {
+        i += 1;
+        typed.textContent = full.slice(0, i);
+        if (i >= full.length) window.clearInterval(timer);
+      }, 34);
+    };
+    link.addEventListener('mouseenter', type);
+    link.addEventListener('focus', type);
+  });
+</script>
+
+<style>
+  .window {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.3125rem var(--space-2) 0.3125rem 0.875rem;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .bar img {
+    border-radius: 3px;
+  }
+
+  .window-title {
+    flex: 1;
+  }
+
+  .controls {
+    display: flex;
+  }
+
+  .controls[hidden] {
+    display: none;
+  }
+
+  .controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2rem;
+    block-size: 1.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: none;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .controls button:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .go {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: 0.875rem 1.375rem 1.125rem;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .go:focus-visible {
+    outline-offset: calc(-1 * var(--focus-width));
+  }
+
+  .go-title {
+    font-size: 1.375rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.75rem;
+  }
+
+  .go:hover .go-title {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .command {
+    min-block-size: 1.5rem;
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+
+  /* The text cursor: blinks twice, then stays. */
+  .cursor {
+    display: inline-block;
+    inline-size: var(--cursor-width);
+    block-size: var(--cursor-height);
+    margin-inline-start: var(--cursor-gap);
+    border-radius: var(--radius-sm);
+    background: var(--color-signal);
+    vertical-align: var(--cursor-drop);
+    animation: blink var(--duration-blink) steps(1) 2;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.375rem var(--space-4);
+    margin: 0;
+    padding: 0 1.375rem 1.25rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .details[hidden],
+  .closed[hidden],
+  .body[hidden] {
+    display: none;
+  }
+
+  dt {
+    color: var(--color-label);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .closed {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) 1.375rem var(--space-4);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .reopen {
+    padding: var(--space-1) 0.625rem;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 3px;
+    background: none;
+    color: var(--color-label);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .closed a {
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-code);
+    font-weight: var(--font-weight-bold);
+    text-underline-offset: 0.2em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor {
+      animation: none;
+    }
+  }
+</style>

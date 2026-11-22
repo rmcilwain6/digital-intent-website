@@ -5,36 +5,40 @@ import { homeSchema } from '../src/schemas/home';
 
 export const home = homeSchema.parse({
   hero: {
-    // The team's own line, not an agent draft.
-    heading:
-      'Every student learns how the natural world works. What about the digital one?',
-    lede: 'We are a BC nonprofit that brings people who work in technology together with teachers and schools. We help classrooms stay grounded in the analog world while teaching the digital one on purpose.',
-    ctas: [
-      {
-        label: 'For teachers',
-        href: '[TK: teacher destination, pending D26]',
-      },
-      {
-        label: 'Students and parents: the Valleyview Grant',
-        href: '/valleyview/',
-      },
-    ],
-    // Original photography (SPEC 8.2): one bridge per starting region.
+    // Draft headline and lede from the website frame design (v1).
+    heading: 'A bridge between BC classrooms and the digital world',
+    lede: 'We are educators and technologists. We meet teachers, families and students face to face, and work through the questions technology raises, together.',
+    teachers: {
+      eyebrow: 'For teachers',
+      title: 'Talk to us about tech in your classroom',
+      action: 'Book a call',
+      href: '[TK: teacher destination, pending D26]',
+    },
+    valleyview: {
+      windowTitle: 'valleyview grant',
+      title: 'Looking for the Valleyview Grant?',
+      command: 'go to the grant',
+      href: '/valleyview/',
+      closedNote: 'window closed',
+      detailLabels: { who: 'who', what: 'what', asks: 'asks', when: 'when' },
+    },
+    // Original photography (SPEC 8.2): one bridge per starting region. From
+    // the top: Vancouver, Victoria, then Kamloops at the base, where we started.
     images: [
       {
-        ratio: '2 / 3',
-        label: 'Kamloops bridge',
-        note: 'Original photo of a bridge in Kamloops.',
+        caption: 'vancouver',
+        label: 'Vancouver: Burrard or Lions Gate Bridge',
+        note: 'Wide, about 3:1. Deck across the frame, at dusk.',
       },
       {
-        ratio: '2 / 3',
-        label: 'Vancouver bridge',
-        note: 'Original photo of a bridge in Vancouver.',
+        caption: 'victoria',
+        label: 'Victoria: Johnson Street Bridge',
+        note: 'Wide, about 3:1. Deck across the frame, from the harbour.',
       },
       {
-        ratio: '2 / 3',
-        label: 'Victoria bridge',
-        note: 'Original photo of a bridge in Victoria.',
+        caption: 'kamloops',
+        label: 'Kamloops: Overlanders Bridge',
+        note: 'Wide, about 3:1. Over the Thompson River, under a storm sky.',
       },
     ],
     draft: true,
@@ -43,6 +47,8 @@ export const home = homeSchema.parse({
   sections: {
     problem: {
       heading: 'Why we exist',
+      // The team's own line, not an agent draft.
+      lead: 'Every student learns how the natural world works. What about the digital one?',
       body: [
         'Technology shapes how students learn and how teachers teach. The companies that build classroom tools have their own business interests, and those do not always match what students need.',
         'Schools deserve an independent voice on technology, one that is not selling anything.',

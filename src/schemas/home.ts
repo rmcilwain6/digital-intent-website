@@ -18,6 +18,8 @@ const callToAction = z.strictObject({
 
 const section = z.strictObject({
   heading: z.string().min(1),
+  /** Optional opening line, set larger than the body. */
+  lead: z.string().min(1).optional(),
   /** Paragraphs, in order. */
   body: z.array(z.string().min(1)).min(1),
   cta: callToAction.optional(),
@@ -44,20 +46,51 @@ export const homeSchema = z.strictObject({
   hero: z.strictObject({
     heading: z.string().min(1),
     lede: z.string().min(1),
-    /** Teachers first, then students and parents (D4). */
-    ctas: z.tuple([callToAction, callToAction]),
-    /** One to three photo slots, shown side by side. */
+    /**
+     * Route for teachers, on paper: an index card (design system: RouteCards).
+     * `href` may be a [TK] note while the destination is open (D26); the card
+     * is then not a link.
+     */
+    teachers: z.strictObject({
+      eyebrow: z.string().min(1),
+      title: z.string().min(1),
+      action: z.string().min(1),
+      href: callToAction.shape.href,
+    }),
+    /** Route for Valleyview students, on navy: a window (design system: RouteCards). */
+    valleyview: z.strictObject({
+      /** Lowercase mono label in the title bar. */
+      windowTitle: z.string().min(1),
+      title: z.string().min(1),
+      /** Typed line under the title, lowercase. */
+      command: z.string().min(1),
+      href: callToAction.shape.href,
+      /** Shown when the window is closed, before the reopen button. */
+      closedNote: z.string().min(1),
+      /** Labels for the details the maximized window shows. */
+      detailLabels: z.strictObject({
+        who: z.string().min(1),
+        what: z.string().min(1),
+        asks: z.string().min(1),
+        when: z.string().min(1),
+      }),
+    }),
+    /**
+     * Photo slots stacked from the top down, each wider than the one above.
+     * The last is the widest, at the base, and the only one shown on phones.
+     */
     images: z
       .array(
         z.strictObject({
-          ratio: z.string().min(1),
+          /** Short lowercase caption beside the photo, e.g. the city. */
+          caption: z.string().min(1),
           label: z.string().min(1),
           note: z.string().min(1),
         }),
       )
       .min(1)
       .max(3),
-    /** True while the lede is an agent draft (the headline is the team's own). */
+    /** True while the hero copy is an agent or design draft. */
     draft: z.boolean(),
   }),
   sections: z.strictObject({

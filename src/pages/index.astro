@@ -30,6 +30,7 @@ const tone = (index: number) => (index % 2 === 0 ? 'surface' : 'base');
       <HomeSection
         id={key}
         heading={section.heading}
+        lead={'lead' in section ? section.lead : undefined}
         body={section.body}
         cta={section.cta}
         draft={section.draft}
