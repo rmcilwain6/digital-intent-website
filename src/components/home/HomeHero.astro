@@ -1,12 +1,11 @@
 ---
 // Home hero, Analog world (SPEC 7.1, D4; website frame design v1). On wide
-// screens the header and hero fill one screen: headline, lede and the two
-// route cards on the left, and on the right a terraced stack of bridge photos
-// sitting on the bottom edge, each wider than the one above, the widest
+// screens the header and hero fill exactly one screen: headline, lede and the
+// two route cards on the left, and on the right a terraced stack of bridge
+// photos sitting on the bottom edge, each wider than the one above, the widest
 // bleeding off the right edge. Phones get the text and both cards first, then
 // one full-width photo. No emphasis marks in the hero (design system).
 import type { Home } from '../../schemas/home';
-import DraftMarker from './DraftMarker.astro';
 import IndexCard from './IndexCard.astro';
 import ValleyviewWindow from './ValleyviewWindow.astro';
 
@@ -19,7 +18,6 @@ const { hero } = Astro.props;
 
 <section class="hero" aria-labelledby="hero-heading">
   <div class="container text">
-    {hero.draft && <DraftMarker />}
     <h1 id="hero-heading">{hero.heading}</h1>
     <p class="lede">{hero.lede}</p>
     <div class="routes">
@@ -31,13 +29,10 @@ const { hero } = Astro.props;
   <ul class="photos">
     {hero.images.map((image) => (
       <li>
-        <figure>
-          <div class="slot">
-            <span class="slot-label">[photo: {image.label}]</span>
-            <span class="slot-note">{image.note}</span>
-          </div>
-          <figcaption>{image.caption}</figcaption>
-        </figure>
+        <div class="slot">
+          <span class="slot-label">[photo: {image.label}]</span>
+          <span class="slot-note">{image.note}</span>
+        </div>
       </li>
     ))}
   </ul>
@@ -45,8 +40,19 @@ const { hero } = Astro.props;
 
 <style>
   .hero {
-    /* Height of the desktop site header, so header and hero fill one screen. */
+    /* Height of the wide-screen site header, so header plus hero is 100vh. */
     --header-height: 8.75rem;
+    /* Column spacing, and the height of everything in it but the headline
+       (lede and both cards). Measured; update it if the cards change. */
+    --pad: var(--space-6);
+    --gap: var(--space-5);
+    --column-rest: 27.75rem;
+    /*
+     * The stack is 3:1 slots at 100%, 80% and 62% width, so its height is
+     * about 0.81 × its width. Cap the width so it never rises above the
+     * hero, leaving a gap at the top.
+     */
+    --stack-max: calc((100svh - var(--header-height) - var(--space-8)) * 1.24);
     position: relative;
     overflow: clip;
   }
@@ -57,12 +63,8 @@ const { hero } = Astro.props;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-5);
-    padding-block: var(--space-7) var(--space-6);
-  }
-
-  .text :global(.draft-marker) {
-    margin-block-end: 0;
+    gap: var(--gap);
+    padding-block: var(--pad);
   }
 
   h1 {
@@ -74,7 +76,7 @@ const { hero } = Astro.props;
   }
 
   .lede {
-    max-inline-size: 40ch;
+    max-inline-size: 44ch;
     margin: 0;
     font-size: 1.25rem;
     line-height: 1.55;
@@ -111,11 +113,6 @@ const { hero } = Astro.props;
     inline-size: 62%;
   }
 
-  figure {
-    position: relative;
-    margin: 0;
-  }
-
   .slot {
     display: flex;
     flex-direction: column;
@@ -128,13 +125,6 @@ const { hero } = Astro.props;
     background: var(--color-surface);
     font-family: var(--font-mono);
     text-align: center;
-  }
-
-  /* Room for the caption inside the slot, below the widest screens. */
-  @media (width < 80rem) {
-    .slot {
-      padding-block-start: var(--space-6);
-    }
   }
 
   /* The photos touch: no doubled border between them. */
@@ -153,46 +143,57 @@ const { hero } = Astro.props;
     line-height: 1.45;
   }
 
-  /* Captions sit inside the slot, and beside it on the widest screens. */
-  figcaption {
-    position: absolute;
-    inset-block-start: 0.625rem;
-    inset-inline-start: var(--space-3);
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    white-space: nowrap;
-  }
-
-  /* Wide screens: one screen tall, the stack on the bottom right. */
+  /* Wide screens: header plus hero fill the screen, stack on the bottom right. */
   @media (width >= 64rem) {
     .hero {
-      min-block-size: max(40rem, calc(100svh - var(--header-height)));
+      min-block-size: calc(100svh - var(--header-height));
+    }
+
+    /*
+     * The headline (three lines) takes whatever height is left, so header
+     * plus hero is exactly one screen. Never below 32px: on very short
+     * screens the hero runs past the fold rather than cramping the text.
+     */
+    h1 {
+      font-size: max(
+        2rem,
+        min(
+          var(--text-display),
+          (
+              100svh - var(--header-height) - 2 * var(--pad) - 2 * var(--gap) -
+                var(--column-rest)
+            ) /
+            3.06
+        )
+      );
     }
 
     .photos {
       position: absolute;
       inset-inline-end: 0;
       inset-block-end: 0;
-      inline-size: 50%;
+      inline-size: min(50%, var(--stack-max));
     }
   }
 
   @media (width >= 80rem) {
     .photos {
-      inline-size: 58%;
-    }
-
-    figcaption {
-      inset-inline: auto calc(100% + var(--space-3));
+      inline-size: min(58%, var(--stack-max));
     }
   }
 
-  /* Phones: only the base photo, full width, captioned on the photo. */
+  /* Shorter wide screens: tighter spacing, so the headline can stay larger. */
+  @media (width >= 64rem) and (height < 56rem) {
+    .hero {
+      --pad: var(--space-5);
+      --gap: var(--space-4);
+    }
+  }
+
+  /* Phones: only the base photo, full width. */
   @media (width < 48rem) {
     .text {
       gap: var(--space-4);
-      padding-block: var(--space-6) var(--space-6);
     }
 
     .photos {
@@ -206,17 +207,6 @@ const { hero } = Astro.props;
     .slot {
       aspect-ratio: 2 / 1;
       border-inline: 0;
-    }
-
-    figcaption {
-      inset-block-start: auto;
-      inset-block-end: 0.625rem;
-      inset-inline: auto var(--space-3);
-      padding: var(--space-1) var(--space-2);
-      border-radius: var(--radius-sm);
-      background: var(--color-navy);
-      color: var(--color-paper);
-      font-size: 0.6875rem;
     }
   }
 </style>

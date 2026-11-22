@@ -82,16 +82,12 @@ export const homeSchema = z.strictObject({
     images: z
       .array(
         z.strictObject({
-          /** Short lowercase caption beside the photo, e.g. the city. */
-          caption: z.string().min(1),
           label: z.string().min(1),
           note: z.string().min(1),
         }),
       )
       .min(1)
       .max(3),
-    /** True while the hero copy is an agent or design draft. */
-    draft: z.boolean(),
   }),
   sections: z.strictObject({
     problem: section,

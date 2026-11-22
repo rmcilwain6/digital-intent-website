@@ -5,7 +5,8 @@ import { homeSchema } from '../src/schemas/home';
 
 export const home = homeSchema.parse({
   hero: {
-    // Draft headline and lede from the website frame design (v1).
+    // Headline and lede from the website frame design (v1). Still draft copy,
+    // but the hero shows no draft marker (Reed, Nov 21): approve before launch.
     heading: 'A bridge between BC classrooms and the digital world',
     lede: 'We are educators and technologists. We meet teachers, families and students face to face, and work through the questions technology raises, together.',
     teachers: {
@@ -26,22 +27,18 @@ export const home = homeSchema.parse({
     // the top: Vancouver, Victoria, then Kamloops at the base, where we started.
     images: [
       {
-        caption: 'vancouver',
         label: 'Vancouver: Burrard or Lions Gate Bridge',
         note: 'Wide, about 3:1. Deck across the frame, at dusk.',
       },
       {
-        caption: 'victoria',
         label: 'Victoria: Johnson Street Bridge',
         note: 'Wide, about 3:1. Deck across the frame, from the harbour.',
       },
       {
-        caption: 'kamloops',
         label: 'Kamloops: Overlanders Bridge',
         note: 'Wide, about 3:1. Over the Thompson River, under a storm sky.',
       },
     ],
-    draft: true,
   },
 
   sections: {
