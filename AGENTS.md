@@ -21,7 +21,7 @@ We are building toward a first launch (SPEC section 5, decision record 0002). Th
 These are summarized from SPEC section 4. Breaking one requires a decision record approved by a human in the same pull request.
 
 - No personal information collected or stored. No forms that submit data to our infrastructure. Anything that collects personal data is an outbound link to a separate system.
-- No tracking. No cookies, no identifiers in browser storage, no fingerprinting, no third-party trackers. Storing the visitor's theme preference in their own browser is allowed.
+- No tracking. No cookies, no identifiers in browser storage, no fingerprinting, no third-party trackers.
 - Self-host fonts, images and scripts. No runtime requests to third parties for core assets.
 - Core content works with JavaScript disabled. JS and motion enhance only.
 - WCAG 2.2 AA. Accessibility failures block release.
@@ -50,7 +50,7 @@ These are summarized from SPEC section 4. Breaking one requires a decision recor
 - Islands: use the lightest `client:*` directive that works (`client:visible` or `client:idle` before `client:load`). Text-first pages should ship little or no JavaScript.
 - Styling uses tokens from `src/brand/tokens.css` only. No colour literals, font names or animation durations outside `src/brand/`.
 - Motion: animate `transform` and `opacity` only. Every animation has a still alternative under `prefers-reduced-motion: reduce`. Motion never delays or hides text.
-- Theme: system preference by default, manual toggle, no flash of the wrong theme on load.
+- Worlds, not themes (decision record 0005): pages are Analog by default; a section opts into Digital with `data-theme="digital"`. No light or dark mode, no theme toggle, no `prefers-color-scheme`.
 - Routing stays ready for more languages (Astro i18n config), even though only English ships.
 - Content collections and data modules have Zod schemas. A missing required field fails the build.
 

@@ -8,7 +8,7 @@ Closes #
 
 ## Screenshots
 
-<!-- If the UI changed: mobile and desktop, light and dark where it matters. Delete this section otherwise. -->
+<!-- If the UI changed: mobile and desktop, and both worlds (Analog and Digital) where it matters. Delete this section otherwise. -->
 
 ## Checklist
 

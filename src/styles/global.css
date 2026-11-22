@@ -9,6 +9,20 @@
   box-sizing: border-box;
 }
 
+/*
+ * Any element with data-theme="analog" or "digital" switches world: it takes
+ * that world's ground and text, and the colour tokens inside it follow.
+ */
+[data-theme] {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+::selection {
+  background: var(--color-highlight);
+  color: var(--color-on-highlight);
+}
+
 body {
   margin: 0;
   background: var(--color-bg);
@@ -29,6 +43,7 @@ h3 {
 
 h1 {
   font-size: var(--text-3xl);
+  letter-spacing: var(--tracking-tight);
 }
 
 h2 {

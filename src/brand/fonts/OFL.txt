@@ -1,4 +1,6 @@
-Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)
+Copyright 2023 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+Applies to Source Sans 3 (source-sans-3-wght.woff2, source-sans-3-italic-wght.woff2)
+and Source Code Pro (source-code-pro-wght.woff2).
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

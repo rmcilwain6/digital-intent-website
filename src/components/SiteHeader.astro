@@ -1,7 +1,6 @@
 ---
 import { site } from '../../content/site';
 import { brand } from '../brand/brand.config';
-import ThemeToggle from './ThemeToggle.astro';
 
 const trim = (path: string) => path.replace(/\/+$/, '') || '/';
 const currentPath = trim(Astro.url.pathname);
@@ -30,7 +29,6 @@ const currentPath = trim(Astro.url.pathname);
         ))}
       </ul>
     </nav>
-    <ThemeToggle />
   </div>
 </header>
 
