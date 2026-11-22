@@ -1,16 +1,33 @@
 /*
- * Self-hosted fonts (rule 3). Placeholder: Noto Sans, variable weight 400 to 700.
+ * Self-hosted fonts (rule 3). Source Sans 3 (roman and italic) and Source Code
+ * Pro, variable weight 400 to 700, from the Digital Intent design system.
  *
- * Built from the full upstream font, not the Google Fonts subsets, because
- * those drop combining marks such as U+0313 and U+0331 used in Indigenous
- * orthographies (SPEC section 6). Covers Latin, Latin Extended A, B and
- * Additional, IPA, spacing modifiers, all combining diacritics and Greek.
+ * Full character sets, not the Google Fonts subsets, because those drop
+ * combining marks such as U+0313 and U+0331 used in Indigenous orthographies
+ * (SPEC section 6). Every character in the orthography fixture is covered.
+ * Hanken Grotesk (the wordmark face) is not loaded: the logo files carry it.
  * Licence: fonts/OFL.txt.
  */
 @font-face {
-  font-family: 'Noto Sans';
+  font-family: 'Source Sans 3';
   font-style: normal;
   font-weight: 400 700;
   font-display: swap;
-  src: url('./fonts/noto-sans-wght.woff2') format('woff2');
+  src: url('./fonts/source-sans-3-wght.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./fonts/source-sans-3-italic-wght.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./fonts/source-code-pro-wght.woff2') format('woff2');
 }

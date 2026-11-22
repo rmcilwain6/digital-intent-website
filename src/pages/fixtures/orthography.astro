@@ -18,9 +18,12 @@ const weights = [
   { label: 'Bold', token: '--font-weight-bold' },
 ];
 
+// Keep in step with the faces in src/brand/fonts.css.
 const families = [
-  { label: 'Body', token: '--font-body' },
-  { label: 'Heading', token: '--font-heading' },
+  { label: 'Body', token: '--font-body', style: 'normal' },
+  { label: 'Body italic', token: '--font-body', style: 'italic' },
+  { label: 'Heading', token: '--font-heading', style: 'normal' },
+  { label: 'Mono', token: '--font-mono', style: 'normal' },
 ];
 ---
 
@@ -43,7 +46,7 @@ const families = [
           <>
             <h3>{weight.label}</h3>
             <ul
-              style={`font-family: var(${family.token}); font-weight: var(${weight.token});`}
+              style={`font-family: var(${family.token}); font-style: ${family.style}; font-weight: var(${weight.token});`}
             >
               {samples.map((sample) => (
                 <li>{sample}</li>

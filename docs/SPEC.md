@@ -69,7 +69,7 @@ The MVP is Phases 0 to 2: foundation, core pages, then brand and launch.
 - D1 (Astro on Cloudflare) recorded as decision record 0001.
 - Repo, basic tooling (type check, lint, format, build in CI), deploy pipeline, preview deploys per pull request. Pre-launch deploys are protected by Cloudflare Access (D23).
 - `AGENTS.md`, this spec, decision log, public-repo files (section 11).
-- Brand layer and placeholder brand: neutral "wireframe" theme in light and dark, plus the shared layout (header, navigation, footer, skip link, theme toggle).
+- Brand layer and placeholder brand: neutral "wireframe" theme in light and dark, plus the shared layout (header, navigation, footer, skip link, theme toggle). The final brand replaces light and dark with the two worlds (record 0005).
 
 ### Phase 1: Core pages (pre-brand)
 
@@ -141,7 +141,7 @@ Goal: applying the final brand does not mean rewriting content or page structure
 src/brand/
   brand.config.ts   # name, shortName, tagline, domain, email, social links, regions
   brand.css         # entry point; imports fonts.css and tokens.css
-  tokens.css        # colour (light and dark), type scale, spacing, radius, motion tokens
+  tokens.css        # colour (Analog and Digital worlds), type scale, spacing, radius, motion tokens
   fonts.css         # self-hosted font definitions
   fonts/            # font files and their licences
 public/brand/
@@ -154,13 +154,13 @@ Rules:
 - Motion tokens (durations, easings, distances) live in the brand layer, so the brand pass can change how the site moves as well as how it looks.
 - Organization name and contact details are read from `brand.config.ts`.
 - Post-MVP: a CI check fails on colour literals and the placeholder org name outside `src/brand/`. Until then, reviewers check this.
-- Both themes (light and dark) must pass contrast checks for every token pairing used (checked before launch).
+- Both worlds (Analog and Digital, record 0005) must pass contrast checks for every token pairing used (checked before launch). A page or section picks its world with `data-theme`; there is no light or dark mode.
 - The placeholder theme must look deliberately unfinished and be labelled "Placeholder brand".
 - **Typefaces must render Indigenous place names and orthographies correctly**, including characters such as é, ʷ, ̓ (combining comma above), ə, ł, ḵ, x̱ and ʔ. A fixture page renders sample strings (Secwépemc, Lək̓ʷəŋən, xʷməθkʷəy̓əm, Sḵwx̱wú7mesh, səl̓ilw̓ətaʔɬ) in every font weight in use. For MVP, a person checks it with the brand fonts before launch; post-MVP it becomes an automated check.
 
 ## 7. Site map and page requirements
 
-All pages share: header with primary navigation, footer (contact, regions, privacy link), skip link, theme toggle, page title and meta description. Navigation goes to separate pages; no anchor-scroll menus. No land acknowledgement in the footer or anywhere else (D13).
+All pages share: header with primary navigation, footer (contact, regions, privacy link), skip link, page title and meta description. Navigation goes to separate pages; no anchor-scroll menus. No land acknowledgement in the footer or anywhere else (D13).
 
 ### 7.1 Home (`/`) Phase 1
 
@@ -242,7 +242,6 @@ Not part of the MVP (record 0004). It ships when Reed says it is needed, after c
 - May open as a dialog from a footer button. The button's link points at `/privacy`, so the text is reachable without JavaScript (rule 4).
 - Lists every service involved (hosting, analytics) and where it is based.
 - Names every third-party service linked from the site (for example a scheduler for teacher calls, or external forms) and explains that each has its own notice and where its data is stored.
-- Notes that the theme toggle preference is stored only in the visitor's own browser.
 - Agent drafts, human approves.
 
 Terms of service: Reed checks whether one is legally needed (D28). If so, it is bare bones and gets the same treatment as Privacy.
@@ -294,7 +293,7 @@ The stack must continue to meet these requirements:
 | T4  | Content as Markdown/MDX files plus typed data modules, validated at build                                                |
 | T5  | Path to a CMS that non-technical writers can use without GitHub accounts (R3)                                            |
 | T6  | Rich motion and interactive components (e.g. a BC map) loaded only where used, without bloating text-only pages          |
-| T7  | Light and dark themes without a flash of the wrong theme on load                                                         |
+| T7  | Analog and Digital worlds set per page or section, with no dependence on JavaScript (record 0005)                        |
 | T8  | Routing structure ready for additional languages without a rewrite                                                       |
 | T9  | Anonymous page view counting (a stretch goal for launch); named events later (section 10, D7)                            |
 | T10 | Mainstream enough that AI agents and future volunteers can work in it, and credible as a modern stack                    |
@@ -321,7 +320,7 @@ Fixed regardless of stack:
   - Motion never delays or hides content. Text is readable at first paint.
   - Animate transform and opacity only, unless a recorded decision allows otherwise.
   - Heavy visuals (map, canvas, WebGL) load only on routes that use them and have their own performance budget.
-- Dark mode ships at launch, following the system setting by default with a manual toggle.
+- Two worlds instead of dark mode (record 0005): pages are Analog, the header, footer, phone menu and 404 are Digital. No theme toggle, and the system theme setting does not change the world.
 - Photography: original images shot by Reed in fall 2026. Layouts define image slots with fixed aspect ratios and a short art-direction note per slot.
 
 ## 9. Quality bars
@@ -346,18 +345,18 @@ In review, for changes that affect the UI:
 
 Once before launch, run by hand against the built site with the final brand:
 
-- Accessibility scan (axe) on every route in both themes, with zero violations.
+- Accessibility scan (axe) on every route, with zero violations.
 - Lighthouse on key routes, aiming for 95 or above (mobile) in all four categories.
 - Budgets for text-first pages: under 200 KB transferred excluding images; JavaScript under 100 KB compressed.
-- Contrast for every token pairing in both themes.
+- Contrast for every token pairing in both worlds.
 - Orthography fixture with the brand fonts (section 6).
 - No `[TK:` placeholders remain, and internal links resolve.
 
 ### 9.3 Post-MVP: automated
 
 - Unit tests for data schemas and utilities.
-- End-to-end smoke tests load every route at mobile and desktop widths, in light and dark themes.
-- Automated axe scan with zero violations on every route and theme.
+- End-to-end smoke tests load every route at mobile and desktop widths.
+- Automated axe scan with zero violations on every route.
 - Lighthouse CI on key routes at 95 or above (mobile). Run against a local production build with the median of several runs, because scores vary between runs.
 - Brand-literal check, `[TK:` check (when launch is enabled), orthography font fixture, internal link check.
 - Routes with heavy visuals (for example a BC map on Home) declare their own budget in a decision record.
@@ -370,7 +369,7 @@ At launch (D7), as a stretch goal: page views per route only. Launch does not wa
 
 Later (deferred, tool via R2):
 
-- Named events, initially: `valleyview_apply_click`, `contact_email_click`, `theme_toggle`.
+- Named events, initially: `valleyview_apply_click`, `contact_email_click`.
 - Referrer domain and broad device class, if the tool provides them without identifiers.
 
 Must not, at any phase:
@@ -415,7 +414,7 @@ The Privacy page names the tool. Optional, if cheap: publish the aggregate numbe
 
 - Branch protection on `main`: pull request required, CI green, at least one approval from a person other than the author. No exceptions for content-only changes. Team members review each other's work.
 - Size guideline: under about 400 changed lines excluding content and lockfiles. Split larger work where it is sensible.
-- Template: what changed, why, linked issue, and screenshots when the UI changes (mobile and desktop; light and dark where it matters).
+- Template: what changed, why, linked issue, and screenshots when the UI changes (mobile and desktop).
 - Preview deploy URL on every pull request (behind Cloudflare Access until launch).
 - `main` is staging. Production deploys only from a published GitHub release, which moves the `production` branch (record 0003).
 - Conventional Commits.
@@ -453,7 +452,7 @@ Write these once the patterns they describe have settled in real code. `add-page
 ## 13. Launch checklist (Phase 2)
 
 - [ ] Name, logo, colours, type and motion applied as section 6 describes
-- [ ] Pre-launch checks in section 9.2 pass with the final brand, both themes
+- [ ] Pre-launch checks in section 9.2 pass with the final brand, both worlds
 - [ ] No `[TK:` placeholders remain
 - [ ] Fixture pages (`/fixtures/`) removed from the production build
 - [ ] Domain connected, HTTPS enforced, `www` redirect decided
@@ -476,7 +475,7 @@ Write these once the patterns they describe have settled in real code. `add-page
 | D7  | Analytics                                               | Decided for MVP        | Anonymous page views only, no cookies, as a stretch goal for launch. Named events deferred; tool via R2                                                                                                   |
 | D8  | Content editing and CMS                                 | Decided for now        | Drafts submitted, published via pull request. CMS later via R3                                                                                                                                            |
 | D9  | Languages                                               | Decided                | English only. i18n-ready routing. French and Indigenous languages are stretch goals (R7)                                                                                                                  |
-| D10 | Dark mode                                               | Decided                | At launch, system default plus toggle                                                                                                                                                                     |
+| D10 | Dark mode                                               | Decided                | Replaced by the two worlds (Analog and Digital); no dark mode or toggle (record 0005, Nov 21, 2026)                                                                                                       |
 | D11 | Funding disclosure                                      | Open (board)           | Every funder is thanked publicly, and we take no money from anyone who wants it kept quiet (Nov 11, 2026). Amounts and format open. Values only until the funding page ships                              |
 | D12 | Donations                                               | Decided                | Out of scope                                                                                                                                                                                              |
 | D13 | Land acknowledgement / Indigenous outreach page         | Open (board)           | No land acknowledgement on Home, in the footer or elsewhere; the outreach page (section 7.9) replaces it. Board confirms the page and its timing. R6 informs                                              |

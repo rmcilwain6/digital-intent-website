@@ -2,7 +2,7 @@
 
 Everything that makes the site look and sound like the organization lives here and in `public/brand/`. Brand values stay in these two folders; brand expression such as signature visuals and layout can reach the shared layouts and named components (SPEC section 6). Components read from this layer and never hard-code a name, colour, font, duration, logo or contact detail.
 
-The current values are a **placeholder brand**: neutral greys, one blue accent, Noto Sans. It is meant to look unfinished.
+Colours, type, spacing, radius and the cursor come from the **Digital Intent design system** (v1.3, November 21, 2026). The logo files, the social image and `placeholder: true` in `brand.config.ts` are still the placeholder brand until the brand components and logos land in their own pull requests.
 
 Changes here need approval from a person (AGENTS.md).
 
@@ -11,7 +11,7 @@ Changes here need approval from a person (AGENTS.md).
 | File                     | What it holds                                                       |
 | ------------------------ | ------------------------------------------------------------------- |
 | `brand.config.ts`        | Name, contact details, regions, paths to logo and images            |
-| `tokens.css`             | Colours (light and dark), type, spacing, layout, shape, motion      |
+| `tokens.css`             | Colours (Analog and Digital), type, spacing, layout, shape, motion  |
 | `fonts.css`              | `@font-face` rules for self-hosted fonts                            |
 | `fonts/`                 | Font files and their licences                                       |
 | `brand.css`              | Imports `fonts.css` and `tokens.css`; layouts import this file      |
@@ -38,29 +38,57 @@ Changes here need approval from a person (AGENTS.md).
 
 ### Colour
 
-Each colour is written as `light-dark(light, dark)`. The site follows the system theme; `data-theme="light"` or `data-theme="dark"` on `<html>` overrides it. Every text pairing must reach 4.5:1 and every border 3:1 in both themes (checked before launch).
+The design system has two worlds instead of light and dark (decision record 0005). **Analog** is paper: beige ground, navy text, a pen-red cursor. **Digital** is the screen: navy ground, beige text, a lime cursor. `<html>` is `data-theme="analog"`; any element can set `data-theme="digital"` (or back to `"analog"`) and everything inside it switches. The visitor's system theme does not change the world, and there is no toggle.
 
-| Token                | Use                                           |
-| -------------------- | --------------------------------------------- |
-| `--color-bg`         | Page background                               |
-| `--color-surface`    | Raised or set-apart areas, image placeholders |
-| `--color-text`       | Body text and headings                        |
-| `--color-text-muted` | Secondary text                                |
-| `--color-border`     | Borders and dividers                          |
-| `--color-accent`     | Buttons, highlights                           |
-| `--color-on-accent`  | Text on `--color-accent`                      |
-| `--color-link`       | Links (defaults to the accent)                |
-| `--color-focus`      | Focus outline (defaults to the accent)        |
+Every text pairing must reach 4.5:1 and every border 3:1 in both worlds (checked before launch).
+
+Brand colours, the same in both worlds. Prefer the world tokens below.
+
+| Token           | Value     | Use                                                     |
+| --------------- | --------- | ------------------------------------------------------- |
+| `--color-navy`  | `#0B2E4F` | Digital ground, Analog text                             |
+| `--color-paper` | `#F3EEE2` | Analog ground, Digital text                             |
+| `--color-red`   | `#D0202B` | Pen red: cursor, marker marks, labels. Analog only      |
+| `--color-lime`  | `#D4F06A` | Highlighter (Analog); cursor, labels, buttons (Digital) |
+
+World tokens:
+
+| Token                | Analog    | Digital   | Use                                            |
+| -------------------- | --------- | --------- | ---------------------------------------------- |
+| `--color-bg`         | paper     | navy      | Page or section ground                         |
+| `--color-surface`    | `#E9E2D2` | `#133A5E` | Cards, image placeholders, form fields         |
+| `--color-text`       | navy      | paper     | Body text and headings                         |
+| `--color-text-muted` | `#4D5D6C` | `#B4C0CB` | Captions, dates, metadata                      |
+| `--color-border`     | `#6B7886` | `#6F87A0` | Borders, dividers, control outlines            |
+| `--color-signal`     | red       | lime      | The cursor colour                              |
+| `--color-accent`     | navy      | lime      | Primary button fill                            |
+| `--color-on-accent`  | paper     | navy      | Text on `--color-accent`                       |
+| `--color-link`       | navy      | lime      | Links, always underlined                       |
+| `--color-focus`      | navy      | lime      | Focus outline                                  |
+| `--color-label`      | red       | lime      | Mono labels and intent lines. Red on `bg` only |
+
+Emphasis, the same in both worlds:
+
+| Token                  | Use                                                              |
+| ---------------------- | ---------------------------------------------------------------- |
+| `--color-highlight`    | Lime highlighter (Analog) and selected text (Digital)            |
+| `--color-on-highlight` | Navy text on the highlight                                       |
+| `--color-marker`       | Pen-red marker strokes: circles, underlines, arrows. Analog only |
+
+Rules from the design system: navy and beige carry everything; lime and red cover a small part of any piece. Lime is never text or a line on paper. Red never appears on navy. One kind of emphasis per section.
 
 ### Type
 
 | Token                                                | Use                                |
 | ---------------------------------------------------- | ---------------------------------- |
-| `--font-body`, `--font-heading`, `--font-mono`       | Font stacks                        |
+| `--font-sans`, `--font-mono`                         | Source Sans 3, Source Code Pro     |
+| `--font-body`, `--font-heading`                      | Both point at `--font-sans`        |
 | `--font-weight-regular`, `--font-weight-bold`        | The only weights in use (400, 700) |
-| `--text-sm`, `--text-base`, `--text-lg`, `--text-xl` | Fixed sizes                        |
-| `--text-2xl`, `--text-3xl`                           | Headings; scale with the viewport  |
+| `--text-sm`, `--text-base`, `--text-lg`, `--text-xl` | 15, 18, 21 and 24px                |
+| `--text-code`                                        | 16px, code and typed text          |
+| `--text-2xl`, `--text-3xl`                           | Headings; scale up to 32 and 44px  |
 | `--leading-tight`, `--leading-normal`                | Line height for headings and body  |
+| `--tracking-tight`                                   | Letter spacing for the page title  |
 
 Any font must render the orthography fixture correctly (SPEC section 6). If you add a weight, add a `--font-weight-*` token and add it to the fixture page.
 
@@ -74,6 +102,8 @@ Any font must render the orthography fixture correctly (SPEC section 6). If you 
 | `--radius-sm`, `--radius-md`, `--radius-lg` | Corner radius                   |
 | `--border-width`                            | Default border                  |
 | `--focus-width`, `--focus-offset`           | Focus outline size and gap      |
+| `--cursor-width`, `--cursor-height`         | The thin cursor, in em          |
+| `--cursor-gap`, `--cursor-drop`             | Gap before it, drop below line  |
 
 ### Motion
 
@@ -85,8 +115,10 @@ Animate `transform` and `opacity` only. Under `prefers-reduced-motion: reduce`, 
 | `--ease-standard`, `--ease-enter`, `--ease-exit`        | Easing curves       |
 | `--motion-distance-sm`, `--motion-distance-md`          | How far things move |
 
-## Placeholder font
+## Fonts
 
-Noto Sans (SIL Open Font License, `fonts/OFL.txt`), variable weight 400 to 700, about 108 KB as WOFF2. It was cut from the full upstream font, because the Google Fonts subsets drop combining marks the orthographies need (U+0313 comma above, U+0331 macron below). Covered ranges: `U+0000-024F, U+0250-02FF, U+0300-036F, U+0370-03FF, U+1E00-1E9F, U+2000-206F`, plus a few symbols.
+Source Sans 3 (roman and italic) and Source Code Pro, variable weight 400 to 700, SIL Open Font License (`fonts/OFL.txt`). About 400 KB as WOFF2 in total; pages only download the files they use. These are the full upstream fonts, not the Google Fonts subsets, which drop combining marks the orthographies need. Every character in the orthography fixture is covered in all three files.
 
-To swap in the final fonts: add the files to `fonts/` with their licence, update `fonts.css` and the `--font-*` tokens, then check the fixture page in every weight.
+Hanken Grotesk (the wordmark), Chakra Petch and Martian Mono are for logos, print and social pieces. They lack characters that Indigenous place names need, so the site does not load them.
+
+To change a font: add the file to `fonts/` with its licence, update `fonts.css` and the `--font-*` tokens, then check the fixture page in every weight.
