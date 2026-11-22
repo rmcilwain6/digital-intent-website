@@ -1,8 +1,293 @@
 ---
-import PageLayout from '../layouts/PageLayout.astro';
+// About (SPEC 7.2), from the "About, desktop (inner page)" design: title and
+// mission as the lede, then the pillars and how we work beside a captioned
+// portrait photo that stays in view on tall screens, then our story across
+// the full width. Copy is in content/.
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
+import { Picture } from 'astro:assets';
+import { render } from 'astro:content';
+import { about } from '../../content/about';
+import { brand } from '../brand/brand.config';
+import RichText, { type Segment } from '../components/RichText.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
+import type { About } from '../schemas/about';
 
 const page = await getPage('about');
+const { Content } = await render(page);
+
+const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
+  brand.regions,
+);
+
+// Caption specs for the original photo, read at build so they stay true.
+const { photo } = about;
+const photoBytes = statSync(
+  join(process.cwd(), 'src/assets/photos', photo.file),
+).size;
+const photoSpecs = [
+  `${photo.src.width} × ${photo.src.height}`,
+  `${Math.round(photoBytes / 1024)} kb`,
+  photo.taken,
+].join(' · ');
+
+// Split each paragraph into plain, highlighted and linked runs. The schema
+// checks each phrase is in the text and that they do not overlap.
+type Paragraph = About['howWeWork']['paragraphs'][number];
+
+const toSegments = ({ text, highlight, link }: Paragraph) => {
+  const filled = text.replaceAll('{regions}', regions);
+  const marked: Segment[] = [];
+  if (highlight) marked.push({ text: highlight, mark: true });
+  if (link) marked.push({ text: link.text, href: link.href });
+
+  const phrases = marked
+    .map((p) => ({ ...p, at: filled.indexOf(p.text) }))
+    .filter((p) => p.at !== -1)
+    .sort((a, b) => a.at - b.at);
+
+  const segments: Segment[] = [];
+  let cursor = 0;
+  for (const { at, ...phrase } of phrases) {
+    if (at > cursor) segments.push({ text: filled.slice(cursor, at) });
+    segments.push(phrase);
+    cursor = at + phrase.text.length;
+  }
+  if (cursor < filled.length) segments.push({ text: filled.slice(cursor) });
+  return segments;
+};
+
+// Text sections after the pillars, in page order. Wide sections run the full
+// page width below the pillars and photo; the rest stay in the text column.
+const sections = [
+  { id: 'how-we-work', wide: false, ...about.howWeWork },
+  { id: 'our-story', wide: true, ...about.story },
+].map(({ paragraphs, ...section }) => ({
+  ...section,
+  paragraphs: paragraphs.map(toSegments),
+}));
+const columnSections = sections.filter((s) => !s.wide);
+const wideSections = sections.filter((s) => s.wide);
+
+const number = (index: number) => String(index + 1).padStart(2, '0');
 ---
 
-<PageLayout page={page} />
+<BaseLayout title={page.data.title} description={page.data.description}>
+  <article>
+    <div class="intro">
+      <h1>{page.data.heading ?? page.data.title}</h1>
+      <div class="lede">
+        <Content />
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="text">
+        <section aria-labelledby="pillars-heading">
+          <h2 id="pillars-heading">{about.pillars.heading}</h2>
+          <p class="section-intro">{about.pillars.intro}</p>
+          <ol class="pillars">
+            {about.pillars.items.map((pillar, index) => (
+              <li>
+                <span class="number" aria-hidden="true">
+                  {number(index)}
+                </span>
+                <span class="pillar">{pillar}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {columnSections.map((section) => (
+          <section aria-labelledby={`${section.id}-heading`}>
+            <h2 id={`${section.id}-heading`}>{section.heading}</h2>
+            {section.paragraphs.map((segments) => (
+              <p>
+                <RichText segments={segments} />
+              </p>
+            ))}
+          </section>
+        ))}
+      </div>
+
+      <figure class="figure">
+        <Picture
+          class="photo"
+          src={photo.src}
+          alt={photo.alt}
+          formats={['avif', 'webp']}
+          quality={45}
+          widths={[480, 720, 960, 1280]}
+          sizes="(min-width: 68rem) 40rem, calc(100vw - 2.5rem)"
+          loading="eager"
+        />
+        <figcaption>
+          <span>{photo.file}</span>
+          <span>{photoSpecs}</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    {wideSections.map((section) => (
+      <section class="wide" aria-labelledby={`${section.id}-heading`}>
+        <h2 id={`${section.id}-heading`}>{section.heading}</h2>
+        {section.paragraphs.map((segments) => (
+          <p>
+            <RichText segments={segments} />
+          </p>
+        ))}
+      </section>
+    ))}
+  </article>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--space-8) var(--space-6);
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  /* Spans both columns below it: the pillars and the image. */
+  .lede {
+    margin-block-start: var(--space-5);
+    font-size: var(--text-xl);
+    line-height: var(--leading-normal);
+  }
+
+  .lede :global(p) {
+    margin: 0;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 28.75rem), 1fr));
+    gap: var(--space-8);
+    align-items: start;
+    padding-block-start: var(--space-6);
+  }
+
+  h2 {
+    margin: 0 0 var(--space-3);
+  }
+
+  section + section {
+    margin-block-start: var(--space-8);
+  }
+
+  section + section h2 {
+    margin-block-end: var(--space-4);
+  }
+
+  p {
+    max-inline-size: 52ch;
+    margin: 0 0 var(--space-4);
+  }
+
+  /* Full page width below the pillars and photo, like the mission above. */
+  .wide {
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-7);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .wide h2 {
+    margin-block-end: var(--space-4);
+  }
+
+  .wide p {
+    max-inline-size: none;
+  }
+
+  .section-intro {
+    max-inline-size: 44ch;
+    margin-block-end: var(--space-5);
+  }
+
+  .pillars {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pillars li {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: var(--space-3);
+    padding-block: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .number {
+    padding-block-start: var(--space-1);
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+
+  .pillar {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .figure {
+    margin: 0;
+  }
+
+  /* File name and specs, as typed text (design: About, inner page). */
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 var(--space-4);
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  /* The 4:5 frame holds its space while the photo loads. */
+  .figure :global(.photo) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Keeps the image in view beside the text, clear of the sticky header. */
+  @media (height >= 56rem) {
+    .figure {
+      position: sticky;
+      inset-block-start: calc(var(--header-clearance) + var(--space-4));
+    }
+  }
+
+  @media (width < 48rem) {
+    .intro {
+      padding-block-start: var(--space-7);
+    }
+
+    .lede {
+      font-size: var(--text-lg);
+    }
+
+    .columns {
+      gap: var(--space-7);
+    }
+
+    .pillars li {
+      grid-template-columns: 2.5rem 1fr;
+      padding-block: var(--space-4);
+    }
+
+    .pillar {
+      font-size: var(--text-lg);
+    }
+  }
+</style>

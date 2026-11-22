@@ -1,10 +1,6 @@
 ---
 title: About
-description: '[TK: one-sentence summary of our mission and how we work]'
+description: Our mission, our four pillars, how we work and how we started.
 ---
 
-[TK: mission statement, pending board ratification]
-
-[TK: the four pillars with approved one-line definitions]
-
-[TK: values and how we work: remote-first, in person by choice, three starting regions, province-wide in scope]
+We help young people in BC understand, question and build with the technology shaping their lives, working alongside their teachers, schools and families.

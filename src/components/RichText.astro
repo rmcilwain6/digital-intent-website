@@ -1,0 +1,25 @@
+---
+// Inline runs of text, some highlighted (the lime highlighter) and some
+// linked. Renders no wrapper, so the caller supplies the <p>.
+export interface Segment {
+  text: string;
+  mark?: boolean;
+  href?: string;
+}
+
+interface Props {
+  segments: Segment[];
+}
+
+const { segments } = Astro.props;
+---
+
+{segments.map((s) =>
+  s.mark ? (
+    <mark>{s.text}</mark>
+  ) : s.href ? (
+    <a href={s.href}>{s.text}</a>
+  ) : (
+    s.text
+  ),
+)}

@@ -20,7 +20,7 @@ export const site = siteSchema.parse({
     {
       label: 'Who we are',
       href: '/about/',
-      description: 'Our mission, our four pillars and how we work.',
+      description: 'Our mission, our four pillars, how we work and our story.',
     },
     {
       label: 'The Valleyview Grant',
