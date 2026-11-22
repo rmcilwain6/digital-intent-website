@@ -22,8 +22,15 @@ export interface Brand {
   regions: readonly string[];
   /** Paths under `public/`. */
   logo: {
+    /** Wordmark for paper (Analog) grounds. */
     full: string;
+    /** Wordmark for navy (Digital) grounds, e.g. the site header and footer. */
+    onDark: string;
+    /** Square icon. */
     mark: string;
+    /** Logo files have their natural size here, for width and height attributes. */
+    width: number;
+    height: number;
     alt: string;
   };
   favicon: string;
@@ -38,7 +45,7 @@ export interface Brand {
 const name = 'Digital Intent Learning Society';
 
 export const brand = {
-  placeholder: true,
+  placeholder: false,
   name,
   shortName: 'Digital Intent',
   tagline: '[TK: tagline, from the brand work]',
@@ -48,7 +55,10 @@ export const brand = {
   regions: ['Kamloops', 'Victoria', 'Vancouver'],
   logo: {
     full: '/brand/logo.svg',
+    onDark: '/brand/logo-on-dark.svg',
     mark: '/brand/logo-mark.svg',
+    width: 610,
+    height: 155,
     alt: name,
   },
   favicon: '/brand/favicon.svg',

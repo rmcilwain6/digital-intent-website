@@ -1,0 +1,56 @@
+---
+// Small outline of British Columbia with the starting regions marked, for
+// the footer. The outline is a simplified copy of the province shape in
+// data/map (data/map/bc-outline.json); dots come from the waypoints there,
+// matched to the regions in brand config.
+import outline from '../../data/map/bc-outline.json';
+import map from '../../data/map/bc-map.json';
+import { brand } from '../brand/brand.config';
+
+interface Props {
+  /** Rendered width in CSS pixels; the height follows the outline's shape. */
+  width: number;
+}
+
+const { width } = Astro.props;
+const [viewWidth, viewHeight] = outline.viewBox as [number, number];
+const height = Math.round((width * viewHeight) / viewWidth);
+
+const regions: readonly string[] = brand.regions;
+const dots = map.waypoints.filter((point) => regions.includes(point.name));
+const regionList = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
+  brand.regions,
+);
+---
+
+<svg
+  class="bc-outline"
+  viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+  width={width}
+  height={height}
+  role="img"
+  aria-label={`Outline of British Columbia with ${regionList} marked`}
+  focusable="false"
+>
+  <path class="province" d={outline.d}></path>
+  {dots.map((dot) => (
+    <circle class="region" cx={dot.at[0]} cy={dot.at[1]} r="18"></circle>
+  ))}
+</svg>
+
+<style>
+  .bc-outline {
+    display: block;
+    flex: none;
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  .province {
+    fill: var(--color-surface);
+  }
+
+  .region {
+    fill: var(--color-signal);
+  }
+</style>

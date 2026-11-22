@@ -2,37 +2,37 @@
 
 Everything that makes the site look and sound like the organization lives here and in `public/brand/`. Brand values stay in these two folders; brand expression such as signature visuals and layout can reach the shared layouts and named components (SPEC section 6). Components read from this layer and never hard-code a name, colour, font, duration, logo or contact detail.
 
-Colours, type, spacing, radius and the cursor come from the **Digital Intent design system** (v1.3, November 21, 2026). The logo files, the social image and `placeholder: true` in `brand.config.ts` are still the placeholder brand until the brand components and logos land in their own pull requests.
+Colours, type, spacing, radius and the cursor come from the **Digital Intent design system** (v1.3, November 21, 2026). The logo files are the design system's outlined SVGs. The social image (`og-default.png`) is still a placeholder.
 
 Changes here need approval from a person (AGENTS.md).
 
 ## Files
 
-| File                     | What it holds                                                       |
-| ------------------------ | ------------------------------------------------------------------- |
-| `brand.config.ts`        | Name, contact details, regions, paths to logo and images            |
-| `tokens.css`             | Colours (Analog and Digital), type, spacing, layout, shape, motion  |
-| `fonts.css`              | `@font-face` rules for self-hosted fonts                            |
-| `fonts/`                 | Font files and their licences                                       |
-| `brand.css`              | Imports `fonts.css` and `tokens.css`; layouts import this file      |
-| `public/brand/`          | `logo.svg`, `logo-mark.svg`, `favicon.svg`, `og-default.png`        |
-| `/fixtures/orthography/` | Page that renders the SPEC section 6 sample strings in every weight |
+| File                     | What it holds                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| `brand.config.ts`        | Name, contact details, regions, paths to logo and images                         |
+| `tokens.css`             | Colours (Analog and Digital), type, spacing, layout, shape, motion               |
+| `fonts.css`              | `@font-face` rules for self-hosted fonts                                         |
+| `fonts/`                 | Font files and their licences                                                    |
+| `brand.css`              | Imports `fonts.css` and `tokens.css`; layouts import this file                   |
+| `public/brand/`          | `logo.svg`, `logo-on-dark.svg`, `logo-mark.svg`, `favicon.svg`, `og-default.png` |
+| `/fixtures/orthography/` | Page that renders the SPEC section 6 sample strings in every weight              |
 
 ## Config values (`brand.config.ts`)
 
-| Key           | Current value                             | Notes                                                                                     |
-| ------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `placeholder` | `true`                                    | Set to `false` with the final brand. While `true`, pages show a "Placeholder brand" label |
-| `name`        | `Digital Intent Learning Society`         | Full legal name (D31)                                                                     |
-| `shortName`   | `Digital Intent`                          | Usual short form; for tight spaces (D31)                                                  |
-| `tagline`     | `[TK]`                                    | One line, plain language                                                                  |
-| `domain`      | `digitalintent.ca`                        | Bare `.ca` domain, no `https://`. Also sets `site` in `astro.config.mjs` (D2)             |
-| `email`       | `[TK]`                                    | Organization email, created with the domain (D21)                                         |
-| `social`      | none                                      | List of `{ label, href }`                                                                 |
-| `regions`     | Kamloops, Victoria, Vancouver             | Starting regions (SPEC section 2)                                                         |
-| `logo`        | `/brand/logo.svg`, `/brand/logo-mark.svg` | Full logo, square mark, and alt text                                                      |
-| `favicon`     | `/brand/favicon.svg`                      | SVG favicon                                                                               |
-| `socialImage` | `/brand/og-default.png`                   | 1200 × 630, with alt text                                                                 |
+| Key           | Current value                                                        | Notes                                                                                                                                                             |
+| ------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `placeholder` | `false`                                                              | While `true`, pages show a "Placeholder brand" label                                                                                                              |
+| `name`        | `Digital Intent Learning Society`                                    | Full legal name (D31)                                                                                                                                             |
+| `shortName`   | `Digital Intent`                                                     | Usual short form; for tight spaces (D31)                                                                                                                          |
+| `tagline`     | `[TK]`                                                               | One line, plain language                                                                                                                                          |
+| `domain`      | `digitalintent.ca`                                                   | Bare `.ca` domain, no `https://`. Also sets `site` in `astro.config.mjs` (D2)                                                                                     |
+| `email`       | `[TK]`                                                               | Organization email, created with the domain (D21)                                                                                                                 |
+| `social`      | none                                                                 | List of `{ label, href }`                                                                                                                                         |
+| `regions`     | Kamloops, Victoria, Vancouver                                        | Starting regions (SPEC section 2)                                                                                                                                 |
+| `logo`        | `/brand/logo.svg`, `/brand/logo-on-dark.svg`, `/brand/logo-mark.svg` | Wordmark for paper, wordmark for navy (header and footer), square icon; natural size 610 × 155; alt text. Never recolour a logo file: pick the one for the ground |
+| `favicon`     | `/brand/favicon.svg`                                                 | SVG favicon                                                                                                                                                       |
+| `socialImage` | `/brand/og-default.png`                                              | 1200 × 630, with alt text                                                                                                                                         |
 
 ## Tokens (`tokens.css`)
 
@@ -75,6 +75,8 @@ Emphasis, the same in both worlds:
 | `--color-on-highlight` | Navy text on the highlight                                       |
 | `--color-marker`       | Pen-red marker strokes: circles, underlines, arrows. Analog only |
 
+Keycaps (Digital only): the key face is `--color-surface` and a pressed key sinks to `--color-bg`. `--color-key-lip` is the deep bottom edge, `--color-key-edge` and `--color-key-edge-top` the light edges.
+
 Rules from the design system: navy and beige carry everything; lime and red cover a small part of any piece. Lime is never text or a line on paper. Red never appears on navy. One kind of emphasis per section.
 
 ### Type
@@ -98,7 +100,8 @@ Any font must render the orthography fixture correctly (SPEC section 6). If you 
 | ------------------------------------------- | ------------------------------- |
 | `--space-1` to `--space-8`                  | Spacing scale, 0.25rem to 4rem  |
 | `--width-prose`                             | Maximum line length for reading |
-| `--width-page`                              | Maximum page width              |
+| `--width-page`                              | Page width, 84rem (1344px)      |
+| `--space-gutter`                            | Page side padding, 20 to 48px   |
 | `--radius-sm`, `--radius-md`, `--radius-lg` | Corner radius                   |
 | `--border-width`                            | Default border                  |
 | `--focus-width`, `--focus-offset`           | Focus outline size and gap      |
@@ -109,11 +112,12 @@ Any font must render the orthography fixture correctly (SPEC section 6). If you 
 
 Animate `transform` and `opacity` only. Under `prefers-reduced-motion: reduce`, durations and distances drop to zero; components still provide their own still alternative.
 
-| Token                                                   | Use                 |
-| ------------------------------------------------------- | ------------------- |
-| `--duration-fast`, `--duration-base`, `--duration-slow` | 120ms, 200ms, 400ms |
-| `--ease-standard`, `--ease-enter`, `--ease-exit`        | Easing curves       |
-| `--motion-distance-sm`, `--motion-distance-md`          | How far things move |
+| Token                                                   | Use                  |
+| ------------------------------------------------------- | -------------------- |
+| `--duration-press`                                      | 80ms, a keycap press |
+| `--duration-fast`, `--duration-base`, `--duration-slow` | 120ms, 200ms, 400ms  |
+| `--ease-standard`, `--ease-enter`, `--ease-exit`        | Easing curves        |
+| `--motion-distance-sm`, `--motion-distance-md`          | How far things move  |
 
 ## Fonts
 
