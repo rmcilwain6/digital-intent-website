@@ -3,8 +3,6 @@
 // mission as the lede, then the pillars and how we work beside a captioned
 // portrait photo that stays in view on tall screens, then our story across
 // the full width. Copy is in content/.
-import { statSync } from 'node:fs';
-import { join } from 'node:path';
 import { Picture } from 'astro:assets';
 import { render } from 'astro:content';
 import { about } from '../../content/about';
@@ -21,14 +19,12 @@ const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
   brand.regions,
 );
 
-// Caption specs for the original photo, read at build so they stay true.
+// Caption specs for the original photo. Dimensions come from the image;
+// file size and date from content/about.ts.
 const { photo } = about;
-const photoBytes = statSync(
-  join(process.cwd(), 'src/assets/photos', photo.file),
-).size;
 const photoSpecs = [
   `${photo.src.width} × ${photo.src.height}`,
-  `${Math.round(photoBytes / 1024)} kb`,
+  photo.size,
   photo.taken,
 ].join(' · ');
 

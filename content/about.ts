@@ -12,6 +12,7 @@ export const about = aboutSchema.parse({
     src: campusAvenue,
     alt: 'A student reads at a table under a long avenue of trees in autumn.',
     file: 'campus-avenue-autumn.jpg',
+    size: '859 kb',
     taken: 'fall 2026',
   },
   pillars: {
