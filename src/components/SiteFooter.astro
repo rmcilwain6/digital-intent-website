@@ -1,57 +1,225 @@
 ---
+// Site footer, Digital world (design system: website frame). "Next stops"
+// continue the reader's path, then the organization, its starting regions,
+// contact and links. The page receipt comes in its own pull request (SPEC 8.2).
 import { site } from '../../content/site';
 import { brand } from '../brand/brand.config';
+import BcOutline from './BcOutline.astro';
 import EmailLink from './EmailLink.astro';
+
+const trim = (path: string) => path.replace(/\/+$/, '') || '/';
+const currentPath = trim(Astro.url.pathname);
+const stops = site.nextStops.filter((stop) => trim(stop.href) !== currentPath);
 
 const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
   brand.regions,
 );
 ---
 
-<footer class="site-footer">
-  <div class="container inner">
-    <p class="site-name">{brand.name}</p>
-    <p>
-      {site.regionsIntro} {regions}.
+<footer class="site-footer" data-theme="digital">
+  <div class="container">
+    {stops.length > 0 && (
+      <section class="next-stops" aria-labelledby="next-stops-heading">
+        <h2 id="next-stops-heading">Next stops</h2>
+        <ul>
+          {stops.map((stop) => (
+            <li>
+              <a href={stop.href}>
+                <span class="stop-path">{trim(stop.href)}</span>
+                <span class="stop-name">{stop.label}</span>
+                <span class="stop-text">{stop.description}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <div class="about">
+      <div class="org">
+        <BcOutline width={120} />
+        <div class="org-text">
+          <img
+            class="logo"
+            src={brand.logo.onDark}
+            alt={brand.name}
+            width={brand.logo.width}
+            height={brand.logo.height}
+          />
+          <p class="muted">
+            {site.regionsIntro} {regions}.
+          </p>
+          <p>
+            <EmailLink />
+          </p>
+        </div>
+      </div>
+
+      <nav class="footer-nav" aria-label="Footer">
+        <ul>
+          {site.footerNav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+
+    <p class="fine-print">
+      {brand.name} · {site.licence}
     </p>
-    <p>
-      <EmailLink />
-    </p>
-    <nav aria-label="Footer">
-      <ul>
-        {site.footerNav.map((item) => (
-          <li>
-            <a href={item.href}>{item.label}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <p class="fine-print">{site.mapCredit}</p>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    margin-block-start: var(--space-8);
-    border-block-start: var(--border-width) solid var(--color-border);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
+    padding-block: var(--space-8) var(--space-6);
   }
 
-  .inner {
-    padding-block: var(--space-6);
+  h2 {
+    margin: 0 0 var(--space-5);
+    font-size: var(--text-xl);
   }
 
-  .site-name {
-    color: var(--color-text);
-    font-weight: var(--font-weight-bold);
-  }
-
-  ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-4);
+  .next-stops ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 0 var(--space-6);
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  .next-stops a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding-block: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .next-stops a:hover .stop-name {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .stop-path {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-label);
+  }
+
+  .stop-name {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .stop-text {
+    color: var(--color-text-muted);
+    font-size: var(--text-code);
+  }
+
+  .about {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-7);
+    margin-block-start: var(--space-8);
+  }
+
+  .org {
+    display: flex;
+    flex: 1 1 20rem;
+    align-items: flex-start;
+    gap: var(--space-5);
+  }
+
+  .org-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .org-text p {
+    margin: 0;
+    max-inline-size: 30ch;
+    font-size: var(--text-code);
+  }
+
+  .logo {
+    --logo-height: 2.125rem;
+    align-self: flex-start;
+    block-size: var(--logo-height);
+    inline-size: auto;
+    margin-inline-start: calc(-0.3 * var(--logo-height));
+  }
+
+  .muted {
+    color: var(--color-text-muted);
+  }
+
+  .footer-nav {
+    flex: 0 1 12.5rem;
+  }
+
+  .footer-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-code);
+  }
+
+  .footer-nav a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .footer-nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .fine-print {
+    margin: var(--space-7) 0 0;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .fine-print + .fine-print {
+    margin-block-start: var(--space-2);
+  }
+
+  @media (width < 48rem) {
+    .site-footer {
+      padding-block: var(--space-7) var(--space-6);
+    }
+
+    .next-stops a {
+      padding-block: var(--space-4);
+    }
+
+    .about {
+      gap: var(--space-6);
+      margin-block-start: var(--space-7);
+    }
+
+    .footer-nav {
+      flex-basis: 100%;
+    }
+
+    .footer-nav ul {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-3) var(--space-5);
+    }
   }
 </style>

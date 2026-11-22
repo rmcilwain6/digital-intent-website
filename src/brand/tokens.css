@@ -26,6 +26,12 @@
   --color-on-highlight: var(--color-navy);
   --color-marker: var(--color-red);
 
+  /* Keycaps, the Digital world's button: a light top edge and a deep lip.
+     The key face is the Digital surface; pressed, it sinks to the ground. */
+  --color-key-lip: #051a2e;
+  --color-key-edge: color-mix(in srgb, var(--color-paper) 16%, transparent);
+  --color-key-edge-top: color-mix(in srgb, var(--color-paper) 32%, transparent);
+
   /* Type. Source Sans 3 for all website text, Source Code Pro for anything
      shown as typed. Display and student faces are for print and social only. */
   --font-sans: 'Source Sans 3', system-ui, sans-serif;
@@ -59,9 +65,10 @@
   --space-7: 3rem;
   --space-8: 4rem;
 
-  /* Layout */
+  /* Layout. The page is 1344px wide on desktop, plus the gutter each side. */
   --width-prose: 65ch;
-  --width-page: 72rem;
+  --width-page: 84rem;
+  --space-gutter: clamp(1.25rem, 4vw, 3rem);
 
   /* Shape. Nothing rounder than radius-lg: the brand is typed, not bubbly. */
   --radius-sm: 2px;
@@ -78,6 +85,7 @@
   --cursor-drop: -0.13em;
 
   /* Motion. Animate transform and opacity only (SPEC 8.2). */
+  --duration-press: 80ms;
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 400ms;
@@ -134,6 +142,7 @@
  */
 @media (prefers-reduced-motion: reduce) {
   :root {
+    --duration-press: 0ms;
     --duration-fast: 0ms;
     --duration-base: 0ms;
     --duration-slow: 0ms;

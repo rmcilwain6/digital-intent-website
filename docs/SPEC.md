@@ -314,7 +314,7 @@ Fixed regardless of stack:
 - Teaching through the site: every page should teach something, to every kind of visitor, without asking them to do extra work. It should serve beginners and experts at once.
   - Page receipt (stretch goal for launch): a footer element showing what the page loaded and how big it was. A possible running total for the visit is held in memory only, never stored or sent (rule 2). Scoped in its own issue.
   - Post-MVP: info icons beside UI patterns (for example the hero) that, on hover or keyboard focus, outline the component and explain what it is and why sites use it.
-- Kept from the layout studies, not yet scoped: "next stops" that continue the reader's path at the end of a page.
+- "Next stops" in the footer continue the reader's path: links to other pages, leaving out the current one (`nextStops` in `content/site.ts`).
 - Motion is part of the identity, under these limits:
   - Every animation respects `prefers-reduced-motion` with a still alternative.
   - Motion never delays or hides content. Text is readable at first paint.
