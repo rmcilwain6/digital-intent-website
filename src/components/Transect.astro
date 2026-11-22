@@ -28,7 +28,10 @@ import {
   </div>
   <ul class="labels">
     {labels.map((label, i) => (
-      <li class:list={{ first: i === 0 }} style={`left: ${label.percent}%`}>
+      <li
+        class:list={{ first: i === 0, minor: label.minor }}
+        style={`left: ${label.percent}%`}
+      >
         {label.name}
       </li>
     ))}
@@ -127,6 +130,13 @@ import {
 
   li.first {
     transform: none;
+  }
+
+  /* Rogers Pass and Golden collide below the full page width. */
+  @media (width < 80rem) {
+    li.minor {
+      display: none;
+    }
   }
 
   /* Phones: a shorter profile and no labels. */

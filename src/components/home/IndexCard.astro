@@ -1,0 +1,141 @@
+---
+// The teachers' route on Home: an index card on paper (design system:
+// RouteCards). On hover or keyboard focus the card lifts and a pen-red marker
+// line draws in under the action. The line grows with a transform, so it
+// meets the motion rule, and it is already drawn under reduced motion.
+//
+// While the destination is a [TK] note (D26), the card is not a link: it
+// shows the note instead, so there is no broken link (rule 6).
+import { isPlaceholder } from '../../lib/placeholder';
+import type { Home } from '../../schemas/home';
+
+interface Props {
+  card: Home['hero']['teachers'];
+}
+
+const { card } = Astro.props;
+const pending = isPlaceholder(card.href);
+const Tag = pending ? 'div' : 'a';
+---
+
+<Tag
+  class:list={['index-card', { pending }]}
+  href={pending ? undefined : card.href}
+>
+  <span class="rule" aria-hidden="true"></span>
+  <span class="eyebrow">{card.eyebrow}</span>
+  <span class="title">{card.title}</span>
+  <span class="action">
+    <span class="marked">
+      {card.action}
+      {!pending && (
+        <svg viewBox="0 0 240 30" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M6 22 C 60 12, 150 10, 236 18" />
+        </svg>
+      )}
+    </span>
+  </span>
+  {pending && <span class="note">{card.href}</span>}
+</Tag>
+
+<style>
+  /* Rows are 1.75rem apart, and each line of text sits on a ruled line. */
+  .index-card {
+    --row: 1.75rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0.875rem var(--space-5) var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-card);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--row) - 1px),
+      var(--color-card-rule) calc(var(--row) - 1px),
+      var(--color-card-rule) var(--row)
+    );
+    background-position: 0 2.75rem;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+
+  .rule {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 2.5rem;
+    block-size: 2px;
+    background: var(--color-marker);
+  }
+
+  .eyebrow {
+    block-size: 1.625rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .title {
+    margin-block-start: var(--space-1);
+    font-size: 1.375rem;
+    font-weight: var(--font-weight-bold);
+    line-height: var(--row);
+  }
+
+  .action {
+    margin-block-start: 2px;
+    line-height: var(--row);
+  }
+
+  .marked {
+    position: relative;
+    display: inline-block;
+    font-weight: var(--font-weight-bold);
+  }
+
+  svg {
+    position: absolute;
+    inset-inline-start: -4%;
+    inset-block-end: -9px;
+    inline-size: 108%;
+    block-size: 14px;
+    overflow: visible;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--duration-slow) var(--ease-standard);
+  }
+
+  path {
+    fill: none;
+    stroke: var(--color-marker);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  a.index-card:hover,
+  a.index-card:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  a.index-card:hover svg,
+  a.index-card:focus-visible svg {
+    transform: scaleX(1);
+  }
+
+  .note {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .index-card {
+      transition: none;
+    }
+
+    svg {
+      transform: none;
+      transition: none;
+    }
+  }
+</style>

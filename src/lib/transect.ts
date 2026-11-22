@@ -20,6 +20,9 @@ const LABELLED = [
   'Golden',
 ];
 
+/** Labels that sit close to a neighbour; dropped on narrower screens. */
+const MINOR = ['Rogers Pass'];
+
 const { totalKm, marks, km, elevation } = map.profile;
 const maxElevation = Math.max(...elevation);
 
@@ -43,4 +46,5 @@ export const labels = marks
   .map((mark) => ({
     name: mark.name,
     percent: round((mark.km / totalKm) * 100),
+    minor: MINOR.includes(mark.name),
   }));
