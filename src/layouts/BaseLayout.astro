@@ -4,6 +4,7 @@
 import '../brand/brand.css';
 import '../styles/global.css';
 import { brand } from '../brand/brand.config';
+import { preloadFonts } from '../brand/fonts';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 
@@ -30,6 +31,9 @@ const lang = Astro.currentLocale ?? 'en';
     <title>{documentTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
+    {preloadFonts.map((href) => (
+      <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />
+    ))}
     <link rel="icon" href={brand.favicon} type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={documentTitle} />
