@@ -9,6 +9,7 @@ import { board, boardSettings } from '../../content/board';
 import BoardMap, {
   type MapDistricts,
   type MapPlace,
+  type MapWorld,
 } from '../components/board/BoardMap.astro';
 import ImagePlaceholder from '../components/ImagePlaceholder.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -19,6 +20,10 @@ const page = await getPage('board');
 const { Content } = await render(page);
 const { showRegionalLeads } = boardSettings;
 const listFormat = new Intl.ListFormat('en-CA', { type: 'conjunction' });
+
+// The map you can zoom is the Digital map (design system: Map), a navy object
+// on this Analog page, like the Valleyview window on Home.
+const mapWorld: MapWorld = 'digital';
 
 const slug = (name: string) =>
   name
@@ -62,7 +67,7 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
   description={page.data.description}
   fullWidth
 >
-  <div class="board-page" data-board>
+  <div class="board-page container" data-board>
     <div class="layout">
       <header class="intro">
         <p class="tk-marker">
@@ -79,7 +84,7 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
         <Content />
       </header>
 
-      <div class="map-panel">
+      <div class="map-panel" data-theme={mapWorld}>
         {/*
           Phones with JavaScript: the person being read, beside the map. A
           visual copy of each card's heading, so it is hidden from assistive
@@ -102,7 +107,7 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
           ))}
         </div>
         <div class="map-slot">
-          <BoardMap places={places} districts={mapDistricts} />
+          <BoardMap places={places} districts={mapDistricts} world={mapWorld} />
         </div>
       </div>
 
@@ -245,7 +250,7 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
         JSON.parse(card.dataset.focus ?? 'null') as Focus,
       ]),
     );
-    const [, , mapWidth = 1000, mapHeight = 866] = (
+    const [originX = 0, originY = 0, mapWidth = 1000, mapHeight = 866] = (
       svg.getAttribute('viewBox') ?? ''
     )
       .split(' ')
@@ -265,7 +270,10 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
         const covered = peopleBox!.getBoundingClientRect().right - box.left;
         x = covered + (box.width - covered) / 2;
       }
-      return [(x - offsetX) / k, (box.height / 2 - offsetY) / k];
+      return [
+        originX + (x - offsetX) / k,
+        originY + (box.height / 2 - offsetY) / k,
+      ];
     }
 
     function place() {
@@ -316,12 +324,16 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
     let observer: IntersectionObserver | undefined;
 
     function watch() {
-      // Phones: pin the panel under the pinned header.
-      const headerHeight = phone.matches && header ? header.offsetHeight : 0;
+      // Pin the panel under the site header, which is sticky except on short
+      // screens.
+      const headerHeight =
+        header && getComputedStyle(header).position === 'sticky'
+          ? header.offsetHeight
+          : 0;
       root.style.setProperty('--board-header-height', `${headerHeight}px`);
       const top = phone.matches
         ? headerHeight + panel!.offsetHeight + 16
-        : window.innerHeight * 0.45;
+        : headerHeight + (window.innerHeight - headerHeight) * 0.4;
       const bottom = Math.max(window.innerHeight - top - 48, 0);
       observer?.disconnect();
       observer = new IntersectionObserver(
@@ -369,16 +381,6 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
 </script>
 
 <style>
-  .board-page {
-    padding-inline: var(--space-4);
-  }
-
-  @media (min-width: 64rem) {
-    .board-page {
-      padding-inline: var(--space-6);
-    }
-  }
-
   .intro {
     max-width: var(--width-prose);
     padding-block: var(--space-6) var(--space-5);
@@ -399,20 +401,29 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
     gap: var(--space-5);
   }
 
-  /* Phones: a short strip pinned to the top while the list scrolls under it. */
+  /*
+   * Phones: a short strip of map, edge to edge, above the list. With
+   * JavaScript it is pinned under the site header, whose height the script
+   * measures.
+   */
   .map-panel {
-    position: sticky;
-    inset-block-start: 0;
     z-index: 1;
     height: 38vh;
-    padding-block: var(--space-2);
-    background: var(--color-bg);
+    margin-inline: calc(-1 * var(--space-gutter));
+  }
+
+  @media (max-width: 63.99rem) {
+    :global(.js) .map-panel {
+      position: sticky;
+      inset-block-start: var(--board-header-height, 0);
+    }
   }
 
   /*
    * Wide screens: intro and list on the left, the map filling the right side
    * from the top of the page, so the whole province shows on arrival. The
-   * panel height leaves room for the site header above it.
+   * panel stays pinned under the site header and fills the rest of the
+   * screen.
    */
   @media (min-width: 64rem) {
     .layout {
@@ -430,10 +441,16 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
     }
 
     .map-panel {
+      --panel-top: calc(var(--board-header-height, 9rem) + var(--space-5));
+      position: sticky;
       grid-area: map;
       align-self: start;
-      height: calc(100vh - var(--space-8));
-      padding-block: var(--space-5);
+      inset-block-start: var(--panel-top);
+      height: calc(100dvh - var(--panel-top) - var(--space-5));
+      margin-block-start: var(--space-5);
+      margin-inline: 0;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
     }
 
     .list {
@@ -459,8 +476,8 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
   }
 
   /*
-   * Phones with JavaScript: an app-like view. The site header and the map
-   * panel stay pinned; only the details below them scroll. The map starts as
+   * Phones with JavaScript: an app-like view. The map panel stays pinned
+   * under the site header; only the details below them scroll. The map starts as
    * the whole province, full width. When a member is being read, their
    * photo, name, role and town fade in over the left of the map, and the
    * script centres the map in the space beside them. Each card's photo, name,
@@ -468,17 +485,8 @@ const mapDistricts: MapDistricts[] = members.flatMap((m) =>
    * technology. Without JavaScript, the full cards show as normal.
    */
   @media (max-width: 63.99rem) {
-    :global(.js .site-header) {
-      position: sticky;
-      inset-block-start: 0;
-      z-index: 2;
-      background: var(--color-bg);
-    }
-
     :global(.js) .map-panel {
-      inset-block-start: var(--board-header-height, 0);
       height: clamp(12rem, 30vh, 17rem);
-      border-block-end: var(--border-width) solid var(--color-border);
     }
 
     :global(.js) .people {

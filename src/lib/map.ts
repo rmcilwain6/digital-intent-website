@@ -25,6 +25,21 @@ export interface Focus {
 
 export const [mapWidth, mapHeight] = map.viewBox as [number, number];
 
+/**
+ * The province alone with a small margin: the house map is a BC cut-out with
+ * no neighbours or ocean (design system: Map), so it is framed on BC.
+ */
+export const bcFrame: Box = (() => {
+  const margin = 12;
+  const b = pathBounds(map.bc);
+  return {
+    x: b.x - margin,
+    y: b.y - margin,
+    width: b.width + 2 * margin,
+    height: b.height + 2 * margin,
+  };
+})();
+
 /** Map position of a named town or city, failing the build if it is unknown. */
 export function placePoint(name: string): [number, number] {
   const place = map.places.find((p) => p.name === name);

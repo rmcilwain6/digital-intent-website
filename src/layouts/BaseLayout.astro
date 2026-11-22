@@ -59,6 +59,15 @@ const socialImage = new URL(brand.socialImage.src, Astro.site).href;
     />
     <meta property="og:image:alt" content={brand.socialImage.alt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <!--
+      Marks the page as able to run scripts, before first paint, so styles for
+      script-enhanced views (such as the Board page on phones) apply with no
+      flash. Without JavaScript the class is absent and pages show their
+      complete, still version (rule 4).
+    -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">

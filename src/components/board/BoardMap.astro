@@ -1,16 +1,22 @@
 ---
-// Board map (SPEC 7.3): the province with a marker for each town where board
-// members live, labelled with the place name. Several members can share a
-// marker. While D14 allows, the school districts a member leads are shaded
-// when that member is selected. Drawn at build time as inline SVG: no tiles,
-// no map service, no runtime requests.
+// Board map (SPEC 7.3): the house map of BC (design system: Map) with a
+// marker for each town where board members live, labelled with the place
+// name. Several members can share a marker. While D14 allows, the school
+// districts a member leads are outlined when that member is selected. Drawn
+// at build time as inline SVG: no tiles, no map service, no runtime requests.
+//
+// The house map is a BC cut-out: province in the surface tone, school
+// districts as fine lines, labels in mono, no neighbours or ocean. It is drawn
+// in either world. In Digital (the design system's map for anything you can
+// zoom or select) the selected town is a lime ring with its name as selected
+// text. In Analog the selected town turns pen red.
 //
 // Without JavaScript it is a still overview. The Board page script moves the
 // "camera" group to ease in on one member. Markers sit outside the camera so
 // they keep their size; the script moves them to match. Both move by
 // transform only, and the motion tokens make it instant under reduced motion.
 // The page shows the data credits (data/map/README.md) below the list.
-import { map, mapHeight, mapWidth } from '../../lib/map';
+import { bcFrame, map } from '../../lib/map';
 
 export interface MapPlace {
   name: string;
@@ -24,70 +30,90 @@ export interface MapDistricts {
   d: string;
 }
 
+export type MapWorld = 'analog' | 'digital';
+
 interface Props {
   places: MapPlace[];
   districts: MapDistricts[];
+  world: MapWorld;
 }
 
-const { places, districts } = Astro.props;
+const { places, districts, world } = Astro.props;
+const viewBox = [bcFrame.x, bcFrame.y, bcFrame.width, bcFrame.height]
+  .map((n) => Math.round(n))
+  .join(' ');
 
-// Labels sit east of the marker unless they would run off the map. Width is
-// a rough estimate, sized for the largest (phone) labels.
+// Labels are in mono, so their width is known: 0.6em a character in Source
+// Code Pro. The selected-text block behind a label is sized from that, in em,
+// so it follows the label's font size at every breakpoint.
+const charWidth = 0.6;
+const blockPad = 0.3;
+const labelWidth = (name: string) => name.length * charWidth;
+
+// Labels sit east of the marker unless they would run off the map. Checked at
+// the largest (phone) label size, about 44 map units.
 const labelLeft = ({ name, point: [x] }: MapPlace) =>
-  x + name.length * 32 + 24 > mapWidth;
+  x + 48 + labelWidth(name) * 44 > bcFrame.x + bcFrame.width;
 ---
 
-<div class="board-map">
-  <div class="frame">
-    <svg
-      viewBox={`0 0 ${mapWidth} ${mapHeight}`}
-      preserveAspectRatio="xMidYMid meet"
-      role="img"
-      aria-label={`Map of British Columbia marking where board members live: ${places.map((p) => p.name).join(', ')}`}
-    >
-      <g class="camera" data-camera>
-        <path class="neighbours" d={map.neighbours} />
-        <path class="province" d={map.bc} />
-        {districts.map((d) => (
-          <path class="district" d={d.d} data-member={d.member} />
-        ))}
-      </g>
-      {places.map((p) => (
+<div class="board-map" data-world={world}>
+  <svg
+    viewBox={viewBox}
+    preserveAspectRatio="xMidYMid meet"
+    role="img"
+    aria-label={`Map of British Columbia marking where board members live: ${places.map((p) => p.name).join(', ')}`}
+  >
+    <g class="camera" data-camera>
+      <path class="province" d={map.bc}></path>
+      <path class="district-lines" d={map.districtLines}></path>
+      {districts.map((d) => (
+        <path class="district" d={d.d} data-member={d.member}></path>
+      ))}
+    </g>
+    {places.map((p) => {
+      const left = labelLeft(p);
+      const width = labelWidth(p.name);
+      return (
         <g
-          class="marker"
+          class:list={['marker', { left }]}
           data-members={p.members.join(' ')}
           data-x={p.point[0]}
           data-y={p.point[1]}
           transform={`translate(${p.point[0]} ${p.point[1]})`}
         >
-          <circle r="6" />
-          <text
-            x={labelLeft(p) ? -14 : 14}
-            dy="0.35em"
-            text-anchor={labelLeft(p) ? 'end' : 'start'}
-          >
-            {p.name}
-          </text>
+          <circle class="ring" r="14"></circle>
+          <circle class="dot" r="6"></circle>
+          <g class="label">
+            <rect
+              class="block"
+              x={left ? `${-1.1 - width - blockPad}em` : `${1.1 - blockPad}em`}
+              y="-0.72em"
+              width={`${width + 2 * blockPad}em`}
+              height="1.44em"
+            ></rect>
+            <text
+              x={left ? '-1.1em' : '1.1em'}
+              dy="0.35em"
+              text-anchor={left ? 'end' : 'start'}
+            >
+              {p.name}
+            </text>
+          </g>
         </g>
-      ))}
-    </svg>
-    <button type="button" class="reset" data-map-reset hidden>
-      Show all of BC
-    </button>
-  </div>
+      );
+    })}
+  </svg>
+  <button type="button" class="reset" data-map-reset hidden>
+    all of BC
+  </button>
 </div>
 
 <style>
   .board-map {
-    height: 100%;
-  }
-
-  .frame {
+    --label-size: 20px;
     position: relative;
     height: 100%;
     overflow: hidden;
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
   }
 
   svg {
@@ -105,77 +131,149 @@ const labelLeft = ({ name, point: [x] }: MapPlace) =>
     transition: transform var(--duration-slower) var(--ease-standard);
   }
 
-  .neighbours {
-    fill: none;
-    stroke: var(--color-border);
-    stroke-opacity: 0.25;
-    stroke-width: 1;
-    vector-effect: non-scaling-stroke;
-  }
-
   .province {
-    fill: var(--color-bg);
+    fill: var(--color-surface);
     stroke: var(--color-border);
     stroke-width: 1;
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
   }
 
+  /* School districts: dotted on paper, a faint line on navy (design system). */
+  .district-lines {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-width: 0.8;
+    stroke-dasharray: 1.5 2.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-world='digital'] .district-lines {
+    stroke: var(--color-text-muted);
+    stroke-opacity: 0.28;
+    stroke-dasharray: none;
+  }
+
   /* Hidden until its member is selected. Animates opacity only (SPEC 8.2). */
   .district {
-    fill: var(--color-accent);
-    fill-opacity: 0.12;
-    stroke: var(--color-accent);
-    stroke-opacity: 0.5;
-    stroke-width: 1;
+    fill: none;
+    stroke: var(--color-marker);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
     opacity: 0;
     transition: opacity var(--duration-slower) var(--ease-standard);
+  }
+
+  [data-world='digital'] .district {
+    fill: var(--color-signal);
+    fill-opacity: 0.16;
+    stroke: var(--color-signal);
+    stroke-width: 2;
   }
 
   .district.is-active {
     opacity: 1;
   }
 
-  .marker circle {
-    fill: var(--color-text-muted);
-    stroke: var(--color-bg);
-    stroke-width: 3;
+  /* Towns: small navy dots on paper, paper dots on navy. */
+  .dot {
+    fill: var(--color-text);
+    stroke: var(--color-surface);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    transition: fill var(--duration-slow) var(--ease-standard);
   }
 
-  .marker text {
+  .ring {
+    fill: none;
+    stroke: var(--color-signal);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    opacity: 0;
+    transition: opacity var(--duration-slow) var(--ease-standard);
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--label-size);
+  }
+
+  .label text {
     fill: var(--color-text);
-    font-size: 24px;
     paint-order: stroke;
-    stroke: var(--color-bg);
-    stroke-width: 6;
+    stroke: var(--color-surface);
+    stroke-width: 0.3em;
     stroke-linejoin: round;
   }
 
+  [data-world='digital'] .label text {
+    fill: var(--color-text-muted);
+  }
+
+  /* The selected-text block: Digital only, shown on the selected town. */
+  .block {
+    fill: var(--color-highlight);
+    opacity: 0;
+    transition: opacity var(--duration-slow) var(--ease-standard);
+  }
+
+  /* Selected town. Analog: pen red dot, bold name. */
+  .marker.is-active .dot {
+    fill: var(--color-signal);
+  }
+
+  .marker.is-active text {
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* Digital: lime dot in a lime ring, its name as selected text. */
+  [data-world='digital'] .marker.is-active .ring,
+  [data-world='digital'] .marker.is-active .block {
+    opacity: 1;
+  }
+
+  [data-world='digital'] .marker.is-active text {
+    fill: var(--color-on-highlight);
+    stroke: none;
+  }
+
   /*
-   * The map is drawn small on phones: larger markers, and with JavaScript only
-   * the current place is labelled, so the small map stays readable and calm.
+   * The map is drawn small on phones: larger markers and labels in map units,
+   * and with JavaScript only the selected place is labelled, so the small map
+   * stays readable and calm.
    */
   @media (max-width: 63.99rem) {
-    .marker circle {
+    .board-map {
+      --label-size: 36px;
+    }
+
+    .dot {
       r: 9px;
     }
 
-    .marker text {
-      font-size: 36px;
+    .ring {
+      r: 20px;
     }
 
-    /* With JavaScript the map shares the width with the person: smaller still. */
-    :global(.js) .marker circle {
-      r: 14px;
+    :global(.js) .board-map {
+      --label-size: 44px;
     }
 
-    :global(.js) .marker text {
-      font-size: 60px;
+    :global(.js) .dot {
+      r: 12px;
+    }
+
+    :global(.js) .ring {
+      r: 26px;
+    }
+
+    :global(.js) .label {
       opacity: 0;
+      transition: opacity var(--duration-slow) var(--ease-standard);
     }
 
-    :global(.js) .marker.is-active text {
+    :global(.js) .marker.is-active .label {
       opacity: 1;
     }
 
@@ -184,26 +282,41 @@ const labelLeft = ({ name, point: [x] }: MapPlace) =>
     }
   }
 
-  .marker.is-active circle {
-    fill: var(--color-accent);
-  }
-
-  .marker.is-active text {
-    font-weight: var(--font-weight-bold);
-  }
-
+  /* Back to the whole province. Analog: a quiet written link. */
   .reset {
     position: absolute;
     inset-block-start: var(--space-3);
     inset-inline-end: var(--space-3);
-    padding: var(--space-1) var(--space-3);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-bg);
+    padding: var(--space-1) var(--space-2);
+    border: 0;
+    background: none;
     color: var(--color-link);
-    font: inherit;
+    font-family: var(--font-mono);
     font-size: var(--text-sm);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
     cursor: pointer;
+  }
+
+  /* Digital: a keycap (design system: Keycap). */
+  [data-world='digital'] .reset {
+    padding: 0.375rem var(--space-3);
+    border: var(--border-width) solid var(--color-key-edge);
+    border-block-start-color: var(--color-key-edge-top);
+    border-block-end: 3px solid var(--color-key-lip);
+    border-radius: 6px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    line-height: 1.4;
+    transition: transform var(--duration-press) var(--ease-standard);
+  }
+
+  [data-world='digital'] .reset:active {
+    border-block-end-width: var(--border-width);
+    background: var(--color-bg);
+    transform: translateY(2px);
+    box-shadow: inset 0 2px 0 var(--color-key-lip);
   }
 
   .reset[hidden] {
