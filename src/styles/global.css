@@ -9,14 +9,18 @@
   box-sizing: border-box;
 }
 
-/* Keep linked and focused content clear of the sticky header. */
+/*
+ * Keep linked and focused content clear of the sticky header. Sticky page
+ * content uses the same clearance.
+ */
 html {
-  scroll-padding-block-start: 9rem;
+  --header-clearance: 9rem;
+  scroll-padding-block-start: var(--header-clearance);
 }
 
 @media (width < 48rem) {
   html {
-    scroll-padding-block-start: 7rem;
+    --header-clearance: 7rem;
   }
 }
 
@@ -71,6 +75,20 @@ h3 {
 
 a {
   color: var(--color-link);
+}
+
+/*
+ * The highlighter: a hand-drawn lime swipe behind a phrase, navy text. One
+ * kind of emphasis per section (design system).
+ */
+mark {
+  margin-inline: -0.08em;
+  padding: 0.02em 0.22em;
+  border-radius: 0.3em 0.7em 0.35em 0.6em / 0.6em 0.35em 0.55em 0.45em;
+  background: var(--color-highlight);
+  color: var(--color-on-highlight);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 :focus-visible {

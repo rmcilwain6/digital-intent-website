@@ -181,8 +181,9 @@ Sections, in order (teachers above Valleyview is a preference, not settled; D30)
 ### 7.2 About (`/about`) Phase 1
 
 - Mission statement (`[TK]` until ratified).
-- Pillars with approved one-line definitions.
+- The four pillars in their board-voted wording (section 2), which serves as each pillar's one-line definition.
 - Values and how we work (remote-first, in person by choice, three starting regions, province-wide in scope).
+- Our story: how and why we started, after how we work.
 
 ### 7.3 Board (`/board`) Phase 1
 
