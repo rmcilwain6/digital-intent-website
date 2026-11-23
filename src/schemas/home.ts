@@ -30,6 +30,52 @@ const section = z.strictObject({
   draft: z.boolean(),
 });
 
+/**
+ * "Why we exist": the friction argument beside a photo, what we advocate for,
+ * then the "Do you know the answer?" window of questions from
+ * content/questions.ts.
+ */
+const whyWeExist = z.strictObject({
+  heading: z.string().min(1),
+  friction: z.strictObject({
+    heading: z.string().min(1),
+    body: z.array(z.string().min(1)).min(1),
+    /** Original photography, a labelled placeholder until it exists. */
+    image: z.strictObject({
+      label: z.string().min(1),
+      note: z.string().min(1),
+    }),
+  }),
+  /** What we advocate for: the balance, in a few short points. */
+  balance: z.strictObject({
+    heading: z.string().min(1),
+    lede: z.string().min(1),
+    points: z
+      .array(
+        z.strictObject({
+          title: z.string().min(1),
+          text: z.string().min(1),
+        }),
+      )
+      .min(2)
+      .max(4),
+  }),
+  questions: z.strictObject({
+    heading: z.string().min(1),
+    lede: z.string().min(1),
+    /** How many questions from the bank the window shows. */
+    count: z.int().min(1).max(8),
+    /** Lowercase mono label in the window's title bar. */
+    windowTitle: z.string().min(1),
+    /** Lowercase mono line before the reveal key. */
+    prompt: z.string().min(1),
+    reveal: z.string().min(1),
+    hide: z.string().min(1),
+    next: z.string().min(1),
+  }),
+  draft: z.boolean(),
+});
+
 export const sectionKeys = [
   'problem',
   'mission',
@@ -93,8 +139,16 @@ export const homeSchema = z.strictObject({
       )
       .length(3),
   }),
+  /**
+   * The break straight after the hero: one question split across the two
+   * worlds, the first half on paper, the second on navy.
+   */
+  question: z.strictObject({
+    analog: z.string().min(1),
+    digital: z.string().min(1),
+  }),
   sections: z.strictObject({
-    problem: section,
+    problem: whyWeExist,
     mission: section,
     map: section.extend({ regionsHeading: z.string().min(1) }),
     teachers: section,
@@ -112,4 +166,5 @@ export const homeSchema = z.strictObject({
 });
 
 export type Home = z.infer<typeof homeSchema>;
+export type WhyWeExist = z.infer<typeof whyWeExist>;
 export type CallToAction = z.infer<typeof callToAction>;

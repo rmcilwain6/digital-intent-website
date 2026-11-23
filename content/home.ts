@@ -47,16 +47,55 @@ export const home = homeSchema.parse({
     ],
   },
 
+  // The team's own line, split across the two worlds.
+  question: {
+    analog: 'Every student learns how the natural world works.',
+    digital: 'What about the digital one?',
+  },
+
   sections: {
     problem: {
       heading: 'Why we exist',
-      // The team's own line, not an agent draft.
-      lead: 'Every student learns how the natural world works. What about the digital one?',
-      body: [
-        'Technology shapes how students learn and how teachers teach. The companies that build classroom tools have their own business interests, and those do not always match what students need.',
-        'Schools deserve an independent voice on technology, one that is not selling anything.',
-      ],
-      cta: { label: 'About us', href: '/about/' },
+      friction: {
+        heading:
+          'Learning needs friction. Most technology is built to remove it.',
+        body: [
+          'Technology is built for convenience: fewer steps, faster answers, less effort. That’s great for work. It’s not as great for learning, which happens in the hard part: the wrong answer, the second try, working out why.',
+          'Schools now have digital literacy programs, AI literacy programs and devices in most classrooms. We’re not convinced it all adds up to a generation that understands the technology it depends on.',
+        ],
+        image: {
+          label: 'Friction',
+          note: '[TK: photo for the friction idea, Reed to choose]. Original photography, landscape.',
+        },
+      },
+      balance: {
+        heading: 'What we’re working toward',
+        lede: 'We’re not against technology in schools, and we don’t think it belongs everywhere. We’re looking for the balance between the two.',
+        points: [
+          {
+            title: 'Keep what works',
+            text: 'Classrooms stay places for the human, hard parts of learning: talking it through, making things, and sticking with a problem together.',
+          },
+          {
+            title: 'Use devices on purpose',
+            text: 'A device comes out when it’s the best tool for the job, not by default, and goes away when it isn’t.',
+          },
+          {
+            title: 'Teach how it works',
+            text: 'Help teachers teach the ideas behind technology, without handing control of their classroom to a device or an ed-tech platform.',
+          },
+        ],
+      },
+      questions: {
+        heading: 'Do you know the answer?',
+        lede: 'A few questions about the technology we use every day. Have a guess before you look: that’s the part where the learning happens.',
+        count: 5,
+        windowTitle: '~/questions',
+        prompt: 'have a guess first. then:',
+        reveal: 'show the answer',
+        hide: 'hide the answer',
+        next: 'next question',
+      },
       draft: true,
     },
 

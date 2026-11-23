@@ -1,0 +1,183 @@
+---
+// "Why we exist" on Home (SPEC 7.1, section 2): the friction argument
+// beside a photo, what we advocate for (the balance), then "Do you know the
+// answer?", a window of questions from the bank. One paper band: the window
+// is its only Digital object.
+import { questions } from '../../../content/questions';
+import type { WhyWeExist as Section } from '../../schemas/home';
+import ImagePlaceholder from '../ImagePlaceholder.astro';
+import DraftMarker from './DraftMarker.astro';
+import QuestionWindow from './QuestionWindow.astro';
+
+interface Props {
+  id: string;
+  section: Section;
+  tone: 'base' | 'surface';
+}
+
+const { id, section, tone } = Astro.props;
+const { friction, balance } = section;
+const copy = section.questions;
+const headingId = `${id}-heading`;
+// For now the first few, in order. Later, a different few on each visit.
+const shown = questions.slice(0, copy.count);
+const draft = section.draft || shown.some((q) => q.draft);
+---
+
+<section class:list={['band', tone]} aria-labelledby={headingId}>
+  <div class="container">
+    {draft && <DraftMarker />}
+    <h2 id={headingId}>{section.heading}</h2>
+
+    <div class="friction">
+      <div class="friction-text">
+        <h3>{friction.heading}</h3>
+        {friction.body.map((paragraph, index) => (
+          <p class:list={{ lede: index === 0 }}>{paragraph}</p>
+        ))}
+      </div>
+      <ImagePlaceholder
+        ratio="3 / 2"
+        label={friction.image.label}
+        note={friction.image.note}
+      />
+    </div>
+
+    <div class="balance">
+      <div class="balance-intro">
+        <h3>{balance.heading}</h3>
+        <p class="lede">{balance.lede}</p>
+      </div>
+      <ol class="points">
+        {balance.points.map((point) => (
+          <li>
+            <h4>{point.title}</h4>
+            <p>{point.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="questions">
+      <div class="questions-intro">
+        <h3>{copy.heading}</h3>
+        <p>{copy.lede}</p>
+      </div>
+      <QuestionWindow questions={shown} copy={copy} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    padding-block: var(--space-8) calc(2 * var(--space-8));
+    background: var(--band-bg);
+  }
+
+  .base {
+    --band-bg: var(--color-bg);
+  }
+
+  .surface {
+    --band-bg: var(--color-surface);
+  }
+
+  h2 {
+    margin-block: 0 var(--space-6);
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  h3 {
+    margin-block: 0 var(--space-5);
+    font-size: var(--text-2xl);
+  }
+
+  .friction,
+  .questions-intro {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .friction-text p {
+    max-inline-size: var(--width-prose);
+  }
+
+  .lede {
+    font-size: var(--text-lg);
+  }
+
+  .balance,
+  .questions {
+    margin-block-start: calc(2 * var(--space-8));
+  }
+
+  .balance-intro {
+    max-inline-size: var(--width-prose);
+  }
+
+  .balance-intro .lede {
+    margin-block: 0;
+  }
+
+  /* Three short points, each under a rule, side by side on wide screens. */
+  .points {
+    display: grid;
+    gap: var(--space-6);
+    margin: var(--space-7) 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: point;
+  }
+
+  .points li {
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-width) solid var(--color-border);
+    counter-increment: point;
+  }
+
+  .points li::before {
+    content: counter(point, decimal-leading-zero);
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .points h4 {
+    margin: var(--space-2) 0 var(--space-2);
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+  }
+
+  .points p {
+    margin: 0;
+  }
+
+  @media (min-width: 48rem) {
+    .points {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .questions-intro {
+    align-items: end;
+    margin-block-end: var(--space-6);
+  }
+
+  .questions-intro h3,
+  .questions-intro p {
+    margin-block: 0;
+  }
+
+  @media (min-width: 56rem) {
+    .friction,
+    .questions-intro {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-8);
+    }
+
+    .friction {
+      align-items: center;
+    }
+  }
+</style>
