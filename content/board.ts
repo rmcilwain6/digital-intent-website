@@ -1,4 +1,4 @@
-// Board member cards (SPEC 7.3). FICTIONAL PLACEHOLDERS ONLY, for the map
+// Board member entries (SPEC 7.3). FICTIONAL PLACEHOLDERS ONLY, for the map
 // prototype: the names, places, portfolios and bios below are invented. A
 // member's real details are committed only after that member has agreed to
 // them, because git history is public and permanent.

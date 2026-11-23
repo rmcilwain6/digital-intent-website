@@ -187,7 +187,7 @@ Sections, in order (teachers above Valleyview is a preference, not settled; D30)
 
 ### 7.3 Board (`/board`) Phase 1
 
-Card per person, with data in `content/board.ts`, schema-validated:
+An entry per person beside a map of BC, with data in `content/board.ts`, schema-validated. The map is the main visual; entries are plain text beside it, not cards:
 
 - Required: name, photo, board role, home region.
 - Optional: industry or career, areas of expertise, short bio, one external link.

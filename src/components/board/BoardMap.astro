@@ -1,23 +1,24 @@
 ---
-// Board map (SPEC 7.3): the Analog house map of BC (design system: Map), as
-// a stack of paper sheets. The first sheet is the whole province with a
-// marker for each town where board members live. Each member also has their
-// own sheet, cut at build time around their town and, while D14 allows, the
-// school districts they lead, which are circled in pen red and named.
+// Board map (SPEC 7.3): the Analog house map of BC (design system: Map) with
+// a marker for each town where board members live. It is the main thing on
+// the page; the text beside it supports it.
 //
-// The map is not a control: nothing on it can be clicked. As the visitor
-// scrolls, the Board page script lays the next member's sheet over the last,
-// the way someone would put a closer map on top to show where they mean.
-// Sheets move by transform only, and the motion tokens make the change
-// instant under reduced motion. Without JavaScript only the province sheet
-// shows, a still overview.
+// One map, one camera. Without JavaScript it is a still view of the whole
+// province. With it, the Board page script moves the camera to the member
+// being read: a gentle zoom on their part of the province, and closer only
+// where towns sit close together (the Lower Mainland and the Capital Region),
+// where the close-up coastline (data/map: detail) fades in. While D14 allows,
+// the districts the member leads are outlined in pen red.
+//
+// The camera and the markers move by transform, everything else by opacity.
+// Markers and labels sit outside the camera so they keep their size; the
+// script moves them to match. The motion tokens make every change instant
+// under reduced motion. The map is not a control: nothing on it can be
+// clicked.
 //
 // Drawn at build time as inline SVG: no tiles, no map service, no runtime
-// requests. The province and district lines are drawn once and reused by
-// every sheet. Sheets zoomed in on the Lower Mainland or the Capital Region
-// use the close-up layers instead (data/map: detail), with a detailed
-// coastline. The page shows the data credits (data/map/README.md).
-import { bcFrame, type Box, kmPerUnit, map, scaleBarKm } from '../../lib/map';
+// requests. The page shows the data credits (data/map/README.md).
+import { bcFrame, type Box, map } from '../../lib/map';
 
 export interface MapPlace {
   name: string;
@@ -31,47 +32,30 @@ export interface MapDistrict {
   label: [number, number];
 }
 
-export interface MapSheet {
-  /** The member this sheet belongs to. */
+export interface MapView {
+  /** The member this view belongs to. */
   member: string;
-  /** The town the sheet is about. */
+  /** The town the view is about. */
   place: string;
-  /** What the sheet shows, in map units. */
+  /** What the view shows, in map units. */
   box: Box;
   /** Districts the member leads (empty unless D14 allows). */
   leads: MapDistrict[];
 }
 
-/** How a new sheet arrives: rolled up over the last, or flipped down. */
-export type MapTurn = 'roll' | 'flip';
-
 interface Props {
   places: MapPlace[];
-  sheets: MapSheet[];
-  turn: MapTurn;
+  views: MapView[];
 }
 
-const { places, sheets, turn } = Astro.props;
+const { places, views } = Astro.props;
 
-const inside = (box: Box, [x, y]: [number, number]) =>
-  x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height;
-
-const viewBoxOf = (box: Box) =>
-  [box.x, box.y, box.width, box.height].map((n) => n.toFixed(1)).join(' ');
-
-// Markers and labels are drawn in whole-province units and scaled down by
-// each sheet's zoom (k), so they are the same size on every sheet.
-const pinned = (point: [number, number], k: number) =>
-  `translate(${point[0]} ${point[1]}) scale(${(1 / k).toFixed(4)})`;
-
-// Labels sit east of the marker unless they would run off the sheet.
-// Source Code Pro is 0.6em a character; checked at the phone label size.
-const labelLeft = (
-  name: string,
-  point: [number, number],
-  box: Box,
-  k: number,
-) => point[0] + (24 + name.length * 0.6 * 44) / k > box.x + box.width;
+// A view uses the close-up layers when it lies wholly inside them.
+const within = (box: Box, outer: Box) =>
+  box.x >= outer.x &&
+  box.y >= outer.y &&
+  box.x + box.width <= outer.x + outer.width &&
+  box.y + box.height <= outer.y + outer.height;
 
 const asDistricts = (list: typeof map.districts): MapDistrict[] =>
   list.map((d) => ({
@@ -80,265 +64,151 @@ const asDistricts = (list: typeof map.districts): MapDistrict[] =>
     d: d.d,
     label: d.label as [number, number],
   }));
-const allDistricts = asDistricts(map.districts);
 const detailDistricts = asDistricts(map.detail.districts);
 
-// A sheet uses the close-up layers when it lies wholly inside them.
-const within = (box: Box, outer: Box) =>
-  box.x >= outer.x &&
-  box.y >= outer.y &&
-  box.x + box.width <= outer.x + outer.width &&
-  box.y + box.height <= outer.y + outer.height;
+// The camera for each view: scale k, then move so the view's box fills the
+// frame. The script applies it as translate(tx, ty) scale(k).
+const cameras = Object.fromEntries(
+  views.map((view) => {
+    const k = bcFrame.width / view.box.width;
+    return [
+      view.member,
+      {
+        k: +k.toFixed(4),
+        tx: +(bcFrame.x - k * view.box.x).toFixed(2),
+        ty: +(bcFrame.y - k * view.box.y).toFixed(2),
+        detail: within(view.box, map.detail.frame),
+      },
+    ];
+  }),
+);
 
-const pointOf = (place: string | null) =>
-  places.find((p) => p.name === place)?.point;
-
-const views = [
-  { member: null, place: null, box: bcFrame, leads: [] as MapDistrict[] },
-  ...sheets,
-].map((base) => {
-  const detail = base.member !== null && within(base.box, map.detail.frame);
-  const districts = detail ? detailDistricts : allDistricts;
-  const sheet = {
-    ...base,
-    leads: base.leads.map(
-      (lead) => districts.find((d) => d.number === lead.number) ?? lead,
-    ),
-  };
-  const k = bcFrame.width / sheet.box.width;
-  const leadNumbers = sheet.leads.map((d) => d.number);
-  // On a closer sheet, number every other district in view, to show how
-  // many there are around the ones the member leads.
-  const others =
-    sheet.member === null
-      ? []
-      : districts.filter(
-          (d) => !leadNumbers.includes(d.number) && inside(sheet.box, d.label),
-        );
-  // The town's own name is left off when a district name sits right on it.
-  const town = pointOf(sheet.place);
-  // Distance on the sheet, in whole-province units.
-  const apart = (a: [number, number], b: [number, number]) =>
-    Math.hypot(a[0] - b[0], a[1] - b[1]) * k;
-  const crowded =
-    town !== undefined && sheet.leads.some((d) => apart(d.label, town) < 70);
-  // A district name that would sit on the town's dot moves just below it.
-  const names = sheet.leads.map((d) => ({
-    ...d,
-    at:
-      town !== undefined && apart(d.label, town) < 40
-        ? ([town[0], town[1] + 44 / k] as [number, number])
+// Close views draw their lead districts from the close-up layer. A district
+// label that would sit on the member's town moves just below it.
+const outlines = views.flatMap((view) => {
+  const camera = cameras[view.member];
+  const k = camera?.k ?? 1;
+  const town = places.find((p) => p.name === view.place)?.point;
+  return view.leads.map((lead) => {
+    const d = camera?.detail
+      ? (detailDistricts.find((x) => x.number === lead.number) ?? lead)
+      : lead;
+    const crowded =
+      town !== undefined &&
+      Math.hypot(d.label[0] - town[0], d.label[1] - town[1]) * k < 48;
+    return {
+      ...d,
+      member: view.member,
+      label: crowded
+        ? ([town[0], town[1] + 30 / k] as [number, number])
         : d.label,
-  }));
-  const km = scaleBarKm(sheet.box.width * kmPerUnit);
-  return {
-    ...sheet,
-    detail,
-    k,
-    others,
-    crowded,
-    names,
-    km,
-    barLength: (km / kmPerUnit) * k,
-    title:
-      sheet.place === null
-        ? 'British Columbia'
-        : sheet.leads.length > 0
-          ? `${sheet.place} · SD ${sheet.leads.map((d) => d.number).join(', ')}`
-          : sheet.place,
-  };
+    };
+  });
 });
+
+// Labels sit east of the marker unless they would run off the province
+// frame. Source Code Pro is 0.6em a character; checked at the phone size.
+const labelLeft = ({ name, point }: MapPlace) =>
+  point[0] + 24 + name.length * 0.6 * 44 > bcFrame.x + bcFrame.width;
+
+const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
 ---
 
-<div class="board-map" data-turn={turn}>
-  <svg class="defs" aria-hidden="true" focusable="false">
-    <defs>
-      <path
-        id="board-map-bc"
-        d={map.bc}
-        vector-effect="non-scaling-stroke"
-      ></path>
-      <path
-        id="board-map-district-lines"
-        d={map.districtLines}
-        vector-effect="non-scaling-stroke"
-      ></path>
-      {views.some((view) => view.detail) && (
-        <>
-          <path
-            id="board-map-detail-land"
-            d={map.detail.land}
-            vector-effect="non-scaling-stroke"
-          />
-          <path
-            id="board-map-detail-district-lines"
-            d={map.detail.districtLines}
-            vector-effect="non-scaling-stroke"
-          />
-        </>
-      )}
-    </defs>
-  </svg>
-
-  {views.map((view) => (
-    <div
-      class:list={['sheet', { 'is-in': view.member === null }]}
-      data-sheet={view.member ?? 'all'}
-    >
-      <svg
-        viewBox={viewBoxOf(view.box)}
-        preserveAspectRatio="xMidYMid meet"
-        focusable="false"
-        {...(view.member === null
-          ? {
-              role: 'img',
-              'aria-label': `Map of British Columbia marking where board members live: ${places.map((p) => p.name).join(', ')}`,
-            }
-          : { 'aria-hidden': 'true' })}
+<div class="board-map" data-board-map data-cameras={JSON.stringify(cameras)}>
+  <svg
+    viewBox={[bcFrame.x, bcFrame.y, bcFrame.width, bcFrame.height]
+      .map((n) => n.toFixed(1))
+      .join(' ')}
+    preserveAspectRatio="xMidYMid meet"
+    focusable="false"
+    role="img"
+    aria-label={`Map of British Columbia marking where board members live: ${places.map((p) => p.name).join(', ')}`}
+  >
+    <g class="camera" data-camera>
+      <g class="province" data-province>
+        <path class="land" d={map.bc} />
+        <path class="district-lines" d={map.districtLines} />
+      </g>
+      <g class="detail" data-detail>
+        <path class="land" d={map.detail.land} />
+        <path class="district-lines" d={map.detail.districtLines} />
+      </g>
+      {outlines.map((d) => (
+        <path class="lead" d={d.d} data-member={d.member} />
+      ))}
+    </g>
+    {outlines.map((d) => (
+      <g
+        class="pin district-name"
+        data-member={d.member}
+        data-x={d.label[0]}
+        data-y={d.label[1]}
+        style={{ transform: at(d.label) }}
       >
-        <use
-          class="province"
-          href={view.detail ? '#board-map-detail-land' : '#board-map-bc'}
-        />
-        <use
-          class="district-lines"
-          href={
-            view.detail
-              ? '#board-map-detail-district-lines'
-              : '#board-map-district-lines'
-          }
-        />
-        {view.leads.map((d) => (
-          <path class="lead" d={d.d} />
-        ))}
-        {view.others.map((d) => (
-          <g class="district-number" transform={pinned(d.label, view.k)}>
-            <text dy="0.35em" text-anchor="middle">
-              {d.number}
-            </text>
-          </g>
-        ))}
-        {view.names.map((d) => (
-          <g class="district-name" transform={pinned(d.at, view.k)}>
-            <text text-anchor="middle">
-              <tspan x="0" dy="-0.2em">
-                SD {d.number}
-              </tspan>
-              <tspan x="0" dy="1.2em">
-                {d.name}
-              </tspan>
-            </text>
-          </g>
-        ))}
-        {places.map((p) => {
-          const here = p.name === view.place;
-          const left = labelLeft(p.name, p.point, view.box, view.k);
-          return (
-            <g
-              class:list={['marker', { here }]}
-              transform={pinned(p.point, view.k)}
-            >
-              <circle r="6" />
-              {!(here && view.crowded) && (
-                <text
-                  x={left ? -14 : 14}
-                  dy="0.35em"
-                  text-anchor={left ? 'end' : 'start'}
-                >
-                  {p.name}
-                </text>
-              )}
-            </g>
-          );
-        })}
+        <text text-anchor="middle" dy="0.35em">
+          SD {d.number}
+        </text>
+      </g>
+    ))}
+    {places.map((p) => {
+      const left = labelLeft(p);
+      return (
         <g
-          class="scale-bar"
-          transform={pinned(
-            [
-              view.box.x + view.box.width * 0.04,
-              view.box.y + view.box.height * 0.96,
-            ],
-            view.k,
-          )}
+          class="pin marker"
+          data-place={p.name}
+          data-x={p.point[0]}
+          data-y={p.point[1]}
+          style={{ transform: at(p.point) }}
         >
-          <path
-            d={`M0 -6V0H${view.barLength.toFixed(1)}V-6`}
-            vector-effect="non-scaling-stroke"
-          />
-          <text x={view.barLength + 10} dy="0.1em">
-            {view.km} km
+          <circle r="6" />
+          <text
+            x={left ? -14 : 14}
+            dy="0.35em"
+            text-anchor={left ? 'end' : 'start'}
+          >
+            {p.name}
           </text>
         </g>
-      </svg>
-      <p class="title" aria-hidden="true">
-        {view.title}
-      </p>
-    </div>
-  ))}
+      );
+    })}
+  </svg>
 </div>
 
 <style>
   .board-map {
-    --label-size: 20px;
-    --district-size: 15px;
-    position: relative;
+    --label-size: 18px;
+    --district-size: 14px;
     height: 100%;
-    overflow: hidden;
-    isolation: isolate;
-    perspective: 1800px;
   }
 
-  .defs {
-    position: absolute;
-    width: 0;
-    height: 0;
-  }
-
-  /*
-   * A sheet of paper. Only the province sheet shows without JavaScript; the
-   * script lays the others on top as the visitor reads.
-   */
-  .sheet {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-sm);
-    background: var(--color-bg);
-    transform-origin: 50% 0;
-    transition: transform var(--duration-slower) var(--ease-standard);
-    backface-visibility: hidden;
-  }
-
-  .sheet:not(.is-in) {
-    display: none;
-  }
-
-  /*
-   * Where a new sheet starts before it settles: below the stack, to be
-   * rolled up over it, or tipped up from its top edge, to flip down onto it.
-   */
-  [data-turn='roll'] .sheet.is-entering {
-    transform: translateY(101%);
-    transition: none;
-  }
-
-  [data-turn='flip'] .sheet.is-entering {
-    transform: rotateX(-100deg);
-    transition: none;
-  }
-
-  svg:not(.defs) {
+  svg {
     display: block;
     width: 100%;
     height: 100%;
+    overflow: visible;
   }
 
-  .province {
+  .camera {
+    transform-box: view-box;
+    transform-origin: 0 0;
+  }
+
+  .camera,
+  .pin {
+    transition: transform var(--duration-slower) var(--ease-standard);
+  }
+
+  .pin {
+    transform-box: view-box;
+    transform-origin: 0 0;
+  }
+
+  .land {
     fill: var(--color-surface);
     stroke: var(--color-border);
     stroke-width: 1;
     stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
   }
 
   /* School districts as dotted lines (design system: MapAnalog). */
@@ -347,9 +217,35 @@ const views = [
     stroke: var(--color-border);
     stroke-width: 0.8;
     stroke-dasharray: 1.5 2.5;
+    vector-effect: non-scaling-stroke;
   }
 
-  /* The districts a member leads, circled in pen red. */
+  /*
+   * On close views the close-up coastline takes over from the province
+   * outline, which is too rough at that scale.
+   */
+  .province {
+    transition: opacity var(--duration-slower) var(--ease-standard);
+  }
+
+  .province.is-off {
+    opacity: 0;
+  }
+
+  .detail,
+  .lead,
+  .district-name {
+    opacity: 0;
+    transition: opacity var(--duration-slower) var(--ease-standard);
+  }
+
+  .detail.is-on,
+  .lead.is-on,
+  .district-name.is-on {
+    opacity: 1;
+  }
+
+  /* The districts a member leads, outlined in pen red. */
   .lead {
     fill: none;
     stroke: var(--color-marker);
@@ -377,94 +273,37 @@ const views = [
     stroke-width: 2px;
   }
 
-  /* The sheet's own town: a pen-red dot and a bold name. */
-  .marker.here circle {
+  /* The town of the member being read: a pen-red dot and a bold name. */
+  .marker.is-here circle {
     fill: var(--color-marker);
   }
 
-  .marker.here text {
+  .marker.is-here text {
     font-weight: var(--font-weight-bold);
   }
 
   .district-name text {
-    fill: var(--color-text);
+    fill: var(--color-marker);
     font-size: var(--district-size);
-    stroke-width: 5px;
-  }
-
-  .district-name tspan:first-child {
     font-weight: var(--font-weight-bold);
-  }
-
-  .district-number text {
-    fill: var(--color-text-muted);
-    font-size: var(--district-size);
     stroke-width: 5px;
-  }
-
-  .scale-bar path {
-    fill: none;
-    stroke: var(--color-text);
-    stroke-width: 1.5;
-  }
-
-  .scale-bar text {
-    fill: var(--color-text);
-    font-size: var(--district-size);
-    stroke: none;
-  }
-
-  .title {
-    position: absolute;
-    inset-block-start: var(--space-3);
-    inset-inline-start: var(--space-3);
-    margin: 0;
-    padding: var(--space-1) var(--space-2);
-    background: var(--color-bg);
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: 1.3;
   }
 
   /*
-   * The map is drawn small on phones: larger markers and labels in map
-   * units, no district numbers or sheet title, and with JavaScript only the
-   * sheet's own town is named, so the small map stays readable and calm.
+   * Phones: the map is drawn small, so markers and labels are larger in map
+   * units, and while a member is being read only their town is named.
    */
   @media (max-width: 63.99rem) {
     .board-map {
       --label-size: 36px;
-      --district-size: 30px;
-    }
-
-    .sheet {
-      border-inline: 0;
-      border-radius: 0;
+      --district-size: 28px;
     }
 
     .marker circle {
-      r: 9px;
+      r: 10px;
     }
 
-    /* District numbers only: the card names them. */
-    .title,
-    .district-number,
-    .scale-bar,
-    .district-name tspan + tspan {
-      display: none;
-    }
-
-    :global(.js) .board-map {
-      --label-size: 44px;
-      --district-size: 34px;
-    }
-
-    :global(.js) .marker circle {
-      r: 12px;
-    }
-
-    :global(.js) .marker:not(.here) text {
+    .board-map:global(.has-member) .marker:not(.is-here) text {
       display: none;
     }
   }

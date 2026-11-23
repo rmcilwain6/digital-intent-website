@@ -1,4 +1,4 @@
-// Schema for board member cards (content/board.ts, SPEC 7.3).
+// Schema for board member entries (content/board.ts, SPEC 7.3).
 import { z } from 'astro/zod';
 
 const logo = z.union([
@@ -34,7 +34,7 @@ export const boardMemberSchema = z.strictObject({
   name: z.string().min(1),
   photo,
   role: z.string().min(1),
-  /** Home region as shown on the card. */
+  /** Home region as shown in the entry. */
   region: z.string().min(1),
   /**
    * The town or city the map marks for this member: a name from the map's

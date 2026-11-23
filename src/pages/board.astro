@@ -1,28 +1,32 @@
 ---
-// Board (SPEC 7.3): member cards beside a paper map of BC. Without
-// JavaScript the map is a still overview and every card is readable. With it,
-// scrolling to a card, opening its background or focusing it lays that
-// member's own sheet of the map over the last one: their town and the
-// districts they lead (D14 permitting). Several members can share a place.
+// Board (SPEC 7.3): the map of BC is the main thing on the page, with the
+// members listed plainly beside it. Without JavaScript the map is a still
+// view of the province and every entry is complete. With it, the map moves
+// gently to the member being read: their town and, D14 permitting, the
+// districts they lead. Several members can share a place.
 import { render } from 'astro:content';
 import { board, boardSettings } from '../../content/board';
 import BoardMap, {
   type MapPlace,
-  type MapSheet,
-  type MapTurn,
+  type MapView,
 } from '../components/board/BoardMap.astro';
 import ImagePlaceholder from '../components/ImagePlaceholder.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { district, pathBounds, placePoint, sheetFor, union } from '../lib/map';
+import {
+  bcFrame,
+  district,
+  map,
+  pathBounds,
+  placePoint,
+  sheetFor,
+  union,
+} from '../lib/map';
 import { getPage } from '../lib/pages';
 
 const page = await getPage('board');
 const { Content } = await render(page);
 const { showRegionalLeads } = boardSettings;
 const listFormat = new Intl.ListFormat('en-CA', { type: 'conjunction' });
-
-// How the next sheet of the map arrives (prototype: try 'roll' or 'flip').
-const mapTurn: MapTurn = 'roll';
 
 const slug = (name: string) =>
   name
@@ -47,24 +51,48 @@ for (const m of members) {
   }
 }
 
-// Each member's sheet is cut around their town and the districts they lead,
-// as close as that needs: Greater Vancouver fills the sheet.
-const sheets: MapSheet[] = members.map((m) => ({
-  member: m.id,
-  place: m.member.place,
-  box: sheetFor(
+// How close the map goes. A gentle zoom by default, so the member's part of
+// the province shows with plenty around it. Closer only where towns sit
+// close together (the Lower Mainland and the Capital Region), where the
+// close-up coastline takes over.
+const inside = ([x, y]: [number, number], b: typeof bcFrame) =>
+  x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height;
+const gentle = bcFrame.width / 2.5;
+const close = 80;
+
+// A close view is kept inside the close-up area, so it never falls back to
+// the rougher province outline.
+const keepInside = (box: typeof bcFrame, outer: typeof bcFrame) => {
+  const clamp = (v: number, lo: number, hi: number) =>
+    Math.min(Math.max(v, lo), Math.max(lo, hi));
+  return {
+    ...box,
+    x: clamp(box.x, outer.x, outer.x + outer.width - box.width),
+    y: clamp(box.y, outer.y, outer.y + outer.height - box.height),
+  };
+};
+
+const views: MapView[] = members.map((m) => {
+  const isClose = inside(m.point, map.detail.frame);
+  const box = sheetFor(
     union(
       m.districts.map((d) => pathBounds(d.d)),
       [m.point],
     ),
-  ),
-  leads: m.districts.map((d) => ({
-    number: d.number,
-    name: d.name,
-    d: d.d,
-    label: d.label as [number, number],
-  })),
-}));
+    isClose ? close : gentle,
+  );
+  return {
+    member: m.id,
+    place: m.member.place,
+    box: isClose ? keepInside(box, map.detail.frame) : box,
+    leads: m.districts.map((d) => ({
+      number: d.number,
+      name: d.name,
+      d: d.d,
+      label: d.label as [number, number],
+    })),
+  };
+});
 ---
 
 <BaseLayout
@@ -72,8 +100,8 @@ const sheets: MapSheet[] = members.map((m) => ({
   description={page.data.description}
   fullWidth
 >
-  <div class="board-page container" data-board>
-    <div class="layout">
+  <div class="layout" data-board>
+    <div class="text">
       <header class="intro">
         <p class="tk-marker">
           [TK: fictional placeholder board members for the map prototype. Real
@@ -89,43 +117,17 @@ const sheets: MapSheet[] = members.map((m) => ({
         <Content />
       </header>
 
-      <div class="map-panel">
-        {/*
-          Phones with JavaScript: the person being read, beside the map. A
-          visual copy of each card's heading, so it is hidden from assistive
-          technology, which reads the cards themselves.
-        */}
-        <div class="people" aria-hidden="true">
-          {members.map(({ member, id }) => (
-            <div class="person" data-person={id}>
-              {'placeholder' in member.photo ? (
-                <span class="person-photo person-photo-placeholder">
-                  Portrait
-                </span>
-              ) : (
-                <img class="person-photo" src={member.photo.src} alt="" />
-              )}
-              <p class="person-name">{member.name}</p>
-              <p class="person-meta">{member.role}</p>
-              <p class="person-meta">{member.region}</p>
-            </div>
-          ))}
-        </div>
-        <div class="map-slot">
-          <BoardMap places={places} sheets={sheets} turn={mapTurn} />
-        </div>
-      </div>
-
-      <div class="list">
-        <ol class="members">
-          {members.map(({ member, id, districts }) => (
-            <li class="card" id={id} data-card data-member={id}>
+      <ol class="members">
+        {members.map(({ member, id, districts }) => (
+          <li class="entry" id={id} data-entry data-member={id}>
+            <div class="entry-head">
               <div class="photo">
                 {'placeholder' in member.photo ? (
                   <ImagePlaceholder
                     ratio="4 / 5"
                     label="Portrait"
                     note={member.photo.note}
+                    compact
                   />
                 ) : (
                   <img
@@ -136,161 +138,155 @@ const sheets: MapSheet[] = members.map((m) => ({
                   />
                 )}
               </div>
-              <div class="text">
+              <div>
                 <h2>{member.name}</h2>
-                <dl class="facts identity">
-                  <div>
-                    <dt>Board role</dt>
-                    <dd>{member.role}</dd>
-                  </div>
-                  <div>
-                    <dt>Location</dt>
-                    <dd>{member.region}</dd>
-                  </div>
-                </dl>
-                <dl class="facts">
-                  {member.focus && (
-                    <div class="wide">
-                      <dt>Focus</dt>
-                      <dd>{member.focus}</dd>
-                    </div>
-                  )}
-                  {districts.length > 0 && (
-                    <div class="wide">
-                      <dt>Regions</dt>
-                      <dd>
-                        School Districts{' '}
-                        {listFormat.format(
-                          districts.map((d) => `${d.number} ${d.name}`),
-                        )}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-                {member.affiliations && (
-                  <ul class="affiliations">
-                    {member.affiliations.map((a) => (
-                      <li>
-                        {'placeholder' in a.logo ? (
-                          <span class="logo-placeholder" aria-hidden="true">
-                            Logo
-                          </span>
-                        ) : (
-                          <img class="logo" src={a.logo.src} alt="" />
-                        )}
-                        <span>
-                          <span class="affiliation-label">{a.label}</span>{' '}
-                          {a.name}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {(member.industry ||
-                  member.expertise ||
-                  member.bio ||
-                  member.link) && (
-                  <details>
-                    <summary>Background</summary>
-                    {member.industry && <p>{member.industry}</p>}
-                    {member.expertise && (
-                      <p>Expertise: {listFormat.format(member.expertise)}</p>
-                    )}
-                    {member.bio && <p>{member.bio}</p>}
-                    {member.link && (
-                      <p>
-                        <a href={member.link.href}>{member.link.label}</a>
-                      </p>
-                    )}
-                  </details>
-                )}
+                <p class="meta">
+                  {member.role} · {member.region}
+                </p>
               </div>
-            </li>
-          ))}
-        </ol>
-        <p class="credits">
-          Map data: Natural Earth (public domain). School district boundaries
-          and the close-up coastline: DataBC. Contains information licensed
-          under the Open Government Licence – British Columbia.
-        </p>
-      </div>
+            </div>
+            {member.focus && <p>{member.focus}</p>}
+            {districts.length > 0 && (
+              <p class="leads">
+                Leads for School Districts{' '}
+                {listFormat.format(
+                  districts.map((d) => `${d.number} ${d.name}`),
+                )}
+                .
+              </p>
+            )}
+            {(member.bio ||
+              member.industry ||
+              member.affiliations ||
+              member.expertise ||
+              member.link) && (
+              <details>
+                <summary>More about {member.name.split(' ')[0]}</summary>
+                {member.bio && <p>{member.bio}</p>}
+                {(member.industry || member.affiliations) && (
+                  <p>
+                    {[
+                      member.industry,
+                      ...(member.affiliations ?? []).map(
+                        (a) => `${a.label} ${a.name}`,
+                      ),
+                    ]
+                      .filter(Boolean)
+                      .join('. ')}
+                    .
+                  </p>
+                )}
+                {member.expertise && (
+                  <p>Knows about {listFormat.format(member.expertise)}.</p>
+                )}
+                {member.link && (
+                  <p>
+                    <a href={member.link.href}>{member.link.label}</a>
+                  </p>
+                )}
+              </details>
+            )}
+          </li>
+        ))}
+      </ol>
+
+      <p class="credits">
+        Map data: Natural Earth (public domain). School district boundaries and
+        the close-up coastline: DataBC. Contains information licensed under the
+        Open Government Licence – British Columbia.
+      </p>
+    </div>
+
+    <div class="map-panel">
+      <BoardMap places={places} views={views} />
     </div>
   </div>
 </BaseLayout>
 
 <script>
-  // Lays each member's sheet of the map over the last as the visitor reads.
-  // An enhancement only: the page is complete without it. Sheets move by
-  // transform; the motion tokens make the change instant under
-  // prefers-reduced-motion.
+  // Moves the map to the member being read. An enhancement only: the page is
+  // complete without it. The camera and markers move by transform, the rest
+  // by opacity; the motion tokens make it instant under reduced motion.
 
-  // Phones get the app-like view; must match the CSS breakpoint.
+  interface Camera {
+    k: number;
+    tx: number;
+    ty: number;
+    detail: boolean;
+  }
+
+  // Phones get the pinned strip of map; must match the CSS breakpoint.
   const phone = window.matchMedia('(max-width: 63.99rem)');
 
   function init(root: HTMLElement) {
+    const mapRoot = root.querySelector<HTMLElement>('[data-board-map]');
+    const camera = root.querySelector<SVGGElement>('[data-camera]');
+    const detail = root.querySelector<SVGGElement>('[data-detail]');
+    const province = root.querySelector<SVGGElement>('[data-province]');
     const panel = root.querySelector<HTMLElement>('.map-panel');
-    const peopleBox = root.querySelector<HTMLElement>('.people');
     const header = document.querySelector<HTMLElement>('.site-header');
-    if (!panel || !peopleBox) return;
-    const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
-    const people = [...root.querySelectorAll<HTMLElement>('[data-person]')];
-    const sheets = new Map(
-      [...root.querySelectorAll<HTMLElement>('[data-sheet]')].map((sheet) => [
-        sheet.dataset.sheet ?? '',
-        sheet,
+    if (!mapRoot || !camera || !detail || !province || !panel) return;
+
+    const cameras: Record<string, Camera> = JSON.parse(
+      mapRoot.dataset.cameras ?? '{}',
+    );
+    const overview: Camera = { k: 1, tx: 0, ty: 0, detail: false };
+    const entries = [...root.querySelectorAll<HTMLElement>('[data-entry]')];
+    const pins = [...mapRoot.querySelectorAll<SVGGElement>('.pin')];
+    const leads = [...mapRoot.querySelectorAll<SVGPathElement>('.lead')];
+    const placeOf = new Map(
+      entries.map((entry) => [
+        entry.dataset.member ?? '',
+        entry.querySelector('.meta')?.textContent?.split(' · ').pop() ?? '',
       ]),
     );
 
-    let active: string | null = null;
-    let top = 1;
-
-    // Put a sheet on top of the stack: it starts off the stack (see the
-    // map's styles) and settles onto it.
-    function layDown(key: string) {
-      const sheet = sheets.get(key);
-      if (!sheet) return;
-      sheet.style.zIndex = String(++top);
-      sheet.classList.add('is-in', 'is-entering');
-      sheet.getBoundingClientRect();
-      sheet.classList.remove('is-entering');
-    }
+    let active: string | null | undefined;
 
     function show(id: string | null) {
       if (id === active) return;
       active = id;
-      layDown(id ?? 'all');
-      for (const card of cards) {
-        card.classList.toggle('is-active', card.dataset.member === id);
+      const { k, tx, ty, detail: close } = (id && cameras[id]) || overview;
+      camera!.style.transform = `translate(${tx}px, ${ty}px) scale(${k})`;
+      detail!.classList.toggle('is-on', close);
+      province!.classList.toggle('is-off', close);
+      const place = id ? placeOf.get(id) : null;
+      for (const pin of pins) {
+        const x = tx + k * Number(pin.dataset.x);
+        const y = ty + k * Number(pin.dataset.y);
+        pin.style.transform = `translate(${x}px, ${y}px)`;
+        if (pin.dataset.member) {
+          pin.classList.toggle('is-on', pin.dataset.member === id);
+        } else {
+          pin.classList.toggle('is-here', pin.dataset.place === place);
+        }
       }
-      for (const person of people) {
-        person.classList.toggle('is-active', person.dataset.person === id);
+      for (const lead of leads) {
+        lead.classList.toggle('is-on', lead.dataset.member === id);
       }
-      peopleBox!.classList.toggle('has-person', id !== null);
+      for (const entry of entries) {
+        entry.classList.toggle('is-active', entry.dataset.member === id);
+      }
+      mapRoot!.classList.toggle('has-member', id !== null);
     }
 
-    // Phones: a member's sheet keeps their area right of the person shown
-    // over the left of the map.
-    function fit() {
-      for (const [key, sheet] of sheets) {
-        sheet
-          .querySelector('svg')
-          ?.setAttribute(
-            'preserveAspectRatio',
-            phone.matches && key !== 'all' ? 'xMaxYMid meet' : 'xMidYMid meet',
-          );
-      }
-    }
-
-    // Scrolling: the card crossing a thin band just below the pinned panel
-    // on phones, or a little above the middle of the screen on wide ones, is
-    // the one being read. Ignored until the visitor scrolls, so the page
-    // opens on the whole province.
+    // The entry crossing a thin band just below the pinned map on phones,
+    // or a little above the middle of the screen on wide ones, is the one
+    // being read. Ignored until the visitor scrolls, so the page opens on
+    // the whole province.
     let scrolled = false;
     let observer: IntersectionObserver | undefined;
+    // Entries in the band now, in page order, so the first scroll can pick
+    // up an entry that was already in the band when the page opened.
+    const inBand = new Set<HTMLElement>();
+
+    function showFromBand() {
+      const first = entries.find((entry) => inBand.has(entry));
+      if (first) show(first.dataset.member ?? null);
+    }
 
     function watch() {
-      // Pin the panel under the site header, which is sticky except on short
-      // screens.
+      // The site header is sticky except on short screens.
       const headerHeight =
         header && getComputedStyle(header).position === 'sticky'
           ? header.offsetHeight
@@ -302,39 +298,43 @@ const sheets: MapSheet[] = members.map((m) => ({
       const bandBottom = Math.max(window.innerHeight - bandTop - 48, 0);
       observer?.disconnect();
       observer = new IntersectionObserver(
-        (entries) => {
-          if (!scrolled) return;
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              show((entry.target as HTMLElement).dataset.member ?? null);
-            }
+        (items) => {
+          for (const item of items) {
+            const entry = item.target as HTMLElement;
+            if (item.isIntersecting) inBand.add(entry);
+            else inBand.delete(entry);
           }
+          if (scrolled) showFromBand();
         },
         { rootMargin: `-${bandTop}px 0px -${bandBottom}px 0px` },
       );
-      cards.forEach((card) => observer!.observe(card));
-      fit();
+      entries.forEach((entry) => observer!.observe(entry));
     }
 
+    show(null);
     watch();
     window.addEventListener('resize', watch);
 
     window.addEventListener(
       'scroll',
       () => {
+        if (window.scrollY < 80) {
+          show(null);
+        } else if (!scrolled) {
+          showFromBand();
+        }
         scrolled = true;
-        if (window.scrollY < 80) show(null);
       },
       { passive: true },
     );
 
-    // Opening a member's background or moving focus into their card.
-    for (const card of cards) {
-      const id = card.dataset.member ?? null;
-      card.querySelector('details')?.addEventListener('toggle', (event) => {
+    // Opening a member's details or moving focus into their entry.
+    for (const entry of entries) {
+      const id = entry.dataset.member ?? null;
+      entry.querySelector('details')?.addEventListener('toggle', (event) => {
         if ((event.target as HTMLDetailsElement).open) show(id);
       });
-      card.addEventListener('focusin', () => show(id));
+      entry.addEventListener('focusin', () => show(id));
     }
   }
 
@@ -343,8 +343,75 @@ const sheets: MapSheet[] = members.map((m) => ({
 </script>
 
 <style>
+  /*
+   * Phones: the text in the usual gutter, with a strip of map pinned under
+   * the site header (with JavaScript) above the entries.
+   */
+  .layout {
+    display: grid;
+    padding-inline: var(--space-gutter);
+  }
+
+  .map-panel {
+    z-index: 1;
+    height: clamp(13rem, 34vh, 18rem);
+    margin-inline: calc(-1 * var(--space-gutter));
+    overflow: hidden;
+    background: var(--color-bg);
+  }
+
+  @media (max-width: 63.99rem) {
+    :global(.js) .map-panel {
+      position: sticky;
+      inset-block-start: var(--board-header-height, 0);
+      border-block-end: var(--border-width) solid var(--color-border);
+    }
+
+    /* The intro sits above the map, the entries below it. */
+    .text {
+      display: contents;
+    }
+
+    .intro {
+      order: -2;
+    }
+
+    .map-panel {
+      order: -1;
+    }
+  }
+
+  /*
+   * Wide screens: a narrow column of text lined up with the site header,
+   * and the map filling the rest of the width, to the edge of the screen.
+   * The map stays pinned under the site header as the text scrolls.
+   */
+  @media (min-width: 64rem) {
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
+      column-gap: var(--space-7);
+      padding-inline-start: max(
+        var(--space-gutter),
+        calc((100% - var(--width-page)) / 2)
+      );
+      padding-inline-end: 0;
+    }
+
+    .map-panel {
+      position: sticky;
+      inset-block-start: var(--board-header-height, 9rem);
+      align-self: start;
+      height: calc(100dvh - var(--board-header-height, 9rem));
+      margin-inline: 0;
+      padding-block: var(--space-5);
+      box-sizing: border-box;
+      /* A soft left edge where the zoomed map meets the text. */
+      mask-image: linear-gradient(to right, transparent, #000 var(--space-7));
+    }
+  }
+
   .intro {
-    max-width: var(--width-prose);
     padding-block: var(--space-6) var(--space-5);
   }
 
@@ -358,288 +425,69 @@ const sheets: MapSheet[] = members.map((m) => ({
     font-size: var(--text-sm);
   }
 
-  .layout {
-    display: grid;
-    gap: var(--space-5);
-  }
-
-  /*
-   * Phones: a short strip of map, edge to edge, above the list. With
-   * JavaScript it is pinned under the site header, whose height the script
-   * measures.
-   */
-  .map-panel {
-    z-index: 1;
-    height: 38vh;
-    margin-inline: calc(-1 * var(--space-gutter));
-  }
-
-  @media (max-width: 63.99rem) {
-    :global(.js) .map-panel {
-      position: sticky;
-      inset-block-start: var(--board-header-height, 0);
-    }
-  }
-
-  /*
-   * Wide screens: intro and list on the left, the map filling the right side
-   * from the top of the page, so the whole province shows on arrival. The
-   * panel stays pinned under the site header and fills the rest of the
-   * screen.
-   */
-  @media (min-width: 64rem) {
-    .layout {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-      grid-template-areas:
-        'intro map'
-        'list map';
-      grid-template-rows: auto 1fr;
-      column-gap: var(--space-7);
-      row-gap: 0;
-    }
-
-    .intro {
-      grid-area: intro;
-    }
-
-    .map-panel {
-      --panel-top: calc(var(--board-header-height, 9rem) + var(--space-5));
-      position: sticky;
-      grid-area: map;
-      align-self: start;
-      inset-block-start: var(--panel-top);
-      height: calc(100dvh - var(--panel-top) - var(--space-5));
-      margin-block-start: var(--space-5);
-      margin-inline: 0;
-    }
-
-    .list {
-      grid-area: list;
-    }
-  }
-
   .members {
-    display: grid;
-    gap: var(--space-5);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  /* The person stack exists for phones with JavaScript only. */
-  .people {
-    display: none;
-  }
-
-  .map-slot {
-    height: 100%;
-  }
-
-  /*
-   * Phones with JavaScript: an app-like view. The map panel stays pinned
-   * under the site header; only the details below it scroll. The map starts
-   * as the whole province, full width. When a member is being read, their
-   * photo, name, role and town fade in over the left of the map, and their
-   * sheet keeps its area in the space beside them. Each card's photo, name,
-   * role and location are visually hidden but stay in place for assistive
-   * technology. Without JavaScript, the full cards show as normal.
-   */
-  @media (max-width: 63.99rem) {
-    :global(.js) .map-panel {
-      height: clamp(12rem, 30vh, 17rem);
-    }
-
-    :global(.js) .people {
-      position: absolute;
-      inset-block: var(--space-2);
-      inset-inline-start: 0;
-      z-index: 1;
-      display: grid;
-      inline-size: 38%;
-      padding: var(--space-3);
-      border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-      background: var(--color-bg);
-      opacity: 0;
-      transition: opacity var(--duration-slow) var(--ease-standard);
-    }
-
-    :global(.js) .people.has-person {
-      opacity: 1;
-    }
-
-    :global(.js) .person {
-      grid-area: 1 / 1;
-      margin: 0;
-      opacity: 0;
-      transition: opacity var(--duration-slow) var(--ease-standard);
-    }
-
-    :global(.js) .person.is-active {
-      opacity: 1;
-    }
-
-    :global(.js) .person-photo {
-      inline-size: 4.5rem;
-    }
-
-    :global(.js) .card {
-      grid-template-columns: minmax(0, 1fr);
-      padding: var(--space-2) 0 0;
-      border: 0;
-      border-radius: 0;
-    }
-
-    :global(.js) .card + .card {
-      border-block-start: var(--border-width) solid var(--color-border);
-      padding-block-start: var(--space-5);
-    }
-
-    :global(.js) .card .photo {
-      display: none;
-    }
-
-    :global(.js) .card h2,
-    :global(.js) .card .identity {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
-
-    :global(.js) .card.is-active {
-      border-color: var(--color-border);
-    }
-  }
-
-  .person-photo {
-    display: block;
-    inline-size: 100%;
-    max-block-size: 22vh;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-  }
-
-  .person-photo-placeholder {
-    display: grid;
-    place-items: center;
-    border: var(--border-width) dashed var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-  }
-
-  .person-name {
-    margin: var(--space-2) 0 0;
-    font-weight: var(--font-weight-bold);
-    line-height: var(--leading-tight);
-  }
-
-  .person-meta {
-    margin: 0;
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-  }
-
-  /* Room after the last card so it can reach the middle of the screen. */
-  .list {
-    padding-block-end: 40vh;
-  }
-
-  .card {
-    display: grid;
-    grid-template-columns: 8.5rem minmax(0, 1fr);
-    gap: var(--space-4);
-    padding: var(--space-4);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-lg);
+  /* Plain entries, divided by a thin rule. */
+  .entry {
+    padding-block: var(--space-6);
+    border-block-start: var(--border-width) solid var(--color-border);
     scroll-margin-block-start: 40vh;
   }
 
-  /* Narrow screens: portrait above the text so the text keeps its width. */
-  @media (max-width: 40rem) {
-    .card {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .photo {
-      max-inline-size: 8.5rem;
-    }
+  .entry > p {
+    margin-block: var(--space-3) 0;
   }
 
-  .card.is-active {
-    border-color: var(--color-accent);
+  .entry-head {
+    display: flex;
+    align-items: end;
+    gap: var(--space-4);
   }
 
-  .text > :first-child {
-    margin-block-start: 0;
+  .photo {
+    flex: none;
+    inline-size: 4.5rem;
   }
 
   h2 {
+    margin: 0;
     font-size: var(--text-xl);
   }
 
-  .facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-3) var(--space-4);
-    margin: var(--space-3) 0;
+  /* Role and town, in the map's own lettering. */
+  .meta {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
   }
 
-  .facts .wide {
-    grid-column: 1 / -1;
+  /* The entry being read: its town turns pen red, as on the map. */
+  .entry.is-active .meta {
+    color: var(--color-text);
   }
 
-  dt {
+  .entry.is-active .meta::before {
+    content: '';
+    display: inline-block;
+    inline-size: 0.6em;
+    block-size: 0.6em;
+    margin-inline-end: var(--space-2);
+    border-radius: 50%;
+    background: var(--color-marker);
+  }
+
+  .leads {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
   }
 
-  dd {
-    margin: 0;
-  }
-
-  .affiliations {
-    display: grid;
-    gap: var(--space-2);
-    margin: 0 0 var(--space-3);
-    padding: 0;
-    list-style: none;
-    font-size: var(--text-sm);
-  }
-
-  .affiliations li {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-  }
-
-  .logo,
-  .logo-placeholder {
-    flex: none;
-    inline-size: var(--space-7);
-    block-size: var(--space-7);
-    border-radius: var(--radius-sm);
-  }
-
-  .logo {
-    object-fit: contain;
-  }
-
-  .logo-placeholder {
-    display: grid;
-    place-items: center;
-    border: var(--border-width) dashed var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-  }
-
-  .affiliation-label {
-    display: block;
-    color: var(--color-text-muted);
+  details {
+    margin-block-start: var(--space-3);
   }
 
   summary {
@@ -648,16 +496,22 @@ const sheets: MapSheet[] = members.map((m) => ({
     cursor: pointer;
   }
 
+  details > p {
+    margin-block: var(--space-3) 0;
+  }
+
   .portrait {
     display: block;
     inline-size: 100%;
     aspect-ratio: 4 / 5;
     object-fit: cover;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
   }
 
+  /* Room after the last entry so it can reach the middle of the screen. */
   .credits {
-    margin-block-start: var(--space-6);
+    margin-block: var(--space-6) 0;
+    padding-block-end: 40vh;
     color: var(--color-text-muted);
     font-size: var(--text-sm);
   }
