@@ -230,6 +230,12 @@ const views: MapView[] = members.map((m) => {
     const cameras: Record<string, Camera> = JSON.parse(
       mapRoot.dataset.cameras ?? '{}',
     );
+    const leadsOf: Record<string, number[]> = JSON.parse(
+      mapRoot.dataset.leads ?? '{}',
+    );
+    const crowded: Record<string, Record<string, number[]>> = JSON.parse(
+      mapRoot.dataset.crowded ?? '{}',
+    );
     const overview: Camera = { k: 1, tx: 0, ty: 0, detail: false };
     const entries = [...root.querySelectorAll<HTMLElement>('[data-entry]')];
     const pins = [...mapRoot.querySelectorAll<SVGGElement>('.pin')];
@@ -243,9 +249,10 @@ const views: MapView[] = members.map((m) => {
 
     let active: string | null | undefined;
 
-    function show(id: string | null) {
-      if (id === active) return;
+    function show(id: string | null, again = false) {
+      if (id === active && !again) return;
       active = id;
+      const hide = crowded[phone.matches ? 'phone' : 'wide']?.[id ?? 'all'];
       const { k, tx, ty, detail: close } = (id && cameras[id]) || overview;
       camera!.style.transform = `translate(${tx}px, ${ty}px) scale(${k})`;
       detail!.classList.toggle('is-on', close);
@@ -255,8 +262,13 @@ const views: MapView[] = members.map((m) => {
         const x = tx + k * Number(pin.dataset.x);
         const y = ty + k * Number(pin.dataset.y);
         pin.style.transform = `translate(${x}px, ${y}px)`;
-        if (pin.dataset.member) {
-          pin.classList.toggle('is-on', pin.dataset.member === id);
+        if (pin.dataset.district) {
+          const number = Number(pin.dataset.district);
+          pin.classList.toggle(
+            'is-lead',
+            (id ? (leadsOf[id] ?? []) : []).includes(number),
+          );
+          pin.classList.toggle('is-hidden', hide?.includes(number) ?? false);
         } else {
           pin.classList.toggle('is-here', pin.dataset.place === place);
         }
@@ -309,6 +321,8 @@ const views: MapView[] = members.map((m) => {
         { rootMargin: `-${bandTop}px 0px -${bandBottom}px 0px` },
       );
       entries.forEach((entry) => observer!.observe(entry));
+      // Phones and wide screens hide different numbers.
+      show(active ?? null, true);
     }
 
     show(null);

@@ -83,38 +83,109 @@ const cameras = Object.fromEntries(
   }),
 );
 
-// Close views draw their lead districts from the close-up layer. A district
-// label that would sit on the member's town moves just below it.
-const outlines = views.flatMap((view) => {
-  const camera = cameras[view.member];
-  const k = camera?.k ?? 1;
-  const town = places.find((p) => p.name === view.place)?.point;
-  return view.leads.map((lead) => {
-    const d = camera?.detail
+// Close views draw their lead outlines from the close-up layer.
+const outlines = views.flatMap((view) =>
+  view.leads.map((lead) => ({
+    ...(cameras[view.member]?.detail
       ? (detailDistricts.find((x) => x.number === lead.number) ?? lead)
-      : lead;
-    const crowded =
-      town !== undefined &&
-      Math.hypot(d.label[0] - town[0], d.label[1] - town[1]) * k < 48;
-    return {
-      ...d,
-      member: view.member,
-      label: crowded
-        ? ([town[0], town[1] + 30 / k] as [number, number])
-        : d.label,
-    };
-  });
-});
+      : lead),
+    member: view.member,
+  })),
+);
+
+// Every district is numbered, always. The ones the member being read leads
+// turn pen red (the script reads each view's leads from here).
+const leadsOf = Object.fromEntries(
+  views.map((view) => [view.member, view.leads.map((d) => d.number)]),
+);
 
 // Labels sit east of the marker unless they would run off the province
 // frame. Source Code Pro is 0.6em a character; checked at the phone size.
 const labelLeft = ({ name, point }: MapPlace) =>
   point[0] + 24 + name.length * 0.6 * 44 > bcFrame.x + bcFrame.width;
 
+// Which district numbers would overlap at each zoom, for wide screens and
+// phones (where labels are larger for the map's size). Worked out here, in
+// screen units at the province's scale, so the script only fades them. The
+// member's own districts are placed first, then the rest in order; a number
+// that would touch one already placed, a town dot or a town name stays
+// hidden in that view.
+const labelSizes = {
+  wide: { town: 18, district: 14 },
+  phone: { town: 36, district: 28 },
+};
+type Rect = [number, number, number, number];
+const overlaps = (a: Rect, b: Rect) =>
+  a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+
+function hiddenNumbers(
+  size: { town: number; district: number },
+  camera: { k: number; tx: number; ty: number },
+  leads: number[],
+) {
+  const screen = ([x, y]: [number, number]): [number, number] => [
+    camera.tx + camera.k * x,
+    camera.ty + camera.k * y,
+  ];
+  const placed: Rect[] = places.map((p) => {
+    const [x, y] = screen(p.point);
+    const width = 14 + p.name.length * 0.6 * size.town;
+    const half = size.town * 0.6;
+    return labelLeft(p)
+      ? [x - width, y - half, x + 8, y + half]
+      : [x - 8, y - half, x + width, y + half];
+  });
+  const order = [
+    ...map.districts.filter((d) => leads.includes(d.number)),
+    ...map.districts.filter((d) => !leads.includes(d.number)),
+  ];
+  const hidden: number[] = [];
+  for (const d of order) {
+    const [x, y] = screen(d.label as [number, number]);
+    const halfWidth = (String(d.number).length * 0.6 * size.district) / 2 + 3;
+    const halfHeight = size.district * 0.6;
+    const rect: Rect = [
+      x - halfWidth,
+      y - halfHeight,
+      x + halfWidth,
+      y + halfHeight,
+    ];
+    if (!leads.includes(d.number) && placed.some((r) => overlaps(r, rect))) {
+      hidden.push(d.number);
+    } else {
+      placed.push(rect);
+    }
+  }
+  return hidden;
+}
+
+const crowded = Object.fromEntries(
+  (['wide', 'phone'] as const).map((mode) => [
+    mode,
+    Object.fromEntries([
+      ['all', hiddenNumbers(labelSizes[mode], { k: 1, tx: 0, ty: 0 }, [])],
+      ...views.map((view) => [
+        view.member,
+        hiddenNumbers(
+          labelSizes[mode],
+          cameras[view.member]!,
+          leadsOf[view.member] ?? [],
+        ),
+      ]),
+    ]),
+  ]),
+);
+
 const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
 ---
 
-<div class="board-map" data-board-map data-cameras={JSON.stringify(cameras)}>
+<div
+  class="board-map"
+  data-board-map
+  data-cameras={JSON.stringify(cameras)}
+  data-leads={JSON.stringify(leadsOf)}
+  data-crowded={JSON.stringify(crowded)}
+>
   <svg
     viewBox={[bcFrame.x, bcFrame.y, bcFrame.width, bcFrame.height]
       .map((n) => n.toFixed(1))
@@ -137,16 +208,19 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
         <path class="lead" d={d.d} data-member={d.member} />
       ))}
     </g>
-    {outlines.map((d) => (
+    {map.districts.map((d) => (
       <g
-        class="pin district-name"
-        data-member={d.member}
+        class:list={[
+          'pin district-number',
+          { 'is-hidden': crowded.wide?.all?.includes(d.number) },
+        ]}
+        data-district={d.number}
         data-x={d.label[0]}
         data-y={d.label[1]}
-        style={{ transform: at(d.label) }}
+        style={{ transform: at(d.label as [number, number]) }}
       >
         <text text-anchor="middle" dy="0.35em">
-          SD {d.number}
+          {d.number}
         </text>
       </g>
     ))}
@@ -193,9 +267,19 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
     transform-origin: 0 0;
   }
 
-  .camera,
-  .pin {
+  .camera {
     transition: transform var(--duration-slower) var(--ease-standard);
+  }
+
+  .pin {
+    transition:
+      transform var(--duration-slower) var(--ease-standard),
+      opacity var(--duration-slower) var(--ease-standard);
+  }
+
+  /* A district number with no room at this zoom. */
+  .pin.is-hidden {
+    opacity: 0;
   }
 
   .pin {
@@ -233,15 +317,13 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
   }
 
   .detail,
-  .lead,
-  .district-name {
+  .lead {
     opacity: 0;
     transition: opacity var(--duration-slower) var(--ease-standard);
   }
 
   .detail.is-on,
-  .lead.is-on,
-  .district-name.is-on {
+  .lead.is-on {
     opacity: 1;
   }
 
@@ -282,11 +364,16 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
     font-weight: var(--font-weight-bold);
   }
 
-  .district-name text {
-    fill: var(--color-marker);
+  /* District numbers: always shown, quiet, pen red where the member leads. */
+  .district-number text {
+    fill: var(--color-text-muted);
     font-size: var(--district-size);
+    stroke-width: 4px;
+  }
+
+  .district-number.is-lead text {
+    fill: var(--color-marker);
     font-weight: var(--font-weight-bold);
-    stroke-width: 5px;
   }
 
   /*
