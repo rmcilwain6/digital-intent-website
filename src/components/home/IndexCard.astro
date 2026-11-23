@@ -1,8 +1,12 @@
 ---
 // The teachers' route on Home: an index card on paper (design system:
-// RouteCards). On hover or keyboard focus the card lifts and a pen-red marker
-// line draws in under the action. The line grows with a transform, so it
-// meets the motion rule, and it is already drawn under reduced motion.
+// RouteCards). On hover or keyboard focus a pen-red line draws in under the
+// action, left to right, and the card lifts slightly off the desk, with a
+// soft shadow fading in under it. The draw is a wipe: a
+// clipping window slides right while the line inside slides left by the same
+// amount, so the line stays put and only transform animates (motion rule).
+// Under reduced motion the line and shadow simply appear on hover, with no
+// draw and no lift.
 //
 // While the destination is a [TK] note (D26), the card is not a link: it
 // shows the note instead, so there is no broken link (rule 6).
@@ -28,11 +32,13 @@ const Tag = pending ? 'div' : 'a';
   <span class="action">
     <span class="marked">
       {card.action}
-      {!pending && (
-        <svg viewBox="0 0 240 30" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M6 22 C 60 12, 150 10, 236 18" />
-        </svg>
-      )}
+      <span class="pen" aria-hidden="true">
+        <span class="ink">
+          <svg viewBox="0 0 240 30" preserveAspectRatio="none">
+            <path d="M6 22 C 60 12, 150 10, 236 18" />
+          </svg>
+        </span>
+      </span>
     </span>
   </span>
   {pending && <span class="note">{card.href}</span>}
@@ -59,7 +65,21 @@ const Tag = pending ? 'div' : 'a';
     background-position: 0 2.75rem;
     color: var(--color-text);
     text-decoration: none;
+    isolation: isolate;
     transition: transform var(--duration-base) var(--ease-standard);
+  }
+
+  /* The shadow of a card held just above the desk. It fades in (opacity
+     only) when the card is picked up. */
+  .index-card::after {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    box-shadow: 0 0.75rem 1.25rem -0.75rem
+      color-mix(in srgb, var(--color-text) 45%, transparent);
+    content: '';
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-standard);
   }
 
   .rule {
@@ -94,16 +114,31 @@ const Tag = pending ? 'div' : 'a';
     font-weight: var(--font-weight-bold);
   }
 
-  svg {
+  /* The clipping window. It starts one width to the left, so it shows none
+     of the line, and slides into place on hover. */
+  .pen {
     position: absolute;
     inset-inline-start: -4%;
-    inset-block-end: -9px;
+    inset-block-end: -12px;
     inline-size: 108%;
-    block-size: 14px;
-    overflow: visible;
-    transform: scaleX(0);
-    transform-origin: left center;
+    block-size: 18px;
+    overflow: hidden;
+    transform: translateX(-100%);
     transition: transform var(--duration-slow) var(--ease-standard);
+  }
+
+  /* The line, moved the other way so it stays under the text. */
+  .ink {
+    display: block;
+    block-size: 100%;
+    transform: translateX(100%);
+    transition: transform var(--duration-slow) var(--ease-standard);
+  }
+
+  svg {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
   }
 
   path {
@@ -113,14 +148,21 @@ const Tag = pending ? 'div' : 'a';
     stroke-linecap: round;
   }
 
-  a.index-card:hover,
+  .index-card:hover,
   a.index-card:focus-visible {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
   }
 
-  a.index-card:hover svg,
-  a.index-card:focus-visible svg {
-    transform: scaleX(1);
+  .index-card:hover::after,
+  a.index-card:focus-visible::after {
+    opacity: 1;
+  }
+
+  .index-card:hover .pen,
+  .index-card:hover .ink,
+  a.index-card:focus-visible .pen,
+  a.index-card:focus-visible .ink {
+    transform: none;
   }
 
   .note {
@@ -129,12 +171,18 @@ const Tag = pending ? 'div' : 'a';
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .index-card {
+    .index-card,
+    .index-card::after {
       transition: none;
     }
 
-    svg {
+    .index-card:hover,
+    a.index-card:focus-visible {
       transform: none;
+    }
+
+    .pen,
+    .ink {
       transition: none;
     }
   }
