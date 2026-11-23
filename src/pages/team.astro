@@ -325,6 +325,12 @@ const views: MapView[] = members.map((m) => {
         ? headerHeight + panel!.offsetHeight
         : headerHeight;
       line = top + (window.innerHeight - top) * (phone.matches ? 0.3 : 0.4);
+      // Phones: keep focused links and "More about" toggles clear of the
+      // pinned header and map when the browser scrolls to them (WCAG
+      // 2.4.11). Wide screens keep the site-wide header clearance.
+      document.documentElement.style.scrollPaddingBlockStart = phone.matches
+        ? `calc(${top}px + var(--space-4))`
+        : '';
       // Phones and wide screens hide different numbers.
       show(active ?? null, true);
       pick();
@@ -352,9 +358,17 @@ const views: MapView[] = members.map((m) => {
     show(null);
     syncToggle();
     measure();
+    // Mobile browsers fire resize repeatedly as the address bar shows and
+    // hides: measure at most once a frame.
+    let resizeQueued = false;
     window.addEventListener('resize', () => {
-      syncToggle();
-      measure();
+      if (resizeQueued) return;
+      resizeQueued = true;
+      requestAnimationFrame(() => {
+        resizeQueued = false;
+        syncToggle();
+        measure();
+      });
     });
 
     let queued = false;
