@@ -1,0 +1,402 @@
+---
+// MOCK FOR REVIEW, not linked from the site. Two ways to show the three
+// bridge photos in the hero as prints on a classroom board, next to the real
+// headline and route cards: a whiteboard with magnets, or a corkboard with
+// push pins. Pages: /mocks/hero-whiteboard/ and /mocks/hero-cork/. Once the
+// team picks one, it moves into HomeHero.astro and this file and the mock
+// pages are deleted.
+import type { Home } from '../../schemas/home';
+import IndexCard from './IndexCard.astro';
+import ValleyviewWindow from './ValleyviewWindow.astro';
+
+interface Props {
+  hero: Home['hero'];
+  board: 'whiteboard' | 'cork';
+}
+
+const { hero, board } = Astro.props;
+
+// Placeholder slots for original photography (rule 8), one per region.
+const bridges = [
+  { city: 'kamloops', bridge: 'Overlanders Bridge' },
+  { city: 'victoria', bridge: 'Johnson Street Bridge' },
+  { city: 'vancouver', bridge: 'Lions Gate Bridge' },
+];
+---
+
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="inner">
+    <div class="text">
+      <h1 id="hero-heading">{hero.heading}</h1>
+      <p class="lede">{hero.lede}</p>
+      <div class="routes">
+        <IndexCard card={hero.teachers} />
+        <ValleyviewWindow card={hero.valleyview} />
+      </div>
+    </div>
+
+    <div class:list={['wall', board]} aria-hidden="true">
+      {bridges.map((b, i) => (
+        <figure class={`print q${i + 1}`}>
+          <span
+            class={
+              board === 'whiteboard' ? `magnet m${i + 1}` : `pin t${i + 1}`
+            }
+          />
+          <div class="slot">
+            <span>[photo: {b.bridge}]</span>
+          </div>
+          <figcaption>{b.city}</figcaption>
+        </figure>
+      ))}
+      {board === 'whiteboard' && (
+        <div class="tray">
+          <span class="pen" />
+          <span class="eraser" />
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  :global(astro-dev-toolbar) {
+    display: none !important;
+  }
+
+  .hero {
+    --header-height: 8.75rem;
+    position: relative;
+    overflow: clip;
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-7);
+    max-inline-size: calc(var(--width-page) + 2 * var(--space-gutter));
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-gutter);
+  }
+
+  .text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-5);
+  }
+
+  h1 {
+    max-inline-size: 9.4em;
+    margin: 0;
+    font-size: clamp(2.25rem, 1rem + 3.4vw, var(--text-display));
+    line-height: 1.02;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .lede {
+    max-inline-size: 44ch;
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.55;
+  }
+
+  .routes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    inline-size: min(100%, 27.5rem);
+  }
+
+  @media (width >= 64rem) {
+    .hero,
+    .inner {
+      min-block-size: calc(100svh - var(--header-height));
+    }
+
+    .inner {
+      grid-template-columns: minmax(27.5rem, 0.85fr) minmax(0, 1fr);
+      align-items: center;
+    }
+
+    /* Same fit as the real hero: header plus hero is one screen. */
+    h1 {
+      font-size: max(
+        2rem,
+        min(
+          var(--text-display),
+          (
+              100svh - var(--header-height) - 2 * var(--space-6) - 2 *
+                var(--space-5) - 27.75rem
+            ) /
+            3.06
+        )
+      );
+    }
+  }
+
+  /* The board: full width on phones, bleeding off the right on wide screens. */
+  .wall {
+    position: relative;
+    block-size: 22rem;
+    margin-inline: calc(-1 * var(--space-gutter));
+    border-block: 0.5rem solid var(--color-border);
+  }
+
+  @media (width >= 64rem) {
+    .wall {
+      align-self: stretch;
+      block-size: auto;
+      min-block-size: 30rem;
+      margin-inline: 0
+        calc(-1 * max(var(--space-gutter), (100vw - var(--width-page)) / 2));
+      border: 0.625rem solid var(--color-border);
+      border-inline-end: 0;
+      border-start-start-radius: var(--radius-md);
+      border-end-start-radius: var(--radius-md);
+    }
+  }
+
+  /* Prints: a beige border, a slight tilt and a soft shadow. */
+  .print {
+    position: absolute;
+    margin: 0;
+    padding: 0.5rem 0.5rem 0.375rem;
+    background: var(--color-paper);
+    box-shadow:
+      0 1px 0 color-mix(in srgb, var(--color-text) 10%, transparent),
+      0 0.75rem 1.25rem -0.75rem
+        color-mix(in srgb, var(--color-text) 55%, transparent);
+  }
+
+  .slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
+    border: 1px dashed var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  figcaption {
+    margin-block-start: 0.375rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .q1 .slot,
+  .q3 .slot {
+    aspect-ratio: 3 / 2;
+  }
+
+  .q2 .slot {
+    aspect-ratio: 4 / 5;
+  }
+
+  .q1 {
+    inline-size: 44%;
+    inset: 9% auto auto 5%;
+    rotate: -2deg;
+  }
+
+  .q2 {
+    inline-size: 30%;
+    inset: 14% 6% auto auto;
+    rotate: 2deg;
+  }
+
+  .q3 {
+    inline-size: 42%;
+    inset: auto auto 13% 30%;
+    rotate: -1deg;
+  }
+
+  @media (width >= 64rem) {
+    .q1 {
+      inline-size: 42%;
+      inset: 8% auto auto 6%;
+    }
+
+    .q2 {
+      inline-size: 28%;
+      inset: 12% 8% auto auto;
+    }
+
+    .q3 {
+      inline-size: 40%;
+      inset: auto auto 11% 30%;
+    }
+  }
+
+  /* Whiteboard: near white, faint ghosts of old marker, a tray. */
+  .whiteboard {
+    background:
+      radial-gradient(
+        ellipse 30% 12% at 70% 82%,
+        color-mix(in srgb, var(--color-text) 4%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 25% 10% at 20% 30%,
+        color-mix(in srgb, var(--color-text) 3%, transparent),
+        transparent
+      ),
+      linear-gradient(
+        160deg,
+        var(--color-card),
+        color-mix(in srgb, var(--color-card) 92%, var(--color-border))
+      );
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--color-text) 8%, transparent);
+  }
+
+  .magnet {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: -0.55rem;
+    inset-inline-start: 50%;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 50%;
+    translate: -50% 0;
+    box-shadow: 0 0.2rem 0.3rem -0.1rem
+      color-mix(in srgb, var(--color-text) 60%, transparent);
+  }
+
+  .m1 {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-red) 55%, var(--color-paper)),
+      var(--color-red) 60%
+    );
+  }
+
+  .m2 {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-navy) 45%, var(--color-paper)),
+      var(--color-navy) 60%
+    );
+  }
+
+  .m3 {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-lime) 40%, var(--color-paper)),
+      color-mix(in srgb, var(--color-lime) 85%, var(--color-navy)) 70%
+    );
+  }
+
+  .tray {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    align-items: end;
+    gap: var(--space-4);
+    block-size: 1rem;
+    padding-inline: 8%;
+    background: color-mix(in srgb, var(--color-border) 70%, var(--color-paper));
+    box-shadow: 0 -1px 0 color-mix(in srgb, var(--color-text) 20%, transparent);
+  }
+
+  .pen {
+    inline-size: 5.5rem;
+    block-size: 0.7rem;
+    margin-block-end: 0.5rem;
+    border-radius: 0.35rem 0.15rem 0.15rem 0.35rem;
+    background: linear-gradient(
+      to right,
+      var(--color-red) 22%,
+      var(--color-paper) 22%
+    );
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-text) 40%, transparent);
+  }
+
+  .eraser {
+    inline-size: 4rem;
+    block-size: 1.1rem;
+    margin-block-end: 0.5rem;
+    border-radius: 0.2rem;
+    background: linear-gradient(
+      to bottom,
+      var(--color-navy) 60%,
+      var(--color-surface) 60%
+    );
+  }
+
+  /* Corkboard: tan from the palette (beige warmed with red and lime),
+     speckled, in a navy frame. A new colour: needs brand sign-off. */
+  .cork {
+    border-color: var(--color-navy);
+    background-color: color-mix(
+      in srgb,
+      var(--color-surface) 62%,
+      color-mix(in srgb, var(--color-red) 45%, var(--color-lime))
+    );
+    background-image:
+      radial-gradient(
+        circle at 20% 30%,
+        color-mix(in srgb, var(--color-text) 22%, transparent) 0.06rem,
+        transparent 0.1rem
+      ),
+      radial-gradient(
+        circle at 70% 60%,
+        color-mix(in srgb, var(--color-paper) 45%, transparent) 0.07rem,
+        transparent 0.11rem
+      ),
+      radial-gradient(
+        circle at 45% 80%,
+        color-mix(in srgb, var(--color-text) 16%, transparent) 0.05rem,
+        transparent 0.09rem
+      ),
+      radial-gradient(
+        circle at 85% 15%,
+        color-mix(in srgb, var(--color-paper) 35%, transparent) 0.05rem,
+        transparent 0.09rem
+      );
+    background-size:
+      0.55rem 0.55rem,
+      0.8rem 0.8rem,
+      0.65rem 0.65rem,
+      0.95rem 0.95rem;
+    box-shadow: inset 0 0.25rem 0.6rem -0.2rem
+      color-mix(in srgb, var(--color-text) 45%, transparent);
+  }
+
+  .pin {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: 0.15rem;
+    inset-inline-start: 50%;
+    inline-size: 1rem;
+    block-size: 1rem;
+    border-radius: 50%;
+    translate: -50% 0;
+    box-shadow: 0.25rem 0.35rem 0.25rem -0.1rem
+      color-mix(in srgb, var(--color-text) 50%, transparent);
+  }
+
+  .t1,
+  .t3 {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-red) 50%, var(--color-paper)),
+      var(--color-red) 65%
+    );
+  }
+
+  .t2 {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-navy) 40%, var(--color-paper)),
+      var(--color-navy) 65%
+    );
+  }
+</style>
