@@ -1,0 +1,210 @@
+---
+// Teachers (D26): where the teachers' call to action on Home lands. Analog
+// world throughout: paper, people, the classroom (record 0005). Title and
+// lede first; then how we work with teachers beside a card to book a call,
+// which stays in view on tall screens; then the lessons to download across
+// the full width. Copy is in content/.
+import { render } from 'astro:content';
+import { teachers } from '../../content/teachers';
+import BookingCard from '../components/teachers/BookingCard.astro';
+import ResourceCard from '../components/teachers/ResourceCard.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('teachers');
+const { Content } = await render(page);
+const { approach, call, resources } = teachers;
+
+const number = (index: number) => String(index + 1).padStart(2, '0');
+
+// Split a line around its highlighted phrase, if it has one.
+const parts = (text: string, highlight?: string) => {
+  const at = highlight ? text.indexOf(highlight) : -1;
+  if (!highlight || at === -1) return { before: text };
+  return {
+    before: text.slice(0, at),
+    mark: highlight,
+    after: text.slice(at + highlight.length),
+  };
+};
+---
+
+<BaseLayout title={page.data.title} description={page.data.description}>
+  <article>
+    <div class="intro">
+      <h1>{page.data.heading ?? page.data.title}</h1>
+      <div class="lede">
+        <Content />
+      </div>
+    </div>
+
+    <div class="columns">
+      <section aria-labelledby="approach-heading">
+        <h2 id="approach-heading">{approach.heading}</h2>
+        <ol class="approach">
+          {approach.items.map((item, index) => {
+            const { before, mark, after } = parts(item.text, item.highlight);
+            return (
+              <li>
+                <span class="number" aria-hidden="true">
+                  {number(index)}
+                </span>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>
+                    {before}
+                    {mark && <mark>{mark}</mark>}
+                    {after}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+      <div class="aside">
+        <BookingCard call={call} />
+      </div>
+    </div>
+
+    <section class="resources" aria-labelledby="resources-heading">
+      <div class="resources-head">
+        <h2 id="resources-heading">{resources.heading}</h2>
+        <p>{resources.intro}</p>
+      </div>
+      <ul class="shelf">
+        {resources.items.map((resource) => (
+          <li>
+            <ResourceCard resource={resource} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--space-8) var(--space-6);
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  .lede {
+    max-inline-size: 48rem;
+    margin-block-start: var(--space-5);
+    font-size: var(--text-xl);
+    line-height: var(--leading-normal);
+  }
+
+  .lede :global(p) {
+    margin: 0;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+    padding-block-start: var(--space-6);
+  }
+
+  h2 {
+    margin: 0 0 var(--space-3);
+  }
+
+  .approach {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .approach li {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: var(--space-3);
+    padding-block: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .number {
+    padding-block-start: var(--space-1);
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+
+  .approach h3 {
+    margin: 0 0 var(--space-2);
+  }
+
+  .approach p {
+    max-inline-size: 52ch;
+    margin: 0;
+  }
+
+  /* Keeps the booking card in view beside the text, clear of the header. */
+  @media (height >= 48rem) {
+    .aside {
+      position: sticky;
+      inset-block-start: calc(var(--header-clearance) + var(--space-4));
+    }
+  }
+
+  .resources {
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-7);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .resources-head p {
+    max-inline-size: 60ch;
+    margin: 0;
+  }
+
+  .shelf {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-5);
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .shelf li {
+    display: flex;
+  }
+
+  .shelf li > :global(*) {
+    flex: 1;
+  }
+
+  @media (width < 56rem) {
+    .columns {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-7);
+    }
+
+    .aside {
+      position: static;
+    }
+  }
+
+  @media (width < 48rem) {
+    .intro {
+      padding-block-start: var(--space-7);
+    }
+
+    .lede {
+      font-size: var(--text-lg);
+    }
+
+    .approach li {
+      grid-template-columns: 2.5rem 1fr;
+      padding-block: var(--space-4);
+    }
+  }
+</style>

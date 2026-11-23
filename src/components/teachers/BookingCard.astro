@@ -1,0 +1,142 @@
+---
+// The call to book a call with us: an index card on paper, like the teachers'
+// route card on Home (design system: RouteCards). The action is an outbound
+// link to a third-party scheduler, never a booking form on our site (rule 1,
+// SPEC 7.1). While the link is a [TK] note, the action shows as text.
+import { isPlaceholder } from '../../lib/placeholder';
+import type { Teachers } from '../../schemas/teachers';
+import EmailLink from '../EmailLink.astro';
+
+interface Props {
+  call: Teachers['call'];
+}
+
+const { call } = Astro.props;
+const pending = isPlaceholder(call.href);
+---
+
+<section class="index-card" aria-labelledby="call-heading">
+  <span class="rule" aria-hidden="true"></span>
+  <p class="eyebrow">{call.eyebrow}</p>
+  <h2 id="call-heading" class="title">
+    {call.title}
+  </h2>
+  <p>{call.text}</p>
+  {pending ? (
+    <p class="action pending">
+      <span class="button" aria-disabled="true">
+        {call.action}
+      </span>
+      <span class="note">{call.href}</span>
+    </p>
+  ) : (
+    <p class="action">
+      <a class="button" href={call.href} rel="external">
+        {call.action}
+        <span class="arrow" aria-hidden="true">
+          ↗
+        </span>
+      </a>
+    </p>
+  )}
+  <p class="small">{call.privacyNote}</p>
+  <p class="small">
+    {call.emailIntro} <EmailLink />
+  </p>
+</section>
+
+<style>
+  /* No ruled lines here: this card holds more text than Home's, and the
+     lines would cross it. The pen-red header rule stays. */
+  .index-card {
+    --row: 1.75rem;
+    position: relative;
+    padding: 0.875rem var(--space-5) var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-card);
+    line-height: var(--row);
+  }
+
+  .rule {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 2.5rem;
+    block-size: 2px;
+    background: var(--color-marker);
+  }
+
+  p {
+    margin: 0 0 var(--row);
+  }
+
+  p:last-child {
+    margin-block-end: 0;
+  }
+
+  .eyebrow {
+    block-size: 1.625rem;
+    margin-block-end: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.625rem;
+  }
+
+  .title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-xl);
+    line-height: var(--row);
+  }
+
+  .action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .button {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+    transition: transform var(--duration-fast) var(--ease-standard);
+  }
+
+  a.button:hover {
+    transform: translateY(-2px);
+  }
+
+  a.button:active {
+    transform: none;
+  }
+
+  .pending .button {
+    opacity: 0.55;
+  }
+
+  .note,
+  .small {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .small a,
+  .small :global(a) {
+    color: var(--color-link);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button {
+      transition: none;
+    }
+
+    a.button:hover {
+      transform: none;
+    }
+  }
+</style>

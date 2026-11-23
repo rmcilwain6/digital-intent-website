@@ -26,6 +26,11 @@
   --color-on-highlight: var(--color-navy);
   --color-marker: var(--color-red);
 
+  /* Index card, the Analog world's route card: lighter paper with faint
+     ruled lines and a pen-red header rule. */
+  --color-card: #fbf8f1;
+  --color-card-rule: color-mix(in srgb, var(--color-navy) 15%, transparent);
+
   /* Keycaps, the Digital world's button: a light top edge and a deep lip.
      The key face is the Digital surface; pressed, it sinks to the ground. */
   --color-key-lip: #051a2e;
