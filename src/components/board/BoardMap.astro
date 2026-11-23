@@ -163,7 +163,8 @@ const crowded = Object.fromEntries(
   (['wide', 'phone'] as const).map((mode) => [
     mode,
     Object.fromEntries([
-      ['all', hiddenNumbers(labelSizes[mode], { k: 1, tx: 0, ty: 0 }, [])],
+      // The whole province is not numbered; every closer view is.
+      ['all', map.districts.map((d) => d.number)],
       ...views.map((view) => [
         view.member,
         hiddenNumbers(
@@ -212,7 +213,8 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
       <g
         class:list={[
           'pin district-number',
-          { 'is-hidden': crowded.wide?.all?.includes(d.number) },
+          // Hidden on the whole-province view, which shows without JavaScript.
+          'is-hidden',
         ]}
         data-district={d.number}
         data-x={d.label[0]}

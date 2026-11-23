@@ -282,62 +282,55 @@ const views: MapView[] = members.map((m) => {
       mapRoot!.classList.toggle('has-member', id !== null);
     }
 
-    // The entry crossing a thin band just below the pinned map on phones,
-    // or a little above the middle of the screen on wide ones, is the one
-    // being read. Ignored until the visitor scrolls, so the page opens on
-    // the whole province.
-    let scrolled = false;
-    let observer: IntersectionObserver | undefined;
-    // Entries in the band now, in page order, so the first scroll can pick
-    // up an entry that was already in the band when the page opened.
-    const inBand = new Set<HTMLElement>();
+    // The entry being read is the last one whose top has passed a line: a
+    // third of the way down the text below the pinned map on phones, a
+    // little above the middle of the screen on wide ones. The page opens on
+    // the whole province; the moment the visitor scrolls, the map goes to
+    // the first member, so no one is skipped.
+    let line = 0;
 
-    function showFromBand() {
-      const first = entries.find((entry) => inBand.has(entry));
-      if (first) show(first.dataset.member ?? null);
+    function pick() {
+      if (window.scrollY < 4) {
+        show(null);
+        return;
+      }
+      let current = entries[0];
+      for (const entry of entries) {
+        if (entry.getBoundingClientRect().top <= line) current = entry;
+      }
+      show(current?.dataset.member ?? null);
     }
 
-    function watch() {
+    function measure() {
       // The site header is sticky except on short screens.
       const headerHeight =
         header && getComputedStyle(header).position === 'sticky'
           ? header.offsetHeight
           : 0;
       root.style.setProperty('--board-header-height', `${headerHeight}px`);
-      const bandTop = phone.matches
-        ? headerHeight + panel!.offsetHeight + 16
-        : headerHeight + (window.innerHeight - headerHeight) * 0.4;
-      const bandBottom = Math.max(window.innerHeight - bandTop - 48, 0);
-      observer?.disconnect();
-      observer = new IntersectionObserver(
-        (items) => {
-          for (const item of items) {
-            const entry = item.target as HTMLElement;
-            if (item.isIntersecting) inBand.add(entry);
-            else inBand.delete(entry);
-          }
-          if (scrolled) showFromBand();
-        },
-        { rootMargin: `-${bandTop}px 0px -${bandBottom}px 0px` },
-      );
-      entries.forEach((entry) => observer!.observe(entry));
+      const top = phone.matches
+        ? headerHeight + panel!.offsetHeight
+        : headerHeight;
+      line = top + (window.innerHeight - top) * (phone.matches ? 0.3 : 0.4);
       // Phones and wide screens hide different numbers.
       show(active ?? null, true);
+      pick();
     }
 
     show(null);
-    watch();
-    window.addEventListener('resize', watch);
+    measure();
+    window.addEventListener('resize', measure);
 
+    let queued = false;
     window.addEventListener(
       'scroll',
       () => {
-        if (window.scrollY < 80) {
-          show(null);
-        } else if (!scrolled) {
-          showFromBand();
-        }
-        scrolled = true;
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          pick();
+        });
       },
       { passive: true },
     );
@@ -462,9 +455,10 @@ const views: MapView[] = members.map((m) => {
     gap: var(--space-4);
   }
 
+  /* The portrait leads the entry, large enough to recognize someone. */
   .photo {
     flex: none;
-    inline-size: 4.5rem;
+    inline-size: clamp(6.5rem, 24vw, 9rem);
   }
 
   h2 {
