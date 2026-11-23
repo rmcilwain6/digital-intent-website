@@ -23,7 +23,7 @@ export const about = aboutSchema.parse({
     heading: 'How we work',
     paragraphs: [
       {
-        text: 'We are remote first and in person by choice. Our board lives in {regions}, so that is where we start, but our work covers the whole province.',
+        text: 'We are remote first and in person by choice. Our team lives in {regions}, so that is where we start, but our work covers the whole province.',
         highlight: 'the whole province.',
       },
       {

@@ -1,14 +1,14 @@
 ---
-// Board map (SPEC 7.3): the Analog house map of BC (design system: Map) with
-// a marker for each town where board members live. It is the main thing on
+// Team map (SPEC 7.3): the Analog house map of BC (design system: Map) with
+// a marker for each town where team members live. It is the main thing on
 // the page; the text beside it supports it.
 //
 // One map, one camera. Without JavaScript it is a still view of the whole
-// province. With it, the Board page script moves the camera to the member
+// province. With it, the Team page script moves the camera to the member
 // being read: a gentle zoom on their part of the province, and closer only
 // where towns sit close together (the Lower Mainland and the Capital Region),
-// where the close-up coastline (data/map: detail) fades in. While D14 allows,
-// the districts the member leads are outlined in pen red.
+// where the close-up coastline (data/map: detail) fades in. The school
+// districts around the member's city are outlined in pen red.
 //
 // The camera and the markers move by transform, everything else by opacity.
 // Markers and labels sit outside the camera so they keep their size; the
@@ -39,8 +39,8 @@ export interface MapView {
   place: string;
   /** What the view shows, in map units. */
   box: Box;
-  /** Districts the member leads (empty unless D14 allows). */
-  leads: MapDistrict[];
+  /** School districts around the member's city, outlined in pen red. */
+  districts: MapDistrict[];
 }
 
 interface Props {
@@ -83,9 +83,9 @@ const cameras = Object.fromEntries(
   }),
 );
 
-// Close views draw their lead outlines from the close-up layer.
+// Close views draw their outlines from the close-up layer.
 const outlines = views.flatMap((view) =>
-  view.leads.map((lead) => ({
+  view.districts.map((lead) => ({
     ...(cameras[view.member]?.detail
       ? (detailDistricts.find((x) => x.number === lead.number) ?? lead)
       : lead),
@@ -93,10 +93,10 @@ const outlines = views.flatMap((view) =>
   })),
 );
 
-// Every district is numbered, always. The ones the member being read leads
-// turn pen red (the script reads each view's leads from here).
+// Every district is numbered, always. The ones outlined for the member being
+// read turn pen red (the script reads each view's list from here).
 const leadsOf = Object.fromEntries(
-  views.map((view) => [view.member, view.leads.map((d) => d.number)]),
+  views.map((view) => [view.member, view.districts.map((d) => d.number)]),
 );
 
 // Labels sit east of the marker unless they would run off the province
@@ -181,8 +181,8 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
 ---
 
 <div
-  class="board-map"
-  data-board-map
+  class="team-map"
+  data-team-map
   data-cameras={JSON.stringify(cameras)}
   data-leads={JSON.stringify(leadsOf)}
   data-crowded={JSON.stringify(crowded)}
@@ -194,7 +194,7 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
     preserveAspectRatio="xMidYMid meet"
     focusable="false"
     role="img"
-    aria-label={`Map of British Columbia marking where board members live: ${places.map((p) => p.name).join(', ')}`}
+    aria-label={`Map of British Columbia marking where team members live: ${places.map((p) => p.name).join(', ')}`}
   >
     <g class="camera" data-camera>
       <g class="province" data-province>
@@ -251,7 +251,7 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
 </div>
 
 <style>
-  .board-map {
+  .team-map {
     --label-size: 18px;
     --district-size: 14px;
     height: 100%;
@@ -383,7 +383,7 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
    * units, and while a member is being read only their town is named.
    */
   @media (max-width: 63.99rem) {
-    .board-map {
+    .team-map {
       --label-size: 36px;
       --district-size: 28px;
     }
@@ -392,7 +392,7 @@ const at = ([x, y]: [number, number]) => `translate(${x}px, ${y}px)`;
       r: 10px;
     }
 
-    .board-map:global(.has-member) .marker:not(.is-here) text {
+    .team-map:global(.has-member) .marker:not(.is-here) text {
       display: none;
     }
   }

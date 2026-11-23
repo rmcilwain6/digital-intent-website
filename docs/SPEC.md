@@ -43,7 +43,7 @@ This order sets what we build first. It does not rank people: every audience mee
 | -------- | --------------------------------------- | -------------------------------------------------------- |
 | 1        | Teachers and school/district staff (BC) | Who we are, what we do, why to trust us, how to reach us |
 | 2        | Graduating high school students         | Valleyview grant details and how to apply                |
-| 3        | Funders, partners, media                | Mission, board, funding values, contact                  |
+| 3        | Funders, partners, media                | Mission, team, funding values, contact                   |
 | 4        | Parents and the public                  | Plain-language writing and resources (later phases)      |
 
 ## 4. Non-negotiable rules
@@ -73,7 +73,7 @@ The MVP is Phases 0 to 2: foundation, core pages, then brand and launch.
 
 ### Phase 1: Core pages (pre-brand)
 
-Pages: Home, About, Board, Valleyview Grant (information only), Contact, Privacy, 404 (section 7), built against the placeholder brand. Funding moved to post-MVP (section 7.5, record 0004).
+Pages: Home, About, Our team, Valleyview Grant (information only), Contact, Privacy, 404 (section 7), built against the placeholder brand. Funding moved to post-MVP (section 7.5, record 0004).
 
 Open for launch: the Indigenous outreach page (section 7.9, D13), a Partnerships page or a contact email (D27), and a terms of service page if one is legally needed (D28).
 
@@ -185,15 +185,18 @@ Sections, in order (teachers above Valleyview is a preference, not settled; D30)
 - Values and how we work (remote-first, in person by choice, three starting regions, province-wide in scope).
 - Our story: how and why we started, after how we work.
 
-### 7.3 Board (`/board`) Phase 1
+### 7.3 Our team (`/team`) Phase 1
 
-An entry per person beside a map of BC, with data in `content/board.ts`, schema-validated. The map is the main visual; entries are plain text beside it, not cards:
+Called "Our team" rather than "Board" while the board's official designation is being settled.
 
-- Required: name, photo, board role, home region.
-- Optional: industry or career, areas of expertise, short bio, one external link.
+An entry per person beside a map of BC, with data in `content/team.ts`, schema-validated. The map is the main visual; entries are plain text beside it, not cards:
+
+- Required: name, photo, role (Executive Director or Board Member), home city (one of the starting regions) and a one-sentence focus.
+- Optional, under "More about": where they work and what they do, where they went to school (each with the organization's logo, self-hosted and used with permission), a short bio and one external link.
+- The map outlines the school districts around each starting region (SD 73 for Kamloops; SD 61, 62 and 63 for Victoria; SD 39 for Vancouver), kept to the districts we can reasonably reach.
 - Not shown: personal email, phone, or regional lead designation (pending board decision D14).
 - Photo slots use placeholders until original portraits are shot.
-- A board member's details are committed only after that member has agreed to them. Git history is public and permanent, so a draft that is later removed is still published.
+- A team member's details are committed only after that member has agreed to them. Git history is public and permanent, so a draft that is later removed is still published.
 
 ### 7.4 Valleyview Social Innovation Grant (`/valleyview`) Phase 1, information only
 
@@ -430,7 +433,7 @@ Decision records are for choices worth explaining later: architectural changes, 
 
 ### 12.5 Human-only areas
 
-Agents may draft, but a human must approve: the brand layer, privacy text, funding wording, board bios, and any statement of the organization's position.
+Agents may draft, but a human must approve: the brand layer, privacy text, funding wording, team bios, and any statement of the organization's position.
 
 ### 12.6 Skills (post-MVP)
 
