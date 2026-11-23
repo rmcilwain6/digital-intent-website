@@ -69,7 +69,6 @@ export const aboutSchema = z.strictObject({
     }),
   pillars: z.strictObject({
     heading: z.string().min(1),
-    intro: z.string().min(1),
     /** Board-voted wording, in order (SPEC section 2). */
     items: z.array(z.string().min(1)).length(4),
   }),

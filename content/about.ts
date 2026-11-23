@@ -1,5 +1,5 @@
 // About page sections (SPEC 7.2). Pillar wording is from the board vote of
-// October 15, 2026 (SPEC section 2). The intro and "How we work" lines are
+// October 15, 2026 (SPEC section 2). The "How we work" lines are
 // draft copy and need approval by a person. The values paragraph covers
 // transparency, privacy by default and face-to-face over platform; the
 // ed-tech business model value waits for the funding page (SPEC 7.5). "Our
@@ -16,9 +16,7 @@ export const about = aboutSchema.parse({
     taken: 'fall 2026',
   },
   pillars: {
-    heading: 'Four pillars',
-    intro:
-      'The board voted on these in October 2026. Everything we take on should serve at least one.',
+    heading: 'Our strategic pillars',
     items: [
       'Be an independent voice on technology in BC education.',
       'Build lasting, face-to-face partnerships with educators and communities.',
