@@ -8,7 +8,7 @@ export const home = homeSchema.parse({
     // Headline and lede from the website frame design (v1). Still draft copy,
     // but the hero shows no draft marker (Reed, Nov 21): approve before launch.
     heading: 'A bridge between BC classrooms and the digital world',
-    lede: 'We are educators and technologists. We meet teachers, families and students face to face, and work through the questions technology raises, together.',
+    lede: 'We’re a BC nonprofit helping students, teachers and families understand, question and shape the digital world.',
     teachers: {
       eyebrow: 'For teachers',
       title: 'Talk to us about tech in your classroom',
@@ -30,16 +30,19 @@ export const home = homeSchema.parse({
         place: 'Kamloops',
         label: 'Overlanders Bridge',
         note: '3:2. Over the Thompson River, under a storm sky.',
+        taken: '[TK: date taken]',
       },
       {
         place: 'Victoria',
         label: 'Johnson Street Bridge',
         note: '4:5. From the harbour.',
+        taken: '[TK: date taken]',
       },
       {
         place: 'Vancouver',
         label: 'Burrard or Lions Gate Bridge',
         note: '3:2. Deck across the frame, at dusk.',
+        taken: '[TK: date taken]',
       },
     ],
   },

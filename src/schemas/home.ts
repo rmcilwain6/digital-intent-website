@@ -87,6 +87,8 @@ export const homeSchema = z.strictObject({
           label: z.string().min(1),
           /** One-line art direction for the photo to come (SPEC rule 8). */
           note: z.string().min(1),
+          /** When it was taken, written on the back of the print. */
+          taken: z.string().min(1),
         }),
       )
       .length(3),
