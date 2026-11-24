@@ -1,0 +1,155 @@
+---
+// Teachers (D26): where the teachers' call to action on Home lands. Analog
+// world throughout: paper, people, the classroom (record 0005). Title and
+// lede first; then how we work with teachers, three points side by side;
+// then the lessons to download, kept in one file folder with a tab each.
+// Booking a call comes later. Copy is in content/.
+import { render } from 'astro:content';
+import { teachers } from '../../content/teachers';
+import FileFolder from '../components/teachers/FileFolder.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('teachers');
+const { Content } = await render(page);
+const { approach, lessons } = teachers;
+
+const number = (index: number) => String(index + 1).padStart(2, '0');
+
+// Split a line around its highlighted phrase, if it has one.
+const parts = (text: string, highlight?: string) => {
+  const at = highlight ? text.indexOf(highlight) : -1;
+  if (!highlight || at === -1) return { before: text };
+  return {
+    before: text.slice(0, at),
+    mark: highlight,
+    after: text.slice(at + highlight.length),
+  };
+};
+---
+
+<BaseLayout title={page.data.title} description={page.data.description}>
+  <article>
+    <div class="intro">
+      <h1>{page.data.heading ?? page.data.title}</h1>
+      <div class="lede">
+        <Content />
+      </div>
+    </div>
+
+    <section class="approach" aria-labelledby="approach-heading">
+      <h2 id="approach-heading">{approach.heading}</h2>
+      <ol>
+        {approach.items.map((item, index) => {
+          const { before, mark, after } = parts(item.text, item.highlight);
+          return (
+            <li>
+              <span class="number" aria-hidden="true">
+                {number(index)}
+              </span>
+              <h3>{item.title}</h3>
+              <p>
+                {before}
+                {mark && <mark>{mark}</mark>}
+                {after}
+              </p>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+
+    <section class="lessons" aria-labelledby="lessons-heading">
+      <div class="lessons-head">
+        <h2 id="lessons-heading">{lessons.heading}</h2>
+        <p>{lessons.intro}</p>
+      </div>
+      <FileFolder lessons={lessons.items} label={lessons.heading} />
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--space-8) var(--space-6);
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  .lede {
+    max-inline-size: 48rem;
+    margin-block-start: var(--space-5);
+    font-size: var(--text-xl);
+    line-height: var(--leading-normal);
+  }
+
+  .lede :global(p) {
+    margin: 0;
+  }
+
+  h2 {
+    margin: 0 0 var(--space-4);
+  }
+
+  .approach {
+    padding-block-start: var(--space-6);
+  }
+
+  .approach ol {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 0 var(--space-7);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .approach li {
+    padding-block: var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .number {
+    display: block;
+    margin-block-end: var(--space-2);
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+
+  .approach h3 {
+    margin: 0 0 var(--space-2);
+  }
+
+  .approach p {
+    max-inline-size: 52ch;
+    margin: 0;
+  }
+
+  .lessons {
+    margin-block-start: var(--space-7);
+    padding-block-start: var(--space-7);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .lessons-head p {
+    max-inline-size: 64ch;
+    margin: 0 0 var(--space-6);
+  }
+
+  @media (width < 48rem) {
+    .intro {
+      padding-block-start: var(--space-7);
+    }
+
+    .lede {
+      font-size: var(--text-lg);
+    }
+
+    .approach li {
+      padding-block: var(--space-4);
+    }
+  }
+</style>

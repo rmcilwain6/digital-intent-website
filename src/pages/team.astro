@@ -1,0 +1,669 @@
+---
+// Our team (SPEC 7.3): the map of BC is the main thing on the page, with the
+// members listed plainly beside it. Without JavaScript the map is a still
+// view of the province and every entry is complete. With it, the map moves
+// gently to the member being read: their town and, D14 permitting, the
+// districts they lead. Several members can share a place.
+import { render } from 'astro:content';
+import { regionDistricts, team } from '../../content/team';
+import TeamMap, {
+  type MapPlace,
+  type MapView,
+} from '../components/team/TeamMap.astro';
+import ImagePlaceholder from '../components/ImagePlaceholder.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {
+  bcFrame,
+  district,
+  map,
+  pathBounds,
+  placePoint,
+  sheetFor,
+  union,
+} from '../lib/map';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('team');
+const { Content } = await render(page);
+
+const slug = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const members = team.map((member) => {
+  const id = slug(member.name);
+  const point = placePoint(member.place);
+  // The school districts around the member's city, outlined on the map.
+  const districts = (regionDistricts[member.place] ?? []).map((n) =>
+    district(n),
+  );
+  return { member, id, point, districts };
+});
+
+// One marker per place, shared by everyone who lives there.
+const places: MapPlace[] = [];
+for (const m of members) {
+  if (!places.some((p) => p.name === m.member.place)) {
+    places.push({ name: m.member.place, point: m.point });
+  }
+}
+
+// How close the map goes. A gentle zoom by default, so the member's part of
+// the province shows with plenty around it. Closer only where towns sit
+// close together (the Lower Mainland and the Capital Region), where the
+// close-up coastline takes over.
+const inside = ([x, y]: [number, number], b: typeof bcFrame) =>
+  x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height;
+const gentle = bcFrame.width / 2.5;
+const close = 80;
+
+// A close view is kept inside the close-up area, so it never falls back to
+// the rougher province outline.
+const keepInside = (box: typeof bcFrame, outer: typeof bcFrame) => {
+  const clamp = (v: number, lo: number, hi: number) =>
+    Math.min(Math.max(v, lo), Math.max(lo, hi));
+  return {
+    ...box,
+    x: clamp(box.x, outer.x, outer.x + outer.width - box.width),
+    y: clamp(box.y, outer.y, outer.y + outer.height - box.height),
+  };
+};
+
+const views: MapView[] = members.map((m) => {
+  const isClose = inside(m.point, map.detail.frame);
+  const box = sheetFor(
+    union(
+      m.districts.map((d) => pathBounds(d.d)),
+      [m.point],
+    ),
+    isClose ? close : gentle,
+  );
+  return {
+    member: m.id,
+    place: m.member.place,
+    box: isClose ? keepInside(box, map.detail.frame) : box,
+    districts: m.districts.map((d) => ({
+      number: d.number,
+      name: d.name,
+      d: d.d,
+      label: d.label as [number, number],
+    })),
+  };
+});
+---
+
+<BaseLayout
+  title={page.data.title}
+  description={page.data.description}
+  fullWidth
+>
+  <div class="layout" data-team>
+    <div class="text">
+      <header class="intro">
+        <p class="tk-marker">
+          [TK: fictional placeholder team members for the map prototype. Real
+          details are added only with each member's agreement.]
+        </p>
+        <h1>{page.data.heading ?? page.data.title}</h1>
+        <Content />
+      </header>
+
+      <ol class="members">
+        {members.map(({ member, id }) => (
+          <li class="entry" id={id} data-entry data-member={id}>
+            <div class="entry-head">
+              <div class="photo">
+                {'placeholder' in member.photo ? (
+                  <ImagePlaceholder
+                    ratio="4 / 5"
+                    label="Portrait"
+                    note={member.photo.note}
+                    compact
+                  />
+                ) : (
+                  <img
+                    class="portrait"
+                    src={member.photo.src}
+                    loading="lazy"
+                    alt={member.photo.alt}
+                  />
+                )}
+              </div>
+              <div>
+                <h2>{member.name}</h2>
+                <p class="meta">
+                  {member.role} · {member.place}
+                </p>
+              </div>
+            </div>
+            <p>{member.focus}</p>
+            {(member.work || member.education || member.bio || member.link) && (
+              <details>
+                <summary>More about {member.name.split(' ')[0]}</summary>
+                {(member.work || member.education) && (
+                  <ul class="orgs">
+                    {[
+                      ...(member.work ?? []).map((w) => ({
+                        org: w.organization,
+                        what: w.title,
+                      })),
+                      ...(member.education ?? []).map((e) => ({
+                        org: e.school,
+                        what: e.program,
+                      })),
+                    ].map(({ org, what }) => (
+                      <li>
+                        {'placeholder' in org.logo ? (
+                          <span
+                            class="logo logo-placeholder"
+                            aria-hidden="true"
+                          >
+                            Logo
+                          </span>
+                        ) : (
+                          <img class="logo" src={org.logo.src} alt="" />
+                        )}
+                        <span>
+                          <span class="org-name">{org.name}</span>
+                          {what && <span class="org-what">{what}</span>}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {member.bio?.split(/\n\s*\n/).map((paragraph) => (
+                  <p>{paragraph}</p>
+                ))}
+                {member.link && (
+                  <p>
+                    <a href={member.link.href}>{member.link.label}</a>
+                  </p>
+                )}
+              </details>
+            )}
+          </li>
+        ))}
+      </ol>
+
+      <p class="credits">
+        Map data: Natural Earth (public domain). School district boundaries and
+        the close-up coastline: DataBC. Contains information licensed under the
+        Open Government Licence – British Columbia.
+      </p>
+    </div>
+
+    <div class="map-panel">
+      {/*
+        Phones with JavaScript: a quiet way to put the map away if its
+        movement is distracting. Shown by the script, so without JavaScript
+        (when the map is still) there is no button that does nothing.
+      */}
+      <button
+        type="button"
+        class="map-toggle"
+        aria-controls="team-map-slot"
+        aria-expanded="true"
+        hidden
+      >
+        Hide map
+      </button>
+      <div class="map-slot" id="team-map-slot">
+        <TeamMap places={places} views={views} />
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Moves the map to the member being read. An enhancement only: the page is
+  // complete without it. The camera and markers move by transform, the rest
+  // by opacity; the motion tokens make it instant under reduced motion.
+
+  interface Camera {
+    k: number;
+    tx: number;
+    ty: number;
+    detail: boolean;
+  }
+
+  // Phones get the pinned strip of map; must match the CSS breakpoint.
+  const phone = window.matchMedia('(max-width: 63.99rem)');
+
+  function init(root: HTMLElement) {
+    const mapRoot = root.querySelector<HTMLElement>('[data-team-map]');
+    const camera = root.querySelector<SVGGElement>('[data-camera]');
+    const detail = root.querySelector<SVGGElement>('[data-detail]');
+    const province = root.querySelector<SVGGElement>('[data-province]');
+    const panel = root.querySelector<HTMLElement>('.map-panel');
+    const header = document.querySelector<HTMLElement>('.site-header');
+    if (!mapRoot || !camera || !detail || !province || !panel) return;
+
+    const cameras: Record<string, Camera> = JSON.parse(
+      mapRoot.dataset.cameras ?? '{}',
+    );
+    const leadsOf: Record<string, number[]> = JSON.parse(
+      mapRoot.dataset.leads ?? '{}',
+    );
+    const crowded: Record<string, Record<string, number[]>> = JSON.parse(
+      mapRoot.dataset.crowded ?? '{}',
+    );
+    const overview: Camera = { k: 1, tx: 0, ty: 0, detail: false };
+    const entries = [...root.querySelectorAll<HTMLElement>('[data-entry]')];
+    const pins = [...mapRoot.querySelectorAll<SVGGElement>('.pin')];
+    const leads = [...mapRoot.querySelectorAll<SVGPathElement>('.lead')];
+    const placeOf = new Map(
+      entries.map((entry) => [
+        entry.dataset.member ?? '',
+        entry.querySelector('.meta')?.textContent?.split(' · ').pop() ?? '',
+      ]),
+    );
+
+    let active: string | null | undefined;
+
+    function show(id: string | null, again = false) {
+      if (id === active && !again) return;
+      active = id;
+      const hide = crowded[phone.matches ? 'phone' : 'wide']?.[id ?? 'all'];
+      const { k, tx, ty, detail: close } = (id && cameras[id]) || overview;
+      camera!.style.transform = `translate(${tx}px, ${ty}px) scale(${k})`;
+      detail!.classList.toggle('is-on', close);
+      province!.classList.toggle('is-off', close);
+      const place = id ? placeOf.get(id) : null;
+      for (const pin of pins) {
+        const x = tx + k * Number(pin.dataset.x);
+        const y = ty + k * Number(pin.dataset.y);
+        pin.style.transform = `translate(${x}px, ${y}px)`;
+        if (pin.dataset.district) {
+          const number = Number(pin.dataset.district);
+          pin.classList.toggle(
+            'is-lead',
+            (id ? (leadsOf[id] ?? []) : []).includes(number),
+          );
+          pin.classList.toggle('is-hidden', hide?.includes(number) ?? false);
+        } else {
+          pin.classList.toggle('is-here', pin.dataset.place === place);
+        }
+      }
+      for (const lead of leads) {
+        lead.classList.toggle('is-on', lead.dataset.member === id);
+      }
+      for (const entry of entries) {
+        entry.classList.toggle('is-active', entry.dataset.member === id);
+      }
+      mapRoot!.classList.toggle('has-member', id !== null);
+    }
+
+    // The entry being read is the last one whose top has passed a line: a
+    // third of the way down the text below the pinned map on phones, a
+    // little above the middle of the screen on wide ones. The page opens on
+    // the whole province; the moment the visitor scrolls, the map goes to
+    // the first member, so no one is skipped.
+    let line = 0;
+
+    function pick() {
+      if (window.scrollY < 4) {
+        show(null);
+        return;
+      }
+      let current = entries[0];
+      for (const entry of entries) {
+        if (entry.getBoundingClientRect().top <= line) current = entry;
+      }
+      show(current?.dataset.member ?? null);
+    }
+
+    function measure() {
+      // The site header is sticky except on short screens.
+      const headerHeight =
+        header && getComputedStyle(header).position === 'sticky'
+          ? header.offsetHeight
+          : 0;
+      root.style.setProperty('--team-header-height', `${headerHeight}px`);
+      const top = phone.matches
+        ? headerHeight + panel!.offsetHeight
+        : headerHeight;
+      line = top + (window.innerHeight - top) * (phone.matches ? 0.3 : 0.4);
+      // Phones: keep focused links and "More about" toggles clear of the
+      // pinned header and map when the browser scrolls to them (WCAG
+      // 2.4.11). Wide screens keep the site-wide header clearance.
+      document.documentElement.style.scrollPaddingBlockStart = phone.matches
+        ? `calc(${top}px + var(--space-4))`
+        : '';
+      // Phones and wide screens hide different numbers.
+      show(active ?? null, true);
+      pick();
+    }
+
+    // Phones: the visitor can put the map away and bring it back. Not
+    // remembered between visits (no browser storage, SPEC rule 2).
+    const toggle = panel.querySelector<HTMLButtonElement>('.map-toggle');
+    function syncToggle() {
+      if (!toggle) return;
+      toggle.hidden = !phone.matches;
+      // Wide screens always show the map.
+      if (!phone.matches) setMapShown(true);
+    }
+    function setMapShown(shown: boolean) {
+      panel!.classList.toggle('is-collapsed', !shown);
+      toggle?.setAttribute('aria-expanded', String(shown));
+      if (toggle) toggle.textContent = shown ? 'Hide map' : 'Show map';
+    }
+    toggle?.addEventListener('click', () => {
+      setMapShown(panel.classList.contains('is-collapsed'));
+      measure();
+    });
+
+    show(null);
+    syncToggle();
+    measure();
+    // Mobile browsers fire resize repeatedly as the address bar shows and
+    // hides: measure at most once a frame.
+    let resizeQueued = false;
+    window.addEventListener('resize', () => {
+      if (resizeQueued) return;
+      resizeQueued = true;
+      requestAnimationFrame(() => {
+        resizeQueued = false;
+        syncToggle();
+        measure();
+      });
+    });
+
+    let queued = false;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          pick();
+        });
+      },
+      { passive: true },
+    );
+
+    // Opening a member's details or moving focus into their entry.
+    for (const entry of entries) {
+      const id = entry.dataset.member ?? null;
+      entry.querySelector('details')?.addEventListener('toggle', (event) => {
+        if ((event.target as HTMLDetailsElement).open) show(id);
+      });
+      entry.addEventListener('focusin', () => show(id));
+    }
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-team]');
+  if (root) init(root);
+</script>
+
+<style>
+  /*
+   * Phones: the text in the usual gutter, with a strip of map pinned under
+   * the site header (with JavaScript) above the entries.
+   */
+  .layout {
+    display: grid;
+    padding-inline: var(--space-gutter);
+  }
+
+  .map-panel {
+    z-index: 1;
+    height: clamp(13rem, 34vh, 18rem);
+    margin-inline: calc(-1 * var(--space-gutter));
+    overflow: hidden;
+    background: var(--color-bg);
+  }
+
+  @media (max-width: 63.99rem) {
+    :global(.js) .map-panel {
+      position: sticky;
+      inset-block-start: var(--team-header-height, 0);
+      border-block-end: var(--border-width) solid var(--color-border);
+    }
+
+    /* The intro sits above the map, the entries below it. */
+    .text {
+      display: contents;
+    }
+
+    .intro {
+      order: -2;
+    }
+
+    .map-panel {
+      order: -1;
+    }
+
+    /* Put away: a slim bar under the site header, holding only the button. */
+    .map-panel.is-collapsed {
+      display: flex;
+      justify-content: end;
+      align-items: center;
+      height: auto;
+      padding-block: var(--space-2);
+      padding-inline: var(--space-gutter);
+    }
+
+    .map-panel.is-collapsed .map-slot {
+      display: none;
+    }
+
+    .map-panel.is-collapsed .map-toggle {
+      position: static;
+    }
+  }
+
+  .map-slot {
+    height: 100%;
+  }
+
+  /* Small and quiet, in the map's lettering, over its top corner. */
+  .map-toggle {
+    position: absolute;
+    inset-block-start: var(--space-2);
+    inset-inline-end: var(--space-gutter);
+    z-index: 1;
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .map-toggle:hover {
+    color: var(--color-text);
+  }
+
+  .map-toggle[hidden] {
+    display: none;
+  }
+
+  /*
+   * Wide screens: a narrow column of text lined up with the site header,
+   * and the map filling the rest of the width, to the edge of the screen.
+   * The map stays pinned under the site header as the text scrolls.
+   */
+  @media (min-width: 64rem) {
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
+      column-gap: var(--space-7);
+      padding-inline-start: max(
+        var(--space-gutter),
+        calc((100% - var(--width-page)) / 2)
+      );
+      padding-inline-end: 0;
+    }
+
+    .map-panel {
+      position: sticky;
+      inset-block-start: var(--team-header-height, 9rem);
+      align-self: start;
+      height: calc(100dvh - var(--team-header-height, 9rem));
+      margin-inline: 0;
+      padding-block: var(--space-5);
+      box-sizing: border-box;
+      /* A soft left edge where the zoomed map meets the text. */
+      mask-image: linear-gradient(to right, transparent, #000 var(--space-7));
+    }
+  }
+
+  .intro {
+    padding-block: var(--space-6) var(--space-5);
+  }
+
+  .tk-marker {
+    display: inline-block;
+    margin-block: 0 var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .members {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Plain entries, divided by a thin rule. */
+  .entry {
+    padding-block: var(--space-6);
+    border-block-start: var(--border-width) solid var(--color-border);
+    scroll-margin-block-start: 40vh;
+  }
+
+  .entry > p {
+    margin-block: var(--space-3) 0;
+  }
+
+  .entry-head {
+    display: flex;
+    align-items: end;
+    gap: var(--space-4);
+  }
+
+  /* The portrait leads the entry, large enough to recognize someone. */
+  .photo {
+    flex: none;
+    inline-size: clamp(6.5rem, 24vw, 9rem);
+  }
+
+  h2 {
+    margin: 0;
+    font-size: var(--text-xl);
+  }
+
+  /* Role and town, in the map's own lettering. */
+  .meta {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  /* The entry being read: its town turns pen red, as on the map. */
+  .entry.is-active .meta {
+    color: var(--color-text);
+  }
+
+  .entry.is-active .meta::before {
+    content: '';
+    display: inline-block;
+    inline-size: 0.6em;
+    block-size: 0.6em;
+    margin-inline-end: var(--space-2);
+    border-radius: 50%;
+    background: var(--color-marker);
+  }
+
+  /* Where they work and studied, each with its logo. */
+  .orgs {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .orgs li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .logo {
+    flex: none;
+    inline-size: var(--space-7);
+    block-size: var(--space-7);
+    object-fit: contain;
+  }
+
+  .logo-placeholder {
+    display: grid;
+    place-items: center;
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .org-name,
+  .org-what {
+    display: block;
+  }
+
+  .org-what {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  details {
+    margin-block-start: var(--space-3);
+  }
+
+  summary {
+    color: var(--color-link);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+  }
+
+  details > p {
+    margin-block: var(--space-3) 0;
+  }
+
+  .portrait {
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+
+  .credits {
+    margin-block: var(--space-6) 0;
+    padding-block-end: var(--space-7);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /*
+   * Wide screens: room after the last entry so it can reach the reading line
+   * a little above the middle of the screen. Phones don't need it: their
+   * reading line sits just below the pinned map, which every entry reaches.
+   */
+  @media (min-width: 64rem) {
+    .credits {
+      padding-block-end: 40vh;
+    }
+  }
+</style>

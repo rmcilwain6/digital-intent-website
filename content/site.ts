@@ -4,14 +4,16 @@ import { siteSchema } from '../src/schemas/site';
 export const site = siteSchema.parse({
   home: { label: 'Home', href: '/' },
   primaryNav: [
+    { label: 'For teachers', href: '/teachers/' },
     { label: 'About', href: '/about/' },
-    { label: 'Board', href: '/board/' },
+    { label: 'Our team', href: '/team/' },
     { label: 'Valleyview Grant', href: '/valleyview/', featured: true },
     { label: 'Contact', href: '/contact/' },
   ],
   footerNav: [
+    { label: 'For teachers', href: '/teachers/' },
     { label: 'About', href: '/about/' },
-    { label: 'Board', href: '/board/' },
+    { label: 'Our team', href: '/team/' },
     { label: 'Valleyview Grant', href: '/valleyview/' },
     { label: 'Contact', href: '/contact/' },
     { label: 'Privacy', href: '/privacy/' },

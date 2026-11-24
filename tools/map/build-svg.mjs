@@ -43,8 +43,10 @@ maxY += pad;
 const W = 1000;
 const scale = W / (maxX - minX);
 const H = Math.round((maxY - minY) * scale);
-const X = (x) => Math.round((x - minX) * scale * 10) / 10;
-const Y = (y) => Math.round((maxY - y) * scale * 10) / 10;
+// Map units to one decimal (about 170 m), or two for the close-up layers.
+let digits = 10;
+const X = (x) => Math.round((x - minX) * scale * digits) / digits;
+const Y = (y) => Math.round((maxY - y) * scale * digits) / digits;
 
 function ringD(ring, close) {
   let out = '';
@@ -94,6 +96,35 @@ for (const f of read('schools.json').features) {
   schools[kind].push([Math.round(x), Math.round(y)]);
 }
 
+// Close-up layers for the Lower Mainland and the Capital Region
+// (build-detail.sh), with the rectangle they fully cover.
+function readDistricts(file) {
+  return read(file)
+    .features.filter((f) => f.geometry)
+    .map((f) => ({
+      number: f.properties.SCHOOL_DISTRICT_NUMBER,
+      name: f.properties.SCHOOL_DISTRICT_NAME,
+      d: geomD(f.geometry),
+      label: [X(f.properties.cx), Y(f.properties.cy)],
+    }))
+    .sort((a, b) => a.number - b.number);
+}
+const [sw, se, ne, nw] =
+  read('detail_frame.json').features[0].geometry.coordinates;
+digits = 100;
+const detail = {
+  frame: {
+    x: Math.ceil(Math.max(X(sw[0]), X(nw[0]))),
+    y: Math.ceil(Math.max(Y(nw[1]), Y(ne[1]))),
+  },
+  land: layerD('detail_land.json'),
+  districtLines: layerD('detail_district_lines.json'),
+  districts: readDistricts('detail_districts.json'),
+};
+detail.frame.width = Math.floor(Math.min(X(se[0]), X(ne[0]))) - detail.frame.x;
+detail.frame.height = Math.floor(Math.min(Y(sw[1]), Y(se[1]))) - detail.frame.y;
+digits = 10;
+
 const profile = read('profile.json');
 const map = {
   viewBox: [W, H],
@@ -106,15 +137,8 @@ const map = {
   rivers: layerD('rivers.json'),
   lakes: layerD('lakes.json'),
   districtLines: layerD('district_lines.json'),
-  districts: read('districts.json')
-    .features.filter((f) => f.geometry)
-    .map((f) => ({
-      number: f.properties.SCHOOL_DISTRICT_NUMBER,
-      name: f.properties.SCHOOL_DISTRICT_NAME,
-      d: geomD(f.geometry),
-      label: [X(f.properties.cx), Y(f.properties.cy)],
-    }))
-    .sort((a, b) => a.number - b.number),
+  districts: readDistricts('districts.json'),
+  detail,
   places: read('places.json').features.map((f) => ({
     name: f.properties.name,
     rank: f.properties.scalerank,

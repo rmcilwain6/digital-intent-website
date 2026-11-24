@@ -1,17 +1,153 @@
 ---
-// Home. Its section-by-section layout comes with #7; this is the frame and
-// the content wiring. The <title> is the organization name alone.
-import { render } from 'astro:content';
+// Home: a guided walk through full-width sections, each with its own job and
+// call to action (SPEC 7.1, record 0004). Copy lives in content/home.ts and
+// content/organization.ts; the section order is data (D30). The <title> is
+// the organization name alone.
+import { home } from '../../content/home';
+import { organization } from '../../content/organization';
+import { valleyview } from '../../content/valleyview';
+import { brand } from '../brand/brand.config';
+import BcMap from '../components/BcMap.astro';
+import EmailLink from '../components/EmailLink.astro';
+import HomeHero from '../components/home/HomeHero.astro';
+import HomeSection from '../components/home/HomeSection.astro';
+import QuestionBreak from '../components/home/QuestionBreak.astro';
+import WhyWeExist from '../components/home/WhyWeExist.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
 
 const page = await getPage('home');
-const { Content } = await render(page);
+const { sections } = home;
+
+// Bands alternate tone after the question break, whatever the order. The
+// first is on the page's own paper, so the break flows straight into it.
+const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
 ---
 
-<BaseLayout description={page.data.description}>
-  <div class="prose">
-    <h1>{page.data.heading ?? page.data.title}</h1>
-    <Content />
-  </div>
+<BaseLayout description={page.data.description} fullWidth>
+  <HomeHero hero={home.hero} />
+  <QuestionBreak question={home.question} />
+
+  {home.order.map((key, index) => {
+    if (key === 'problem') {
+      return (
+        <WhyWeExist id={key} section={sections.problem} tone={tone(index)} />
+      );
+    }
+    const section = sections[key];
+    return (
+      <HomeSection
+        id={key}
+        heading={section.heading}
+        lead={'lead' in section ? section.lead : undefined}
+        body={section.body}
+        cta={section.cta}
+        draft={section.draft}
+        tone={tone(index)}
+      >
+        {key === 'mission' && (
+          <div class="mission">
+            <p class="prose">{organization.mission}</p>
+            <ol class="pillars">
+              {organization.pillars.map((pillar) => (
+                <li>
+                  <h3>{pillar}</h3>
+                </li>
+              ))}
+            </ol>
+            <h3>Our goals</h3>
+            <ul>
+              {organization.goals.map((goal) => (
+                <li>{goal}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {key === 'map' && (
+          <div class="map-layout">
+            <div>
+              <h3>{sections.map.regionsHeading}</h3>
+              <ul>
+                {brand.regions.map((region) => (
+                  <li>{region}</li>
+                ))}
+              </ul>
+            </div>
+            <BcMap />
+          </div>
+        )}
+
+        {key === 'valleyview' && (
+          <div class="prose">
+            <p>{valleyview.current.eligibility}</p>
+            <h3>{sections.valleyview.questionsHeading}</h3>
+            <ol>
+              {valleyview.current.questions.map((question) => (
+                <li>{question}</li>
+              ))}
+            </ol>
+            <p>{valleyview.current.apply.text}</p>
+          </div>
+        )}
+
+        {key === 'partnerships' && (
+          <p>
+            <EmailLink />
+          </p>
+        )}
+      </HomeSection>
+    );
+  })}
 </BaseLayout>
+
+<style>
+  .pillars {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: pillar;
+  }
+
+  @media (min-width: 48rem) {
+    .pillars {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .pillars li {
+    padding: var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg);
+    counter-increment: pillar;
+  }
+
+  .pillars li::before {
+    content: counter(pillar);
+    display: block;
+    margin-block-end: var(--space-2);
+    color: var(--color-accent);
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .pillars h3 {
+    margin: 0;
+    font-size: var(--text-lg);
+  }
+
+  .map-layout {
+    display: grid;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  @media (min-width: 48rem) {
+    .map-layout {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+</style>

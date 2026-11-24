@@ -41,7 +41,7 @@ These are summarized from SPEC section 4. Breaking one requires a decision recor
 - Run the type check, lint, format check and build locally before opening a PR. Do not open a PR you know fails CI.
 - Architectural changes, server code, runtime dependencies that ship JavaScript to visitors, motion budget exceptions and exceptions to the rules above need a short decision record in `docs/decisions/` (copy `0000-template.md`). Development-only tools do not.
 - Pre-launch deploys sit behind Cloudflare Access. Never commit the allowlist or anyone's email address.
-- Agents may draft but must not merge, and a human must approve: anything in `src/brand/` or `public/brand/`, privacy text, funding wording, board bios, and any statement of the organization's position.
+- Agents may draft but must not merge, and a human must approve: anything in `src/brand/` or `public/brand/`, privacy text, funding wording, team bios, and any statement of the organization's position.
 - If the spec contradicts what the work needs, stop and say so in the issue or PR. Propose the spec change; do not quietly work around it.
 
 ## Technical conventions

@@ -15,9 +15,11 @@ interface Props {
   description: string;
   /** Keep the page out of search results, e.g. fixtures. */
   noindex?: boolean;
+  /** Let sections span the full width and set their own containers, as on Home. */
+  fullWidth?: boolean;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, fullWidth = false } = Astro.props;
 const documentTitle = title ? `${title} | ${brand.name}` : brand.name;
 const lang = Astro.currentLocale ?? 'en';
 // Absolute URLs from `site` (set from brand.domain in astro.config.mjs).
@@ -57,13 +59,22 @@ const socialImage = new URL(brand.socialImage.src, Astro.site).href;
     />
     <meta property="og:image:alt" content={brand.socialImage.alt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <!--
+      Marks the page as able to run scripts, before first paint, so styles for
+      script-enhanced views (such as the Team page on phones) apply with no
+      flash. Without JavaScript the class is absent and pages show their
+      complete, still version (rule 4).
+    -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">
       Skip to main content
     </a>
     <SiteHeader />
-    <main id="main" class="container">
+    <main id="main" class:list={[{ container: !fullWidth }]}>
       <slot />
     </main>
     <SiteFooter />

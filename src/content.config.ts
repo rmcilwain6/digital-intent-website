@@ -3,6 +3,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { imageSlotSchema } from './schemas/valleyview';
 
 const pages = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './content/pages' }),
@@ -16,4 +17,28 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { pages };
+/**
+ * One feature per past Valleyview recipient, at /valleyview/<year>/ (decision
+ * record 0006). Commit a recipient's details only with their consent: git
+ * history is public and permanent.
+ */
+const recipients = defineCollection({
+  loader: glob({ pattern: '*.md', base: './content/valleyview-recipients' }),
+  schema: z.strictObject({
+    title: z.string().min(1),
+    description: z.string().min(1),
+    /** First name only, unless the recipient agrees to more. */
+    name: z.string().min(1),
+    year: z.number().int(),
+    /** Label such as "Year 1 · 2026". */
+    cohort: z.string().min(1),
+    headline: z.string().min(1),
+    /** One or two sentences under the headline; also the teaser on /valleyview/. */
+    dek: z.string().min(1),
+    quote: z.string().min(1),
+    hero: imageSlotSchema,
+    gallery: z.array(imageSlotSchema).min(1),
+  }),
+});
+
+export const collections = { pages, recipients };

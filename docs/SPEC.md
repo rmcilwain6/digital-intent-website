@@ -43,7 +43,7 @@ This order sets what we build first. It does not rank people: every audience mee
 | -------- | --------------------------------------- | -------------------------------------------------------- |
 | 1        | Teachers and school/district staff (BC) | Who we are, what we do, why to trust us, how to reach us |
 | 2        | Graduating high school students         | Valleyview grant details and how to apply                |
-| 3        | Funders, partners, media                | Mission, board, funding values, contact                  |
+| 3        | Funders, partners, media                | Mission, team, funding values, contact                   |
 | 4        | Parents and the public                  | Plain-language writing and resources (later phases)      |
 
 ## 4. Non-negotiable rules
@@ -73,7 +73,7 @@ The MVP is Phases 0 to 2: foundation, core pages, then brand and launch.
 
 ### Phase 1: Core pages (pre-brand)
 
-Pages: Home, About, Board, Valleyview Grant (information only), Contact, Privacy, 404 (section 7), built against the placeholder brand. Funding moved to post-MVP (section 7.5, record 0004).
+Pages: Home, About, Our team, Valleyview Grant (information only), Contact, Privacy, 404 (section 7), built against the placeholder brand. Funding moved to post-MVP (section 7.5, record 0004).
 
 Open for launch: the Indigenous outreach page (section 7.9, D13), a Partnerships page or a contact email (D27), and a terms of service page if one is legally needed (D28).
 
@@ -185,31 +185,36 @@ Sections, in order (teachers above Valleyview is a preference, not settled; D30)
 - Values and how we work (remote-first, in person by choice, three starting regions, province-wide in scope).
 - Our story: how and why we started, after how we work.
 
-### 7.3 Board (`/board`) Phase 1
+### 7.3 Our team (`/team`) Phase 1
 
-Card per person, with data in `content/board.ts`, schema-validated:
+Called "Our team" rather than "Board" while the board's official designation is being settled.
 
-- Required: name, photo, board role, home region.
-- Optional: industry or career, areas of expertise, short bio, one external link.
+An entry per person beside a map of BC, with data in `content/team.ts`, schema-validated. The map is the main visual; entries are plain text beside it, not cards:
+
+- Required: name, photo, role (Executive Director or Board Member), home city (one of the starting regions) and a one-sentence focus.
+- Optional, under "More about": where they work and what they do, where they went to school (each with the organization's logo, self-hosted and used with permission), a short bio and one external link.
+- The map outlines the school districts around each starting region (SD 73 for Kamloops; SD 61, 62 and 63 for Victoria; SD 39 for Vancouver), kept to the districts we can reasonably reach.
 - Not shown: personal email, phone, or regional lead designation (pending board decision D14).
 - Photo slots use placeholders until original portraits are shot.
-- A board member's details are committed only after that member has agreed to them. Git history is public and permanent, so a draft that is later removed is still published.
+- A team member's details are committed only after that member has agreed to them. Git history is public and permanent, so a draft that is later removed is still published.
 
 ### 7.4 Valleyview Social Innovation Grant (`/valleyview`) Phase 1, information only
 
-This is a well-designed information page until D5 is decided. How applications are collected and handled is not the website's decision (D5). The likely outcome is an outbound link to a Canadian-hosted form or survey tool.
+`/valleyview` is the home for the grant across years (record 0006). How applications are collected and handled is not the website's decision (D5). The likely outcome is an outbound link to a Canadian-hosted form or survey tool.
 
 This year keeps last year's format and is open to Grade 12 students at Valleyview only. The grant must read as advancing education: recipients agree to mentorship and to follow-up showing how the grant was used to learn, so do not describe it as "no strings attached".
 
-Information page:
+The page, in order:
 
-- What it is, who can apply, award amount, what recipients get (funding plus mentorship), what they agree to in return. Use `[TK]` for any detail the board has not confirmed.
-- The three application questions: what's the idea, why are you the right person, how will this help.
-- Timeline from data, where dates are known.
-- How and when to apply, as text. No apply button until D5 is decided.
-- Short FAQ addressing last year's barriers: nerves about pitching, feeling unqualified.
-- No past-recipient section.
-- Short, memorable URL for posters and school announcements.
+1. Why we fund students: pillar 4, "Empower young people to build their ideas now."
+2. Past recipients: a teaser for each, linking to their feature page at `/valleyview/<year>/` (article and photos). Only with the recipient's consent (D19).
+3. This year's grant: what it is, who can apply, award amount, what recipients get (funding plus mentorship) and what they agree to in return. Use `[TK]` for any detail the board has not confirmed.
+4. The three application questions: what's the idea, why are you the right person, how will this help.
+5. Timeline from data, where dates are known.
+6. How and when to apply, as text. No apply button until D5 is decided.
+7. Short FAQ addressing last year's barriers: nerves about pitching, feeling unqualified.
+
+Short, memorable URL for posters and school announcements. Recipient features may ship after launch.
 
 Once D5 is decided:
 
@@ -431,7 +436,7 @@ Decision records are for choices worth explaining later: architectural changes, 
 
 ### 12.5 Human-only areas
 
-Agents may draft, but a human must approve: the brand layer, privacy text, funding wording, board bios, and any statement of the organization's position.
+Agents may draft, but a human must approve: the brand layer, privacy text, funding wording, team bios, and any statement of the organization's position.
 
 ### 12.6 Skills (post-MVP)
 
@@ -486,7 +491,7 @@ Write these once the patterns they describe have settled in real code. `add-page
 | D16 | Launch date                                             | Decided (target)       | November 25, 2026, together with name, brand and domain (D20). Copy review November 21. Moves if the brand is not ready. Revised Nov 11, 2026 (record 0004)                                               |
 | D17 | Licence                                                 | Decided                | MIT for code, CC BY 4.0 for written content                                                                                                                                                               |
 | D18 | Human review on every pull request                      | Decided                | Yes, including content-only changes                                                                                                                                                                       |
-| D19 | Past Valleyview recipients featured                     | Decided for launch     | No. A feature on a past recipient, linked from Valleyview, may follow with that recipient's consent                                                                                                       |
+| D19 | Past Valleyview recipients featured                     | Decided                | Yes, with consent: a teaser on `/valleyview` and a feature page per recipient. May ship after launch. Nov 22, 2026 (record 0006)                                                                          |
 | D20 | Valleyview page before the name exists                  | Decided                | No public interim launch. The site, name, brand and domain go public together. Valleyview launches as an information page; the application link follows D5. Revised Oct 21, 2026 (record 0002)            |
 | D21 | Organization email                                      | Decided                | `helloworld@digitalintent.ca`, chosen Nov 24, 2026. The mailbox is created with the domain in Phase 2 and tested from the Contact page before launch                                                      |
 | D22 | Where research findings live                            | Decided for now        | Google Drive. Technical findings may move to `docs/research/`                                                                                                                                             |

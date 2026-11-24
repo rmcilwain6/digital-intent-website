@@ -1,0 +1,66 @@
+---
+// A call to action styled as a button. While the destination is a `[TK: ...]`
+// note, it renders as visible text instead of a link, so there is no broken
+// link (SPEC rule 6). Outbound links leave the site; nothing here is a form.
+import type { CallToAction } from '../schemas/home';
+import { isPlaceholder } from '../lib/placeholder';
+
+interface Props {
+  cta: CallToAction;
+  /** Primary: filled. Secondary: outlined. */
+  variant?: 'primary' | 'secondary';
+}
+
+const { cta, variant = 'primary' } = Astro.props;
+const pending = isPlaceholder(cta.href);
+---
+
+{pending ? (
+  <span class="cta pending">
+    {cta.label} <span class="note">{cta.href}</span>
+  </span>
+) : (
+  <a class:list={['cta', variant]} href={cta.href}>
+    {cta.label}
+  </a>
+)}
+
+<style>
+  .cta {
+    display: inline-block;
+    padding: var(--space-3) var(--space-5);
+    border: var(--border-width) solid var(--color-accent);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--leading-tight);
+    text-decoration: none;
+  }
+
+  .primary {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .secondary {
+    background: transparent;
+    color: var(--color-link);
+  }
+
+  a.cta:hover {
+    text-decoration: underline;
+  }
+
+  .pending {
+    border-style: dashed;
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .note {
+    display: block;
+    margin-block-start: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-regular);
+  }
+</style>

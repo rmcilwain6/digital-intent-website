@@ -1,0 +1,462 @@
+---
+// Home hero, Analog world (SPEC 7.1, D4; website frame design v1). On wide
+// screens the header and hero fill exactly one screen: headline, lede and the
+// two route cards on the left, and on the right a classroom whiteboard that
+// bleeds off the edge of the page, with a print of a bridge from each
+// starting region held up by a magnet. Phones get the text and both cards,
+// then the whole board below them. No emphasis marks in the hero (design
+// system).
+import type { Home } from '../../schemas/home';
+import IndexCard from './IndexCard.astro';
+import ValleyviewWindow from './ValleyviewWindow.astro';
+
+interface Props {
+  hero: Home['hero'];
+}
+
+const { hero } = Astro.props;
+---
+
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="inner">
+    <div class="text">
+      <h1 id="hero-heading">{hero.heading}</h1>
+      <p class="lede">{hero.lede}</p>
+      <div class="routes">
+        <IndexCard card={hero.teachers} />
+        <ValleyviewWindow card={hero.valleyview} />
+      </div>
+    </div>
+
+    {/*
+      The prints: each photo fills its paper, held up by a magnet. Clicking
+      one turns it over to the back, where the place and date are written in
+      pencil. The button's name carries the same details for screen readers,
+      and aria-pressed says whether it is turned over. Without JavaScript the
+      prints stay face up.
+    */}
+    <div class="board">
+      {hero.images.map((image, index) => (
+        <div class={`print print-${index + 1}`}>
+          <span
+            class={`magnet ${['magnet-red', 'magnet-navy', 'magnet-lime'][index]}`}
+            aria-hidden="true"
+          />
+          <button
+            type="button"
+            class="turn"
+            aria-pressed="false"
+            aria-label={`Photo of the ${image.label}, ${image.place}, taken ${image.taken}. Turn it over`}
+            data-print
+          >
+            <span class="card" aria-hidden="true">
+              <span class="face front">
+                <span class="slot-label">[photo: {image.label}]</span>
+                <span class="slot-note">{image.note}</span>
+              </span>
+              <span class="face back">
+                <span class="pencil">
+                  {image.label}
+                  <br />
+                  {image.place}
+                </span>
+                <span class="pencil date">{image.taken}</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      ))}
+      <span class="spare spare-1 magnet-red" aria-hidden="true" />
+      <span class="spare spare-2 magnet-navy" aria-hidden="true" />
+      <span class="spare spare-3 magnet-white" aria-hidden="true" />
+      <span class="spare spare-4 magnet-lime" aria-hidden="true" />
+      <span class="spare spare-5 magnet-navy" aria-hidden="true" />
+    </div>
+  </div>
+</section>
+
+<script>
+  // Turn a print over and back. Transform only; under reduced motion the
+  // motion tokens make it instant.
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-print]')
+    .forEach((print) => {
+      print.addEventListener('click', () => {
+        const turned = print.getAttribute('aria-pressed') === 'true';
+        print.setAttribute('aria-pressed', String(!turned));
+      });
+    });
+</script>
+
+<style>
+  .hero {
+    /* Height of the wide-screen site header, so header plus hero is 100vh. */
+    --header-height: 8.75rem;
+    /* Column spacing, and the height of everything in it but the headline
+       (lede and both cards). Measured; update it if the cards change. */
+    --pad: var(--space-6);
+    --gap: var(--space-5);
+    --column-rest: 26rem;
+    position: relative;
+    overflow: clip;
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-7);
+    max-inline-size: calc(var(--width-page) + 2 * var(--space-gutter));
+    margin-inline: auto;
+    padding: var(--pad) var(--space-gutter);
+  }
+
+  .text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap);
+  }
+
+  h1 {
+    max-inline-size: 9.4em;
+    margin: 0;
+    font-size: var(--text-display);
+    line-height: 1.02;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .lede {
+    max-inline-size: 44ch;
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.55;
+  }
+
+  .routes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    inline-size: min(100%, 27.5rem);
+    margin-block-start: var(--space-1);
+  }
+
+  /*
+   * The board: a near-white whiteboard in a grey frame, with faint ghosts of
+   * old marker. Below wide screens it runs full width, nearly square like
+   * the wide-screen board, so the prints sit the same way at every size. On
+   * wide screens it fills the right column and bleeds off the right edge.
+   */
+  .board {
+    position: relative;
+    aspect-ratio: 16 / 15;
+    margin-inline: calc(-1 * var(--space-gutter));
+    border-block: 0.5rem solid var(--color-border);
+    background:
+      radial-gradient(
+        ellipse 30% 12% at 70% 82%,
+        color-mix(in srgb, var(--color-text) 4%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 25% 10% at 20% 30%,
+        color-mix(in srgb, var(--color-text) 3%, transparent),
+        transparent
+      ),
+      linear-gradient(
+        160deg,
+        var(--color-card),
+        color-mix(in srgb, var(--color-card) 92%, var(--color-border))
+      );
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--color-text) 8%, transparent);
+  }
+
+  /* Prints: the photo fills the paper; a slight tilt and a soft shadow. */
+  .print {
+    position: absolute;
+    box-shadow:
+      0 1px 0 color-mix(in srgb, var(--color-text) 10%, transparent),
+      0 0.75rem 1.25rem -0.75rem
+        color-mix(in srgb, var(--color-text) 55%, transparent);
+  }
+
+  .turn {
+    display: block;
+    inline-size: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    perspective: 60rem;
+  }
+
+  .turn:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: 0.375rem;
+  }
+
+  /* The card turns over in place; its two faces share one grid cell. */
+  .card {
+    display: grid;
+    transform-style: preserve-3d;
+    transition: transform var(--duration-slow) var(--ease-standard);
+  }
+
+  .turn[aria-pressed='true'] .card {
+    transform: rotateY(180deg);
+  }
+
+  .face {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    backface-visibility: hidden;
+  }
+
+  /* Front: the photo, edge to edge. A labelled placeholder until it exists. */
+  .front {
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: var(--space-3);
+    border: var(--border-width) dashed var(--color-border);
+    background: var(--color-surface);
+    font-family: var(--font-mono);
+    text-align: center;
+  }
+
+  .slot-label {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .slot-note {
+    max-inline-size: 30ch;
+    color: var(--color-text-muted);
+    font-size: 0.6875rem;
+    line-height: 1.45;
+  }
+
+  /* Back: plain photo paper, written on in pencil. */
+  .back {
+    justify-content: space-between;
+    padding: var(--space-4);
+    background: var(--color-card);
+    transform: rotateY(180deg);
+    text-align: start;
+  }
+
+  .pencil {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.35;
+    rotate: -2deg;
+  }
+
+  .date {
+    align-self: flex-end;
+    rotate: 1deg;
+  }
+
+  /* Kamloops, where we started, top left; Victoria tall, top right;
+     Vancouver below. */
+  .print-1 .card,
+  .print-3 .card {
+    aspect-ratio: 3 / 2;
+  }
+
+  .print-2 .card {
+    aspect-ratio: 4 / 5;
+  }
+
+  .print-1 {
+    inline-size: 42%;
+    inset: 8% auto auto 6%;
+    rotate: -2deg;
+  }
+
+  .print-2 {
+    inline-size: 28%;
+    inset: 12% 8% auto auto;
+    rotate: 2deg;
+  }
+
+  /* Left of Victoria's caption on narrower boards; centred on wide ones. */
+  .print-3 {
+    inline-size: 40%;
+    inset: auto auto 11% 20%;
+    rotate: -1deg;
+  }
+
+  /* Magnets in the brand's three colours, one per print. */
+  .magnet {
+    position: absolute;
+    z-index: 2;
+    inset-block-start: -0.55rem;
+    inset-inline-start: 50%;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 50%;
+    translate: -50% 0;
+    box-shadow: 0 0.2rem 0.3rem -0.1rem
+      color-mix(in srgb, var(--color-text) 60%, transparent);
+  }
+
+  .magnet-red {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-red) 55%, var(--color-paper)),
+      var(--color-red) 60%
+    );
+  }
+
+  .magnet-navy {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-navy) 45%, var(--color-paper)),
+      var(--color-navy) 60%
+    );
+  }
+
+  .magnet-lime {
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-lime) 40%, var(--color-paper)),
+      color-mix(in srgb, var(--color-lime) 85%, var(--color-navy)) 70%
+    );
+  }
+
+  .magnet-white {
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-card),
+      color-mix(in srgb, var(--color-paper) 80%, var(--color-border)) 70%
+    );
+  }
+
+  /* Spare magnets: smaller, left wherever someone last put them. */
+  .spare {
+    position: absolute;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    border-radius: 50%;
+    box-shadow: 0 0.15rem 0.25rem -0.05rem
+      color-mix(in srgb, var(--color-text) 55%, transparent);
+  }
+
+  .spare-1 {
+    inset: 4% 5% auto auto;
+  }
+
+  .spare-2 {
+    inset: 5.5% calc(5% + 1.375rem) auto auto;
+  }
+
+  .spare-3 {
+    inset: 8% calc(5% + 0.5rem) auto auto;
+  }
+
+  .spare-4 {
+    inset: auto 9% 6% auto;
+  }
+
+  .spare-5 {
+    inset: 48% auto auto 3%;
+  }
+
+  /* Phones: the notes would crowd the small prints; labels are enough. */
+  @media (width < 48rem) {
+    .text {
+      gap: var(--space-4);
+    }
+
+    .slot-note {
+      display: none;
+    }
+
+    /* A taller board and bigger prints, so the photos read on a small
+       screen. */
+    .board {
+      aspect-ratio: 8 / 9;
+    }
+
+    .print-1 {
+      inline-size: 50%;
+      inset: 7% auto auto 5%;
+    }
+
+    .print-2 {
+      inline-size: 34%;
+      inset: 11% 5% auto auto;
+    }
+
+    .print-3 {
+      inline-size: 50%;
+      inset: auto auto 8% 14%;
+    }
+
+    .spare-5 {
+      inset-block-start: 40%;
+    }
+  }
+
+  /* Wide screens: header plus hero fill the screen, board on the right. */
+  @media (width >= 64rem) {
+    .hero,
+    .inner {
+      min-block-size: calc(100svh - var(--header-height));
+    }
+
+    .inner {
+      grid-template-columns: minmax(27.5rem, 1fr) minmax(0, 1fr);
+      align-items: center;
+    }
+
+    /*
+     * The headline (three lines) takes whatever height is left, so header
+     * plus hero is exactly one screen. Never below 32px: on very short
+     * screens the hero runs past the fold rather than cramping the text.
+     */
+    h1 {
+      font-size: max(
+        2rem,
+        min(
+          var(--text-display),
+          (
+              100svh - var(--header-height) - 2 * var(--pad) - 2 * var(--gap) -
+                var(--column-rest)
+            ) /
+            3.06
+        )
+      );
+    }
+
+    .board {
+      align-self: stretch;
+      aspect-ratio: auto;
+      min-block-size: 30rem;
+      margin-inline: 0
+        calc(-1 * max(var(--space-gutter), (100vw - var(--width-page)) / 2));
+      border: 0.625rem solid var(--color-border);
+      border-inline-end: 0;
+      border-start-start-radius: var(--radius-md);
+      border-end-start-radius: var(--radius-md);
+    }
+
+    .print-3 {
+      inset-inline-start: 30%;
+    }
+  }
+
+  /* Shorter wide screens: tighter spacing, so the headline can stay larger. */
+  @media (width >= 64rem) and (height < 56rem) {
+    .hero {
+      --pad: var(--space-5);
+      --gap: var(--space-4);
+    }
+  }
+</style>

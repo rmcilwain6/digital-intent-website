@@ -39,7 +39,7 @@ You can use whichever AI tool you like. All agent instructions live in [`AGENTS.
 ## Privacy in a public repo
 
 - Never commit secrets, API tokens, personal email addresses or phone numbers.
-- Never include anything about students, applicants or grant recipients in code, content, issues or pull requests.
+- Never include anything about students or applicants in code, content, issues or pull requests. A grant recipient's details go in only with their consent (decision record 0006).
 - Assume everything you write here is public and permanent.
 
 ## Writing style for site copy

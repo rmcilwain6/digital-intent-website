@@ -1,0 +1,159 @@
+---
+// "Why we exist" on Home (SPEC 7.1, section 2): sets up the problem before
+// What we do offers anything. A short intro, three challenges side by side,
+// "Could you answer these?" with a window of questions from the bank, then a
+// quiet note on why this is hard, which hands off to the mission and pillars.
+// One paper band: the window is its only Digital object.
+import { questions } from '../../../content/questions';
+import type { WhyWeExist as Section } from '../../schemas/home';
+import DraftMarker from './DraftMarker.astro';
+import QuestionWindow from './QuestionWindow.astro';
+
+interface Props {
+  id: string;
+  section: Section;
+  tone: 'base' | 'surface';
+}
+
+const { id, section, tone } = Astro.props;
+const copy = section.questions;
+const headingId = `${id}-heading`;
+// For now the first few, in order. Later, a different few on each visit.
+const shown = questions.slice(0, copy.count);
+const draft = section.draft || shown.some((q) => q.draft);
+---
+
+<section class:list={['band', tone]} aria-labelledby={headingId}>
+  <div class="container">
+    {draft && <DraftMarker />}
+    <h2 id={headingId}>{section.heading}</h2>
+    <p class="lede">{section.lede}</p>
+
+    <ol class="challenges">
+      {section.challenges.map((challenge) => (
+        <li>
+          <h3>{challenge.title}</h3>
+          <p>{challenge.text}</p>
+        </li>
+      ))}
+    </ol>
+
+    <div class="questions">
+      <div class="questions-intro">
+        <h3>{copy.heading}</h3>
+        <p>{copy.lede}</p>
+      </div>
+      <QuestionWindow questions={shown} copy={copy} />
+    </div>
+
+    <div class="closing">
+      <h3>{section.closing.heading}</h3>
+      <p>{section.closing.body}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    padding-block: var(--space-8) calc(2 * var(--space-8));
+    background: var(--band-bg);
+  }
+
+  .base {
+    --band-bg: var(--color-bg);
+  }
+
+  .surface {
+    --band-bg: var(--color-surface);
+  }
+
+  h2 {
+    margin-block: 0;
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .lede {
+    max-inline-size: 36em;
+    margin-block: var(--space-5) 0;
+    font-size: var(--text-lg);
+  }
+
+  /* Three challenges side by side on wide screens, each under a heavy rule. */
+  .challenges {
+    display: grid;
+    gap: var(--space-7);
+    margin: var(--space-8) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .challenges li {
+    padding-block-start: var(--space-5);
+    border-block-start: 2px solid var(--color-text);
+  }
+
+  .challenges h3 {
+    margin: 0;
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+  }
+
+  .challenges p {
+    margin: var(--space-4) 0 0;
+  }
+
+  @media (min-width: 56rem) {
+    .challenges {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    /* Titles take the same height, so the three texts start level. */
+    .challenges h3 {
+      min-block-size: calc(2 * var(--leading-tight) * 1em);
+    }
+  }
+
+  .questions {
+    margin-block-start: calc(1.5 * var(--space-8));
+  }
+
+  .questions-intro {
+    display: grid;
+    gap: var(--space-4);
+    align-items: end;
+    margin-block-end: var(--space-6);
+  }
+
+  .questions-intro h3,
+  .questions-intro p {
+    margin-block: 0;
+  }
+
+  .questions-intro h3 {
+    font-size: var(--text-2xl);
+  }
+
+  @media (min-width: 56rem) {
+    .questions-intro {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-8);
+    }
+  }
+
+  /* Why this is hard: quiet, left-aligned, at reading width. */
+  .closing {
+    max-inline-size: var(--width-prose);
+    margin-block-start: calc(1.5 * var(--space-8));
+  }
+
+  .closing h3 {
+    margin: 0;
+    font-size: var(--text-xl);
+  }
+
+  .closing p {
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-lg);
+  }
+</style>

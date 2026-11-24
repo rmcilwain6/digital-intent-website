@@ -20,4 +20,4 @@ Closes #
 
 ## Notes for reviewers
 
-<!-- Anything a reviewer should look at closely, and any reason this is over ~400 changed lines. Human-only areas (brand, privacy text, funding wording, board bios, organizational positions) need explicit human approval. -->
+<!-- Anything a reviewer should look at closely, and any reason this is over ~400 changed lines. Human-only areas (brand, privacy text, funding wording, team bios, organizational positions) need explicit human approval. -->

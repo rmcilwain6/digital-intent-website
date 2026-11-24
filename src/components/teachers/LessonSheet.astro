@@ -1,0 +1,246 @@
+---
+// One lesson, as the sheet of paper inside its tab of the file folder: what
+// students do and the details on the left, the current version's files on
+// the right, with earlier versions in a native disclosure below them.
+import type { Lesson } from '../../schemas/teachers';
+import FileList from './FileList.astro';
+
+interface Props {
+  lesson: Lesson;
+}
+
+const { lesson } = Astro.props;
+const [current, ...earlier] = lesson.versions;
+const id = `lesson-${lesson.slug}`;
+
+const dateFormat = new Intl.DateTimeFormat('en-CA', {
+  dateStyle: 'medium',
+  timeZone: 'UTC',
+});
+const formatDate = (iso: string) => dateFormat.format(new Date(iso));
+---
+
+{current && (
+  <div class="sheet">
+    <div class="info">
+      {lesson.example && <p class="example">[TK: example entry]</p>}
+      {lesson.intent && <p class="intent">today's intent: {lesson.intent}</p>}
+      <h3 id={`${id}-title`}>{lesson.title}</h3>
+      <p class="version">
+        <span class="tag">v{current.version}</span>
+        <span>
+          Updated{' '}
+          <time datetime={current.date}>{formatDate(current.date)}</time>
+        </span>
+      </p>
+      <p class="summary">{lesson.summary}</p>
+
+      <dl class="specs">
+        <div>
+          <dt>grades</dt>
+          <dd>{lesson.grades}</dd>
+        </div>
+        {lesson.approach && (
+          <div>
+            <dt>approach</dt>
+            <dd>{lesson.approach}</dd>
+          </div>
+        )}
+        {lesson.subjects && (
+          <div>
+            <dt>fits</dt>
+            <dd>{lesson.subjects.join(', ')}</dd>
+          </div>
+        )}
+        {lesson.length && (
+          <div>
+            <dt>time</dt>
+            <dd>{lesson.length}</dd>
+          </div>
+        )}
+        <div>
+          <dt>needs</dt>
+          <dd>{lesson.devices}</dd>
+        </div>
+        {lesson.tool && (
+          <div>
+            <dt>tool</dt>
+            <dd>{lesson.tool}</dd>
+          </div>
+        )}
+      </dl>
+    </div>
+
+    <div class="downloads">
+      <h4>Files for version {current.version}</h4>
+      <p class="notes">{current.notes}</p>
+      <FileList files={current.files} version={current.version} />
+
+      {earlier.length > 0 && (
+        <details class="history">
+          <summary>
+            Earlier versions <span class="count">({earlier.length})</span>
+          </summary>
+          <ol>
+            {earlier.map((version) => (
+              <li>
+                <p class="history-head">
+                  <span class="tag">v{version.version}</span>
+                  <time datetime={version.date}>
+                    {formatDate(version.date)}
+                  </time>
+                </p>
+                <p class="notes">{version.notes}</p>
+                <FileList
+                  files={version.files}
+                  version={version.version}
+                  compact
+                />
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
+    </div>
+  </div>
+)}
+
+<style>
+  /* A sheet of paper with one more just behind it, offset down and right. */
+  .sheet {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--space-7);
+    padding: var(--space-6);
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-card);
+  }
+
+  .sheet::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-card);
+    content: '';
+    transform: translate(0.375rem, 0.375rem);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .example,
+  .intent {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .example,
+  .intent {
+    margin-block-end: var(--space-2);
+    color: var(--color-label);
+  }
+
+  h3 {
+    margin: var(--space-1) 0 var(--space-3);
+    font-size: var(--text-2xl);
+  }
+
+  h4 {
+    margin: 0 0 var(--space-1);
+    font-size: var(--text-base);
+  }
+
+  .version,
+  .history-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* The version number, typed on a small label. */
+  .tag {
+    padding: 0 var(--space-2);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .summary {
+    max-inline-size: 52ch;
+    margin-block: var(--space-4) var(--space-5);
+  }
+
+  .specs {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .specs div {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: var(--space-2);
+  }
+
+  dt {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.6rem;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .notes {
+    margin-block-end: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .history {
+    margin-block-start: var(--space-5);
+  }
+
+  summary {
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+  }
+
+  .count {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-regular);
+  }
+
+  .history ol {
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .history li + li {
+    margin-block-start: var(--space-5);
+  }
+
+  .history .notes {
+    margin-block: var(--space-1) var(--space-2);
+  }
+
+  @media (width < 56rem) {
+    .sheet {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-6);
+      padding: var(--space-5);
+    }
+  }
+</style>

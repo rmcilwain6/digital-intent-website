@@ -55,5 +55,6 @@ $M ne_10m_populated_places_simple.geojson -filter 'adm1name=="British Columbia"'
   -proj "$P" -o "$OUT/places.json" format=geojson precision=1
 $M "$ROOT/tools/map/waypoints.geojson" -proj "$P" -o "$OUT/waypoints.json" format=geojson precision=1
 
+bash "$ROOT/tools/map/build-detail.sh"
 node "$ROOT/tools/map/elevation.mjs"
 node "$ROOT/tools/map/build-svg.mjs"
