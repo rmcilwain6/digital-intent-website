@@ -8,7 +8,6 @@ import { organization } from '../../content/organization';
 import { valleyview } from '../../content/valleyview';
 import { brand } from '../brand/brand.config';
 import BcMap from '../components/BcMap.astro';
-import EmailLink from '../components/EmailLink.astro';
 import HomeHero from '../components/home/HomeHero.astro';
 import HomeSection from '../components/home/HomeSection.astro';
 import QuestionBreak from '../components/home/QuestionBreak.astro';
@@ -89,12 +88,6 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
             </ol>
             <p>{valleyview.current.apply.text}</p>
           </div>
-        )}
-
-        {key === 'partnerships' && (
-          <p>
-            <EmailLink />
-          </p>
         )}
       </HomeSection>
     );
