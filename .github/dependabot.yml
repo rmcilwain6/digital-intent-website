@@ -1,0 +1,53 @@
+# Dependabot keeps npm packages and GitHub Actions up to date. Security
+# fixes come as soon as an advisory is published (turned on in the repo's
+# security settings); the rest arrive weekly, grouped, so there are a few
+# pull requests to review rather than one per package. Every one runs CI
+# and needs a person's approval like any other pull request.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Vancouver
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      # What ships to visitors: review these on their own.
+      astro:
+        patterns:
+          - astro
+          - '@astrojs/*'
+      # Lint, format, type check and deploy tools. Development only.
+      dev-tools:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # TypeScript is pinned to 6.0.x (`~` in package.json). A major upgrade
+      # needs a check that astro check and typescript-eslint support it, so
+      # do it by hand.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Vancouver
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      actions:
+        patterns:
+          - '*'
