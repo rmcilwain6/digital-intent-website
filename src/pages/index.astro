@@ -11,20 +11,29 @@ import BcMap from '../components/BcMap.astro';
 import EmailLink from '../components/EmailLink.astro';
 import HomeHero from '../components/home/HomeHero.astro';
 import HomeSection from '../components/home/HomeSection.astro';
+import QuestionBreak from '../components/home/QuestionBreak.astro';
+import WhyWeExist from '../components/home/WhyWeExist.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
 
 const page = await getPage('home');
 const { sections } = home;
 
-// Bands alternate tone after the hero, whatever the order.
-const tone = (index: number) => (index % 2 === 0 ? 'surface' : 'base');
+// Bands alternate tone after the question break, whatever the order. The
+// first is on the page's own paper, so the break flows straight into it.
+const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
 ---
 
 <BaseLayout description={page.data.description} fullWidth>
   <HomeHero hero={home.hero} />
+  <QuestionBreak question={home.question} />
 
   {home.order.map((key, index) => {
+    if (key === 'problem') {
+      return (
+        <WhyWeExist id={key} section={sections.problem} tone={tone(index)} />
+      );
+    }
     const section = sections[key];
     return (
       <HomeSection

@@ -47,24 +47,52 @@ export const home = homeSchema.parse({
     ],
   },
 
+  // The team's own line, split across the two worlds.
+  question: {
+    analog: 'Every student learns how the natural world works.',
+    digital: 'What about the digital one?',
+  },
+
   sections: {
     problem: {
       heading: 'Why we exist',
-      // The team's own line, not an agent draft.
-      lead: 'Every student learns how the natural world works. What about the digital one?',
-      body: [
-        'Technology shapes how students learn and how teachers teach. The companies that build classroom tools have their own business interests, and those do not always match what students need.',
-        'Schools deserve an independent voice on technology, one that is not selling anything.',
+      lede: 'We see a set of challenges around technology in schools right now. None of them has a simple answer, and we think each one needs careful, intentional work.',
+      challenges: [
+        {
+          title: 'More devices haven’t meant better learning',
+          text: 'Schools had good reasons to bring devices in. But most software is built to make things easier and to hold our attention, and learning happens in the hard part: the wrong answer, the second try, working it out with the people in the room.',
+        },
+        {
+          title: 'Using technology isn’t the same as understanding it',
+          text: 'Students spend hours a day on screens, and many are fluent users. That isn’t the same as knowing how any of it works: the hardware, the networks, where data goes, or who pays for the free apps.',
+        },
+        {
+          title: 'AI changes the ground under all of it',
+          text: 'It arrived in classrooms almost overnight, and it touches how students learn, how we know what they’ve learned, how anyone finds information, and what work students are preparing for.',
+        },
       ],
-      cta: { label: 'About us', href: '/about/' },
-      draft: true,
+      questions: {
+        heading: 'Could you answer these?',
+        lede: 'We think every student should graduate able to answer questions like these. Have a guess before you look.',
+        count: 5,
+        windowTitle: '~/questions',
+        prompt: 'have a guess first. then:',
+        reveal: 'show the answer',
+        hide: 'hide the answer',
+        next: 'next question',
+      },
+      closing: {
+        heading: 'Why this is hard',
+        body: 'None of this has an easy fix, partly because the people who build technology and the people who teach often see it differently. They want different things from it, for different reasons. Finding what’s best for students means bringing those views together. That’s the bridge we’re trying to build.',
+      },
+      draft: false,
     },
 
     mission: {
       heading: 'What we do',
       body: ['Our work rests on four pillars, set by our board.'],
       cta: { label: 'Our mission and how we work', href: '/about/' },
-      draft: true,
+      draft: false,
     },
 
     map: {
@@ -75,7 +103,7 @@ export const home = homeSchema.parse({
       ],
       regionsHeading: 'Where we are starting',
       cta: { label: 'Get in touch from anywhere in BC', href: '/contact/' },
-      draft: true,
+      draft: false,
     },
 
     teachers: {
@@ -88,7 +116,7 @@ export const home = homeSchema.parse({
         label: 'Start a conversation',
         href: '[TK: teacher destination, pending D26]',
       },
-      draft: true,
+      draft: false,
     },
 
     valleyview: {
@@ -98,7 +126,7 @@ export const home = homeSchema.parse({
       ],
       questionsHeading: 'What we ask you',
       cta: { label: 'Read about the grant', href: '/valleyview/' },
-      draft: true,
+      draft: false,
     },
 
     outreach: {
@@ -116,7 +144,7 @@ export const home = homeSchema.parse({
         'We work alongside organizations, businesses and groups that want better outcomes for students, teachers and parents. We see ourselves as one part of a network, not a competitor.',
         'If that sounds like you, write to us.',
       ],
-      draft: true,
+      draft: false,
     },
   },
 
