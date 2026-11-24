@@ -85,14 +85,14 @@ export const home = homeSchema.parse({
         heading: 'Why this is hard',
         body: 'None of this has an easy fix, partly because the people who build technology and the people who teach often see it differently. They want different things from it, for different reasons. Finding what’s best for students means bringing those views together. That’s the bridge we’re trying to build.',
       },
-      draft: true,
+      draft: false,
     },
 
     mission: {
       heading: 'What we do',
       body: ['Our work rests on four pillars, set by our board.'],
       cta: { label: 'Our mission and how we work', href: '/about/' },
-      draft: true,
+      draft: false,
     },
 
     map: {
@@ -103,7 +103,7 @@ export const home = homeSchema.parse({
       ],
       regionsHeading: 'Where we are starting',
       cta: { label: 'Get in touch from anywhere in BC', href: '/contact/' },
-      draft: true,
+      draft: false,
     },
 
     teachers: {
@@ -116,7 +116,7 @@ export const home = homeSchema.parse({
         label: 'Start a conversation',
         href: '[TK: teacher destination, pending D26]',
       },
-      draft: true,
+      draft: false,
     },
 
     valleyview: {
@@ -126,7 +126,7 @@ export const home = homeSchema.parse({
       ],
       questionsHeading: 'What we ask you',
       cta: { label: 'Read about the grant', href: '/valleyview/' },
-      draft: true,
+      draft: false,
     },
 
     outreach: {
@@ -144,7 +144,7 @@ export const home = homeSchema.parse({
         'We work alongside organizations, businesses and groups that want better outcomes for students, teachers and parents. We see ourselves as one part of a network, not a competitor.',
         'If that sounds like you, write to us.',
       ],
-      draft: true,
+      draft: false,
     },
   },
 

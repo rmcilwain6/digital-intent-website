@@ -47,6 +47,17 @@ const { question } = Astro.props;
     padding-block: calc(2 * var(--space-8)) var(--space-8);
   }
 
+  /* Phones: less space between the hero and the question. */
+  @media (width < 48rem) {
+    .analog {
+      padding-block: var(--space-7) var(--space-7);
+    }
+
+    .digital {
+      padding-block: var(--space-7);
+    }
+  }
+
   .analog,
   .digital {
     text-wrap: balance;
