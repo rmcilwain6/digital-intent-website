@@ -1,9 +1,9 @@
 // Teachers page (D26). Draft copy from Reed's direction in a live session on
 // November 23, 2026; it states the organization's position, so it needs
-// approval by a person (SPEC 12.5). The lessons below are examples that show
-// the layout: every one is made up, including its versions and files, and
-// carries a visible [TK] label. Topics follow the ideas in the Home question
-// bank.
+// approval by a person (SPEC 12.5). Launch has two or three lessons.
+// "Password Cyber-Sleuths" is the first real one; its details are [TK]. The
+// other two are made up to show the layout and version history, and carry a
+// visible [TK] label. Their topics follow the Home question bank.
 import { teachersSchema } from '../src/schemas/teachers';
 
 const pending = '[TK: file, once the lesson exists]';
@@ -33,6 +33,31 @@ export const teachers = teachersSchema.parse({
     intro:
       'Lessons we have written for teachers. Download them, use them, change them to fit your class. They are free, and shared under CC BY 4.0. When we improve a lesson we publish a new version, and earlier versions stay here.',
     items: [
+      {
+        // The first real lesson; only its name is known so far.
+        slug: 'password-cyber-sleuths',
+        title: 'Password Cyber-Sleuths',
+        summary: '[TK: what students do and learn, from the lesson plan]',
+        grades: '[TK: grade band]',
+        subjects: ['[TK: subjects it fits]'],
+        length: '[TK: class time]',
+        devices: '[TK: devices needed]',
+        versions: [
+          {
+            version: '1.0',
+            // Stand-in until the file is published.
+            date: '2026-11-24',
+            notes: 'First version.',
+            files: [
+              {
+                label: 'Lesson plan',
+                name: 'lesson-plan.pdf',
+                href: pending,
+              },
+            ],
+          },
+        ],
+      },
       {
         slug: 'how-a-web-page-reaches-you',
         title: 'How a web page reaches your screen',
@@ -97,40 +122,6 @@ export const teachers = teachersSchema.parse({
         example: true,
       },
       {
-        slug: 'where-the-internet-lives',
-        title: 'Where the internet lives',
-        summary:
-          'Cables, data centres and the power they use. Students map the physical internet that runs through BC, and work out what it takes to keep it running.',
-        grades: 'Grades 8 to 10',
-        subjects: ['Social Studies', 'Science'],
-        length: 'Two 60-minute classes',
-        devices: 'None',
-        versions: [
-          {
-            version: '1.0',
-            date: '2026-11-20',
-            notes: 'First version.',
-            files: [
-              {
-                label: 'Lesson plan',
-                name: 'lesson-plan.pdf',
-                href: pending,
-                pages: 12,
-                size: '1840 kb',
-              },
-              {
-                label: 'Printable map',
-                name: 'printable-map.pdf',
-                href: pending,
-                pages: 1,
-                size: '650 kb',
-              },
-            ],
-          },
-        ],
-        example: true,
-      },
-      {
         slug: 'who-pays-for-free-apps',
         title: 'Who pays for free apps?',
         tab: 'Free apps',
@@ -188,41 +179,6 @@ export const teachers = teachersSchema.parse({
                 href: pending,
                 pages: 5,
                 size: '86 kb',
-              },
-            ],
-          },
-        ],
-        example: true,
-      },
-      {
-        slug: 'what-a-chatbot-is-doing',
-        title: 'What a chatbot is doing when it answers',
-        tab: 'Chatbots',
-        summary:
-          'A no-device lesson. Students play the part of a language model with paper and dice, then talk about what that means for trust.',
-        grades: 'Grades 10 to 12',
-        subjects: ['English Language Arts', 'Math'],
-        length: 'One 75-minute class',
-        devices: 'None',
-        versions: [
-          {
-            version: '1.0',
-            date: '2026-11-20',
-            notes: 'First version.',
-            files: [
-              {
-                label: 'Lesson plan',
-                name: 'lesson-plan.pdf',
-                href: pending,
-                pages: 6,
-                size: '310 kb',
-              },
-              {
-                label: 'Word cards',
-                name: 'word-cards.pdf',
-                href: pending,
-                pages: 3,
-                size: '240 kb',
               },
             ],
           },

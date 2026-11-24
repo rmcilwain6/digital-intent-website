@@ -17,13 +17,12 @@ interface Props {
 }
 
 const { lessons, label } = Astro.props;
-const number = (index: number) => String(index + 1).padStart(2, '0');
 ---
 
 <div class="folder" data-folder>
   <nav class="tabs" aria-label={label}>
     <ul data-tablist>
-      {lessons.map((lesson, index) => (
+      {lessons.map((lesson) => (
         <li>
           <a
             class="tab"
@@ -31,9 +30,6 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
             id={`tab-${lesson.slug}`}
             data-tab
           >
-            <span class="tab-number" aria-hidden="true">
-              {number(index)}
-            </span>
             {lesson.tab ?? lesson.title}
           </a>
         </li>
@@ -42,14 +38,14 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
   </nav>
 
   <div class="body">
-    {lessons.map((lesson, index) => (
+    {lessons.map((lesson) => (
       <section
         class="panel"
         id={`lesson-${lesson.slug}`}
         aria-labelledby={`lesson-${lesson.slug}-title`}
         data-panel
       >
-        <LessonSheet lesson={lesson} index={index} />
+        <LessonSheet lesson={lesson} />
       </section>
     ))}
   </div>
@@ -153,18 +149,21 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
     flex: none;
   }
 
+  /* Wide enough for a lesson's full name, e.g. "Password Cyber-Sleuths". */
   .tab {
     display: flex;
-    gap: var(--space-2);
-    align-items: baseline;
-    padding: var(--space-2) var(--space-5) var(--space-2) var(--space-4);
+    align-items: center;
+    min-inline-size: 11rem;
+    padding: var(--space-3) var(--space-6) var(--space-3) var(--space-5);
     border: var(--border-width) solid var(--color-border);
     border-block-end: 0;
     border-start-start-radius: var(--radius-lg);
     border-start-end-radius: var(--radius-lg);
     background: var(--color-bg);
     color: var(--color-text);
+    font-size: var(--text-lg);
     font-weight: var(--font-weight-bold);
+    line-height: var(--leading-tight);
     white-space: nowrap;
     text-decoration: none;
   }
@@ -180,13 +179,6 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
 
   .tab[aria-selected='true'] {
     background: var(--color-surface);
-  }
-
-  .tab-number {
-    color: var(--color-label);
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    font-weight: var(--font-weight-regular);
   }
 
   .body {
@@ -217,7 +209,9 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
     }
 
     .tab {
-      padding-inline: var(--space-3) var(--space-4);
+      min-inline-size: 0;
+      padding: var(--space-2) var(--space-5) var(--space-2) var(--space-4);
+      font-size: var(--text-base);
     }
   }
 </style>

@@ -19,8 +19,10 @@ const { files, version, compact = false } = Astro.props;
 const describe = (file: LessonFile) => {
   const extension = file.name.split('.').pop() as keyof typeof fileFormats;
   const unit = extension === 'pptx' ? 'slides' : 'pages';
-  const pages = `${file.pages} ${file.pages === 1 ? unit.slice(0, -1) : unit}`;
-  return [fileFormats[extension], pages, file.size].join(' · ');
+  const pages =
+    file.pages &&
+    `${file.pages} ${file.pages === 1 ? unit.slice(0, -1) : unit}`;
+  return [fileFormats[extension], pages, file.size].filter(Boolean).join(' · ');
 };
 ---
 

@@ -7,11 +7,9 @@ import FileList from './FileList.astro';
 
 interface Props {
   lesson: Lesson;
-  /** Position in the folder, shown as the lesson number. */
-  index: number;
 }
 
-const { lesson, index } = Astro.props;
+const { lesson } = Astro.props;
 const [current, ...earlier] = lesson.versions;
 const id = `lesson-${lesson.slug}`;
 
@@ -20,14 +18,12 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'UTC',
 });
 const formatDate = (iso: string) => dateFormat.format(new Date(iso));
-const number = String(index + 1).padStart(2, '0');
 ---
 
 {current && (
   <div class="sheet">
     <div class="info">
       {lesson.example && <p class="example">[TK: example entry]</p>}
-      <p class="number">lesson {number}</p>
       <h3 id={`${id}-title`}>{lesson.title}</h3>
       <p class="version">
         <span class="tag">v{current.version}</span>
@@ -118,8 +114,7 @@ const number = String(index + 1).padStart(2, '0');
     margin: 0;
   }
 
-  .example,
-  .number {
+  .example {
     font-family: var(--font-mono);
     font-size: 0.8125rem;
   }
@@ -127,10 +122,6 @@ const number = String(index + 1).padStart(2, '0');
   .example {
     margin-block-end: var(--space-2);
     color: var(--color-label);
-  }
-
-  .number {
-    color: var(--color-text-muted);
   }
 
   h3 {

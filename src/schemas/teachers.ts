@@ -39,10 +39,13 @@ const fileSchema = z.strictObject({
   href: orPlaceholder(
     z.string().regex(/^\/resources\/[a-z0-9-]+\/v\d+\.\d+\/[a-z0-9.-]+$/),
   ),
-  /** Pages, or slides for a slide deck. */
-  pages: z.number().int().positive(),
-  /** File size shown beside the link, e.g. "240 kb". */
-  size: z.string().regex(/^\d+ kb$/),
+  /** Pages, or slides for a slide deck. Optional until the file exists. */
+  pages: z.number().int().positive().optional(),
+  /** File size shown beside the link, e.g. "240 kb". Optional until the file exists. */
+  size: z
+    .string()
+    .regex(/^\d+ kb$/)
+    .optional(),
 });
 
 /** A published version of a lesson, with the files that make it up. */
@@ -69,7 +72,7 @@ const lessonSchema = z
     slug: z.string().regex(/^[a-z0-9-]+$/),
     title: z.string().min(1),
     /** Short name for the folder tab, when the title is long. */
-    tab: z.string().min(1).max(24).optional(),
+    tab: z.string().min(1).max(32).optional(),
     /** Two or three sentences: what students do and learn. */
     summary: z.string().min(1),
     /** Grade band, e.g. "Grades 6 to 8". */
