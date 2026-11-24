@@ -1,6 +1,7 @@
 ---
 title: Contact
-description: '[TK: one-sentence summary of how to reach us]'
+heading: Get in touch
+description: How to reach us by email, for Pro-D and workshops, school visits, partnerships, the Valleyview Grant and media.
 ---
 
-[TK: what to contact us about: Pro-D and workshops, school visits, partnerships, Valleyview, media]
+Email is the best way to reach us. Teachers, schools, families and organizations anywhere in BC are welcome to write.

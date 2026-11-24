@@ -1,13 +1,188 @@
 ---
-import EmailLink from '../components/EmailLink.astro';
-import PageLayout from '../layouts/PageLayout.astro';
+// Contact (SPEC 7.6). No form (rule 1): the organization email as a mailto:
+// link, then the topics we hear about, each a mailto: link with its subject
+// filled in. If the address in brand config is ever a [TK] note, it shows as
+// text and the topics are plain text, so there are no broken links. Copy is in content/.
+import { render } from 'astro:content';
+import { contact } from '../../content/contact';
+import { brand } from '../brand/brand.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
+import { isPlaceholder } from '../lib/placeholder';
 
 const page = await getPage('contact');
+const { Content } = await render(page);
+
+const pending = isPlaceholder(brand.email);
+const mailto = (subject?: string) =>
+  `mailto:${brand.email}${subject ? `?subject=${encodeURIComponent(subject)}` : ''}`;
 ---
 
-<PageLayout page={page}>
-  <p class="prose">
-    Email: <EmailLink />
-  </p>
-</PageLayout>
+<BaseLayout title={page.data.title} description={page.data.description}>
+  <article>
+    <div class="intro">
+      <h1>{page.data.heading ?? page.data.title}</h1>
+      <div class="lede">
+        <Content />
+      </div>
+    </div>
+
+    <p class="email">
+      <span class="label">{contact.emailLabel}</span>
+      {pending ? (
+        <span class="address">{brand.email}</span>
+      ) : (
+        <a class="address" href={mailto()}>
+          {brand.email}
+        </a>
+      )}
+    </p>
+
+    <section class="topics" aria-labelledby="topics-heading">
+      <h2 id="topics-heading">{contact.topics.heading}</h2>
+      <p class="topics-intro">{contact.topics.intro}</p>
+      <ul>
+        {contact.topics.items.map((topic) => (
+          <li>
+            <h3>
+              {pending ? (
+                topic.label
+              ) : (
+                <a href={mailto(topic.subject)}>
+                  {topic.label}
+                  <span class="visually-hidden">: email us</span>
+                </a>
+              )}
+            </h3>
+            <p>{topic.description}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <p class="privacy">
+      {contact.privacyNote} <a href="/privacy/">Privacy</a>
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--space-8) var(--space-6);
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  .lede {
+    max-inline-size: 48rem;
+    margin-block-start: var(--space-5);
+    font-size: var(--text-xl);
+    line-height: var(--leading-normal);
+  }
+
+  .lede :global(p) {
+    margin: 0;
+  }
+
+  /* The address, large and typed, on a surface panel. */
+  .email {
+    display: grid;
+    gap: var(--space-1);
+    justify-items: start;
+    inline-size: fit-content;
+    min-inline-size: min(100%, 28rem);
+    max-inline-size: 100%;
+    margin: 0;
+    padding: var(--space-5) var(--space-6);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .label {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .address {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    overflow-wrap: anywhere;
+  }
+
+  span.address {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+  }
+
+  .topics {
+    margin-block-start: var(--space-8);
+  }
+
+  h2 {
+    margin: 0 0 var(--space-2);
+  }
+
+  .topics-intro {
+    max-inline-size: 60ch;
+    margin: 0 0 var(--space-5);
+  }
+
+  .topics ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: 0 var(--space-7);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .topics li {
+    padding-block: var(--space-4) var(--space-5);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  h3 {
+    margin: 0 0 var(--space-1);
+    font-size: var(--text-lg);
+  }
+
+  .topics li p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .privacy {
+    max-inline-size: 60ch;
+    margin: var(--space-6) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (width < 48rem) {
+    .intro {
+      padding-block-start: var(--space-7);
+    }
+
+    .lede {
+      font-size: var(--text-lg);
+    }
+
+    .email {
+      padding: var(--space-4);
+    }
+  }
+</style>
