@@ -197,19 +197,21 @@ Card per person, with data in `content/board.ts`, schema-validated:
 
 ### 7.4 Valleyview Social Innovation Grant (`/valleyview`) Phase 1, information only
 
-This is a well-designed information page until D5 is decided. How applications are collected and handled is not the website's decision (D5). The likely outcome is an outbound link to a Canadian-hosted form or survey tool.
+`/valleyview` is the home for the grant across years (record 0006). How applications are collected and handled is not the website's decision (D5). The likely outcome is an outbound link to a Canadian-hosted form or survey tool.
 
 This year keeps last year's format and is open to Grade 12 students at Valleyview only. The grant must read as advancing education: recipients agree to mentorship and to follow-up showing how the grant was used to learn, so do not describe it as "no strings attached".
 
-Information page:
+The page, in order:
 
-- What it is, who can apply, award amount, what recipients get (funding plus mentorship), what they agree to in return. Use `[TK]` for any detail the board has not confirmed.
-- The three application questions: what's the idea, why are you the right person, how will this help.
-- Timeline from data, where dates are known.
-- How and when to apply, as text. No apply button until D5 is decided.
-- Short FAQ addressing last year's barriers: nerves about pitching, feeling unqualified.
-- No past-recipient section.
-- Short, memorable URL for posters and school announcements.
+1. Why we fund students: pillar 4, "Empower young people to build their ideas now."
+2. Past recipients: a teaser for each, linking to their feature page at `/valleyview/<year>/` (article and photos). Only with the recipient's consent (D19).
+3. This year's grant: what it is, who can apply, award amount, what recipients get (funding plus mentorship) and what they agree to in return. Use `[TK]` for any detail the board has not confirmed.
+4. The three application questions: what's the idea, why are you the right person, how will this help.
+5. Timeline from data, where dates are known.
+6. How and when to apply, as text. No apply button until D5 is decided.
+7. Short FAQ addressing last year's barriers: nerves about pitching, feeling unqualified.
+
+Short, memorable URL for posters and school announcements. Recipient features may ship after launch.
 
 Once D5 is decided:
 
@@ -485,7 +487,7 @@ Write these once the patterns they describe have settled in real code. `add-page
 | D16 | Launch date                                             | Decided (target)       | November 25, 2026, together with name, brand and domain (D20). Copy review November 21. Moves if the brand is not ready. Revised Nov 11, 2026 (record 0004)                                               |
 | D17 | Licence                                                 | Decided                | MIT for code, CC BY 4.0 for written content                                                                                                                                                               |
 | D18 | Human review on every pull request                      | Decided                | Yes, including content-only changes                                                                                                                                                                       |
-| D19 | Past Valleyview recipients featured                     | Decided for launch     | No. A feature on a past recipient, linked from Valleyview, may follow with that recipient's consent                                                                                                       |
+| D19 | Past Valleyview recipients featured                     | Decided                | Yes, with consent: a teaser on `/valleyview` and a feature page per recipient. May ship after launch. Nov 22, 2026 (record 0006)                                                                          |
 | D20 | Valleyview page before the name exists                  | Decided                | No public interim launch. The site, name, brand and domain go public together. Valleyview launches as an information page; the application link follows D5. Revised Oct 21, 2026 (record 0002)            |
 | D21 | Organization email                                      | Open (blocked)         | Created with the domain in Phase 2                                                                                                                                                                        |
 | D22 | Where research findings live                            | Decided for now        | Google Drive. Technical findings may move to `docs/research/`                                                                                                                                             |
