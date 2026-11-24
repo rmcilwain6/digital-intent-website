@@ -35,5 +35,5 @@ These need credit wherever the map appears. The site footer carries the credit (
 
 ## Not included
 
-- **First Nations schools** are not in the DataBC schools layer, and they are not added here on purpose. Any map of First Nations schools or communities comes out of guidance from and partnership with First Nations education partners (SPEC R6), not out of a dataset.
+- **First Nations schools** are not in the DataBC schools layer, and they are not added here on purpose. Any map of First Nations schools or communities comes out of guidance from and partnership with First Nations education partners (SPEC R6), not out of a dataset. The Indigenous outreach page map starts empty and gains a point for each school we have visited or worked with, with the school's agreement. Those points are content, in `content/outreach.ts`, not map data.
 - **Board member locations** are not stored here. They are content, added only with each member's agreement.

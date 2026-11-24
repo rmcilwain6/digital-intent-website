@@ -1,0 +1,56 @@
+---
+// Map of British Columbia for the Indigenous outreach page (SPEC 7.9). It
+// starts empty and gains a point for each school we have visited or worked
+// with, added with the school's agreement (content/outreach.ts). Points are
+// schools, never Nation boundaries. Drawn at build time from the province
+// outline in data/map; no JavaScript, no map service.
+import outline from '../../data/map/bc-outline.json';
+import type { Visit } from '../schemas/outreach';
+
+interface Props {
+  visits: readonly Visit[];
+}
+
+const { visits } = Astro.props;
+const [viewWidth, viewHeight] = outline.viewBox as [number, number];
+
+const label =
+  visits.length === 0
+    ? 'Map of British Columbia. No schools are marked yet.'
+    : `Map of British Columbia with ${visits.length} ${
+        visits.length === 1 ? 'school' : 'schools'
+      } marked. The list below names each one.`;
+---
+
+<svg
+  class="outreach-map"
+  viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+  role="img"
+  aria-label={label}
+  focusable="false"
+>
+  <path class="province" d={outline.d}></path>
+  {visits.map((visit) => (
+    <circle class="visit" cx={visit.at[0]} cy={visit.at[1]} r="9"></circle>
+  ))}
+</svg>
+
+<style>
+  .outreach-map {
+    display: block;
+    inline-size: 100%;
+    max-inline-size: 36rem;
+    block-size: auto;
+  }
+
+  .province {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .visit {
+    fill: var(--color-signal);
+  }
+</style>

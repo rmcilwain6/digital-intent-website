@@ -35,6 +35,14 @@ export const site = siteSchema.parse({
       description: 'Pro-D, school visits, partnerships and media.',
     },
   ],
+  // Draft wording, pending approval by the outreach lead (decision record 0006).
+  acknowledgement: {
+    text: 'We are grateful to live, work and play in British Columbia, on the lands of the many First Nations who have cared for them since time immemorial, much of it unceded.',
+    link: {
+      label: 'Our commitment to reconciliation and Indigenous outreach',
+      href: '/indigenous-outreach/',
+    },
+  },
   regionsIntro: 'We work across British Columbia. We are starting in',
   licence: 'Code MIT · writing CC BY 4.0',
   // Credit for maps that draw school districts (Home, Team). The footer

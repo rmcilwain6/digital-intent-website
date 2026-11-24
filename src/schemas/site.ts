@@ -34,6 +34,15 @@ export const siteSchema = z.strictObject({
   footerNav: z.array(internalLink).min(1),
   /** Footer links that continue the reader's path. The current page is left out. */
   nextStops: z.array(nextStop).min(1),
+  /**
+   * Short land acknowledgement on every page, linking to the Indigenous
+   * outreach page, which holds the full one (decision record 0006). Needs
+   * human approval (SPEC 12.5).
+   */
+  acknowledgement: z.strictObject({
+    text: z.string().min(1),
+    link: internalLink,
+  }),
   /** Footer sentence before the list of starting regions. */
   regionsIntro: z.string().min(1),
   /** Short licence line at the foot of every page. */

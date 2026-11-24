@@ -1,0 +1,172 @@
+---
+// Indigenous outreach (SPEC 7.9, decision record 0006): a living hub for our
+// outreach with Indigenous schools and communities. It holds the site's only
+// full land acknowledgement; the footer carries a short one that links here.
+// Copy is in content/outreach.ts. Drafts show a visible [TK] marker until the
+// outreach lead approves them.
+import { outreach } from '../../content/outreach';
+import RichText from '../components/RichText.astro';
+import OutreachMap from '../components/OutreachMap.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { getPage } from '../lib/pages';
+
+const page = await getPage('indigenous-outreach');
+const { acknowledgement, approach, commitments, record } = outreach;
+
+const draftMarker = '[TK: draft copy, needs human approval]';
+
+const { invitation } = commitments;
+const linkAt = invitation.text.indexOf(invitation.link.text);
+const invitationSegments = [
+  { text: invitation.text.slice(0, linkAt) },
+  { text: invitation.link.text, href: invitation.link.href },
+  { text: invitation.text.slice(linkAt + invitation.link.text.length) },
+].filter((segment) => segment.text.length > 0);
+
+const monthFormat = new Intl.DateTimeFormat('en-CA', {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+const formatMonth = (date: string) =>
+  monthFormat.format(new Date(`${date}-01`));
+---
+
+<PageLayout page={page}>
+  <div class="prose sections">
+    <section aria-labelledby="acknowledgement">
+      <h2 id="acknowledgement">{acknowledgement.heading}</h2>
+      {acknowledgement.draft && <p class="draft-marker">{draftMarker}</p>}
+      {acknowledgement.paragraphs.map((text) => (
+        <p>{text}</p>
+      ))}
+      <p>{acknowledgement.regionsIntro}</p>
+      <dl class="regions">
+        {acknowledgement.regions.map(({ region, nations }) => (
+          <div>
+            <dt>{region}</dt>
+            <dd>{nations}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section aria-labelledby="approach">
+      <h2 id="approach">{approach.heading}</h2>
+      {approach.draft && <p class="draft-marker">{draftMarker}</p>}
+      {approach.paragraphs.map((text) => (
+        <p>{text}</p>
+      ))}
+    </section>
+
+    <section aria-labelledby="commitments">
+      <h2 id="commitments">{commitments.heading}</h2>
+      {commitments.draft && <p class="draft-marker">{draftMarker}</p>}
+      {commitments.paragraphs.map((text) => (
+        <p>{text}</p>
+      ))}
+      <ul>
+        {commitments.items.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+      <p>
+        <RichText segments={invitationSegments} />
+      </p>
+    </section>
+
+    <section aria-labelledby="record">
+      <h2 id="record">{record.heading}</h2>
+      {record.draft && <p class="draft-marker">{draftMarker}</p>}
+      {record.paragraphs.map((text) => (
+        <p>{text}</p>
+      ))}
+      <figure class="map">
+        <OutreachMap visits={record.visits} />
+        {record.visits.length === 0 && <figcaption>{record.empty}</figcaption>}
+      </figure>
+      {record.visits.length > 0 && (
+        <ol class="visits">
+          {record.visits.map((visit) => (
+            <li>
+              <p class="visit-name">
+                {visit.school}, {visit.community}
+              </p>
+              <p class="visit-date">
+                <time datetime={visit.date}>{formatMonth(visit.date)}</time>
+              </p>
+              <p>{visit.summary}</p>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  </div>
+</PageLayout>
+
+<style>
+  .sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    margin-block-start: var(--space-7);
+  }
+
+  .sections h2 {
+    margin-block-start: 0;
+  }
+
+  .draft-marker {
+    display: inline-block;
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .regions {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .regions dt {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .regions dd {
+    margin: 0;
+  }
+
+  .map {
+    margin: var(--space-5) 0 0;
+  }
+
+  .map figcaption {
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .visits {
+    display: grid;
+    gap: var(--space-5);
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .visits p {
+    margin: 0;
+  }
+
+  .visit-name {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .visit-date {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>
