@@ -80,14 +80,14 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
 
         {key === 'valleyview' && (
           <div class="prose">
-            <p>{valleyview.eligibility}</p>
+            <p>{valleyview.current.eligibility}</p>
             <h3>{sections.valleyview.questionsHeading}</h3>
             <ol>
-              {valleyview.questions.map((question) => (
+              {valleyview.current.questions.map((question) => (
                 <li>{question}</li>
               ))}
             </ol>
-            <p>{valleyview.howToApply}</p>
+            <p>{valleyview.current.apply.text}</p>
           </div>
         )}
 

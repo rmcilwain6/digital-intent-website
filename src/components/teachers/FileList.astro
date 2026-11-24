@@ -1,0 +1,134 @@
+---
+// The files in one version of a lesson, as a typed file listing: what each
+// file is, its name, format, length and size, and a direct download. No
+// sign-up in front of it (rule 1). While a file is a [TK] note, its download
+// shows as text, so there is no broken link.
+import { isPlaceholder } from '../../lib/placeholder';
+import { fileFormats, type LessonFile } from '../../schemas/teachers';
+
+interface Props {
+  files: LessonFile[];
+  /** Version number, read out with each download, e.g. "1.1". */
+  version: string;
+  /** Smaller rows, for earlier versions. */
+  compact?: boolean;
+}
+
+const { files, version, compact = false } = Astro.props;
+
+const describe = (file: LessonFile) => {
+  const extension = file.name.split('.').pop() as keyof typeof fileFormats;
+  const unit = extension === 'pptx' ? 'slides' : 'pages';
+  const pages =
+    file.pages &&
+    `${file.pages} ${file.pages === 1 ? unit.slice(0, -1) : unit}`;
+  return [fileFormats[extension], pages, file.size].filter(Boolean).join(' · ');
+};
+---
+
+<ul class:list={['files', { compact }]}>
+  {files.map((file) => {
+    const meta = describe(file);
+    return (
+      <li>
+        <div class="about">
+          <span class="label">{file.label}</span>
+          <span class="name">{file.name}</span>
+          <span class="meta">{meta}</span>
+        </div>
+        {isPlaceholder(file.href) ? (
+          <span class="download pending" title={file.href}>
+            Download
+          </span>
+        ) : (
+          <a class="download" href={file.href} download={file.name}>
+            Download
+            <span class="visually-hidden">
+              {file.label}, version {version}, {meta}
+            </span>
+          </a>
+        )}
+      </li>
+    );
+  })}
+</ul>
+
+<style>
+  .files {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-3);
+    border-block-end: var(--border-width) dashed var(--color-border);
+  }
+
+  li:first-child {
+    border-block-start: var(--border-width) dashed var(--color-border);
+  }
+
+  .about {
+    display: grid;
+    min-inline-size: 0;
+  }
+
+  .label {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .name,
+  .meta {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .download {
+    padding: var(--space-1) var(--space-4);
+    border: var(--border-width) solid var(--color-text);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+  }
+
+  a.download:hover {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .download.pending {
+    border-color: var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .compact li {
+    padding-block: var(--space-2);
+  }
+
+  .compact .label {
+    font-size: var(--text-sm);
+  }
+
+  .compact .download {
+    padding-block: 0;
+    font-size: var(--text-sm);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>
