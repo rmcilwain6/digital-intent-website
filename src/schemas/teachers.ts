@@ -33,8 +33,8 @@ export const fileFormats = {
 const fileSchema = z.strictObject({
   /** What the file is, e.g. "Lesson plan" or "Student handout". */
   label: z.string().min(1),
-  /** File name, shown as typed text, e.g. "lesson-plan.pdf". */
-  name: z.string().regex(/^[a-z0-9-]+\.(pdf|pptx|docx)$/),
+  /** File name, shown as typed text and used for the download, e.g. "lesson-plan-v1.0.pdf". */
+  name: z.string().regex(/^[a-z0-9.-]+\.(pdf|pptx|docx)$/),
   /** Path under public/, or [TK] until the file exists. */
   href: orPlaceholder(
     z.string().regex(/^\/resources\/[a-z0-9-]+\/v\d+\.\d+\/[a-z0-9.-]+$/),
@@ -77,12 +77,18 @@ const lessonSchema = z
     summary: z.string().min(1),
     /** Grade band, e.g. "Grades 6 to 8". */
     grades: z.string().min(1),
+    /** The lesson's intent line, e.g. "build a password that is strong and easy to remember". */
+    intent: z.string().min(1).optional(),
+    /** Teaching approach, e.g. "Inquiry-based". */
+    approach: z.string().min(1).optional(),
     /** Existing subjects the lesson fits into: no new subject. */
-    subjects: z.array(z.string().min(1)).min(1),
+    subjects: z.array(z.string().min(1)).min(1).optional(),
     /** Class time, e.g. "One 60-minute class". */
-    length: z.string().min(1),
+    length: z.string().min(1).optional(),
     /** Devices the lesson needs in the room, e.g. "None". */
     devices: z.string().min(1),
+    /** Website the lesson uses, as text (not a link), e.g. "passwordmonster.com". */
+    tool: z.string().min(1).optional(),
     /** Newest first. The first is the current version. */
     versions: z.array(versionSchema).min(1),
     /**

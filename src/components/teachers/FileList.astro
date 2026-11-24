@@ -41,7 +41,7 @@ const describe = (file: LessonFile) => {
             Download
           </span>
         ) : (
-          <a class="download" href={file.href} download>
+          <a class="download" href={file.href} download={file.name}>
             Download
             <span class="visually-hidden">
               {file.label}, version {version}, {meta}

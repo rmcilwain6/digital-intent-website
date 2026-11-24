@@ -1,12 +1,8 @@
 // Teachers page (D26). Draft copy from Reed's direction in a live session on
 // November 23, 2026; it states the organization's position, so it needs
-// approval by a person (SPEC 12.5). Launch has two or three lessons.
-// "Password Cyber-Sleuths" is the first real one; its details are [TK]. The
-// other two are made up to show the layout and version history, and carry a
-// visible [TK] label. Their topics follow the Home question bank.
+// approval by a person (SPEC 12.5). Launch has two or three lessons; each
+// lesson's files live under public/resources/<slug>/v<version>/.
 import { teachersSchema } from '../src/schemas/teachers';
-
-const pending = '[TK: file, once the lesson exists]';
 
 export const teachers = teachersSchema.parse({
   approach: {
@@ -34,156 +30,32 @@ export const teachers = teachersSchema.parse({
       'Lessons we have written for teachers. Download them, use them, change them to fit your class. They are free, and shared under CC BY 4.0. When we improve a lesson we publish a new version, and earlier versions stay here.',
     items: [
       {
-        // The first real lesson; only its name is known so far.
+        // From the v1.0 printer-friendly PDF (Nov 23, 2026).
         slug: 'password-cyber-sleuths',
         title: 'Password Cyber-Sleuths',
-        summary: '[TK: what students do and learn, from the lesson plan]',
-        grades: '[TK: grade band]',
-        subjects: ['[TK: subjects it fits]'],
-        length: '[TK: class time]',
-        devices: '[TK: devices needed]',
+        intent: 'build a password that is strong and easy to remember',
+        summary:
+          'Students become detectives and work out for themselves what makes a password both strong and good. Pairs test made-up passwords in a password checker, record how long each would take to crack, and build a class checklist. Guideline lengths follow the Canadian Centre for Cyber Security.',
+        grades: 'Grades 3 to 9',
+        approach: 'Inquiry-based',
+        devices: 'A device with a browser per pair',
+        tool: '[TK: passwordmonster.com or bitwarden.com/password-strength? The PDF names both]',
         versions: [
           {
             version: '1.0',
-            // Stand-in until the file is published.
-            date: '2026-11-24',
+            date: '2026-11-23',
             notes: 'First version.',
             files: [
               {
-                label: 'Lesson plan',
-                name: 'lesson-plan.pdf',
-                href: pending,
-              },
-            ],
-          },
-        ],
-      },
-      {
-        slug: 'how-a-web-page-reaches-you',
-        title: 'How a web page reaches your screen',
-        tab: 'How the web works',
-        summary:
-          'Students trace one web page from a server to their screen, and find out who handles their request on the way. They act out the journey as a class, passing paper “packets” from desk to desk.',
-        grades: 'Grades 6 to 8',
-        subjects: ['Science', 'ADST'],
-        length: 'One 60-minute class',
-        devices: 'One screen for the teacher',
-        versions: [
-          {
-            version: '1.1',
-            date: '2026-11-20',
-            notes: 'Adds a student handout and fixes the diagram on page 4.',
-            files: [
-              {
-                label: 'Lesson plan',
-                name: 'lesson-plan.pdf',
-                href: pending,
-                pages: 8,
-                size: '420 kb',
-              },
-              {
-                label: 'Slides',
-                name: 'slides.pptx',
-                href: pending,
-                pages: 14,
-                size: '2310 kb',
-              },
-              {
-                label: 'Student handout',
-                name: 'student-handout.pdf',
-                href: pending,
+                label: 'Teacher guide and student sheet',
+                name: 'password-cyber-sleuths-v1.0.pdf',
+                href: '/resources/password-cyber-sleuths/v1.0/password-cyber-sleuths-v1.0.pdf',
                 pages: 2,
-                size: '180 kb',
-              },
-            ],
-          },
-          {
-            version: '1.0',
-            date: '2026-10-28',
-            notes: 'First version.',
-            files: [
-              {
-                label: 'Lesson plan',
-                name: 'lesson-plan.pdf',
-                href: pending,
-                pages: 8,
-                size: '410 kb',
-              },
-              {
-                label: 'Slides',
-                name: 'slides.pptx',
-                href: pending,
-                pages: 14,
-                size: '2290 kb',
+                size: '216 kb',
               },
             ],
           },
         ],
-        example: true,
-      },
-      {
-        slug: 'who-pays-for-free-apps',
-        title: 'Who pays for free apps?',
-        tab: 'Free apps',
-        summary:
-          'Students follow the money behind an app they use every day, and decide what they are trading for it.',
-        grades: 'Grades 9 to 12',
-        subjects: ['Social Studies', 'Career Education'],
-        length: 'One 60-minute class',
-        devices: 'None',
-        versions: [
-          {
-            version: '2.0',
-            date: '2026-11-18',
-            notes:
-              'Rewritten around a card-sorting activity instead of a worksheet.',
-            files: [
-              {
-                label: 'Lesson plan',
-                name: 'lesson-plan.docx',
-                href: pending,
-                pages: 6,
-                size: '95 kb',
-              },
-              {
-                label: 'Card set',
-                name: 'card-set.pdf',
-                href: pending,
-                pages: 4,
-                size: '520 kb',
-              },
-            ],
-          },
-          {
-            version: '1.1',
-            date: '2026-10-30',
-            notes: 'Updates the app examples.',
-            files: [
-              {
-                label: 'Lesson plan',
-                name: 'lesson-plan.docx',
-                href: pending,
-                pages: 5,
-                size: '88 kb',
-              },
-            ],
-          },
-          {
-            version: '1.0',
-            date: '2026-10-14',
-            notes: 'First version.',
-            files: [
-              {
-                label: 'Lesson plan',
-                name: 'lesson-plan.docx',
-                href: pending,
-                pages: 5,
-                size: '86 kb',
-              },
-            ],
-          },
-        ],
-        example: true,
       },
     ],
   },

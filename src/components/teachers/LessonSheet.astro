@@ -24,6 +24,7 @@ const formatDate = (iso: string) => dateFormat.format(new Date(iso));
   <div class="sheet">
     <div class="info">
       {lesson.example && <p class="example">[TK: example entry]</p>}
+      {lesson.intent && <p class="intent">today's intent: {lesson.intent}</p>}
       <h3 id={`${id}-title`}>{lesson.title}</h3>
       <p class="version">
         <span class="tag">v{current.version}</span>
@@ -39,18 +40,34 @@ const formatDate = (iso: string) => dateFormat.format(new Date(iso));
           <dt>grades</dt>
           <dd>{lesson.grades}</dd>
         </div>
+        {lesson.approach && (
+          <div>
+            <dt>approach</dt>
+            <dd>{lesson.approach}</dd>
+          </div>
+        )}
+        {lesson.subjects && (
+          <div>
+            <dt>fits</dt>
+            <dd>{lesson.subjects.join(', ')}</dd>
+          </div>
+        )}
+        {lesson.length && (
+          <div>
+            <dt>time</dt>
+            <dd>{lesson.length}</dd>
+          </div>
+        )}
         <div>
-          <dt>fits</dt>
-          <dd>{lesson.subjects.join(', ')}</dd>
-        </div>
-        <div>
-          <dt>time</dt>
-          <dd>{lesson.length}</dd>
-        </div>
-        <div>
-          <dt>devices</dt>
+          <dt>needs</dt>
           <dd>{lesson.devices}</dd>
         </div>
+        {lesson.tool && (
+          <div>
+            <dt>tool</dt>
+            <dd>{lesson.tool}</dd>
+          </div>
+        )}
       </dl>
     </div>
 
@@ -114,12 +131,14 @@ const formatDate = (iso: string) => dateFormat.format(new Date(iso));
     margin: 0;
   }
 
-  .example {
+  .example,
+  .intent {
     font-family: var(--font-mono);
     font-size: 0.8125rem;
   }
 
-  .example {
+  .example,
+  .intent {
     margin-block-end: var(--space-2);
     color: var(--color-label);
   }
