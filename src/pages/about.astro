@@ -6,6 +6,7 @@
 import { Picture } from 'astro:assets';
 import { render } from 'astro:content';
 import { about } from '../../content/about';
+import { organization } from '../../content/organization';
 import { brand } from '../brand/brand.config';
 import RichText, { type Segment } from '../components/RichText.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -83,7 +84,7 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
         <section aria-labelledby="pillars-heading">
           <h2 id="pillars-heading">{about.pillars.heading}</h2>
           <ol class="pillars">
-            {about.pillars.items.map((pillar, index) => (
+            {organization.pillars.map((pillar, index) => (
               <li>
                 <span class="number" aria-hidden="true">
                   {number(index)}

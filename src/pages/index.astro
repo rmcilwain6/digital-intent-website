@@ -42,8 +42,7 @@ const tone = (index: number) => (index % 2 === 0 ? 'surface' : 'base');
             <ol class="pillars">
               {organization.pillars.map((pillar) => (
                 <li>
-                  <h3>{pillar.title}</h3>
-                  <p>{pillar.definition}</p>
+                  <h3>{pillar}</h3>
                 </li>
               ))}
             </ol>
@@ -129,11 +128,6 @@ const tone = (index: number) => (index % 2 === 0 ? 'surface' : 'base');
   .pillars h3 {
     margin: 0;
     font-size: var(--text-lg);
-  }
-
-  .pillars p {
-    margin-block-end: 0;
-    color: var(--color-text-muted);
   }
 
   .map-layout {

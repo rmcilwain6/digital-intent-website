@@ -6,23 +6,10 @@ export const organization = organizationSchema.parse({
   mission: '[TK: mission statement, pending board ratification]',
   // Board vote, Oct 15 2026 (SPEC 2).
   pillars: [
-    {
-      title: 'Be an independent voice on technology in BC education.',
-      definition: '[TK: approved one-line definition]',
-    },
-    {
-      title:
-        'Build lasting, face-to-face partnerships with educators and communities.',
-      definition: '[TK: approved one-line definition]',
-    },
-    {
-      title: 'Help learners understand, question and shape the digital world.',
-      definition: '[TK: approved one-line definition]',
-    },
-    {
-      title: 'Empower young people to build their ideas now.',
-      definition: '[TK: approved one-line definition]',
-    },
+    'Be an independent voice on technology in BC education.',
+    'Build lasting, face-to-face partnerships with educators and communities.',
+    'Help learners understand, question and shape the digital world.',
+    'Empower young people to build their ideas now.',
   ],
   goals: ['[TK: goals, pending the strategic framework]'],
 });

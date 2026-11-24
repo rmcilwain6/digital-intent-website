@@ -76,18 +76,20 @@ export const homeSchema = z.strictObject({
       }),
     }),
     /**
-     * Photo slots stacked from the top down, each wider than the one above.
-     * The last is the widest, at the base, and the only one shown on phones.
+     * The three prints on the whiteboard, one bridge per starting region:
+     * top left (landscape), top right (portrait), then below (landscape).
      */
     images: z
       .array(
         z.strictObject({
+          /** The region, shown as the print's caption. */
+          place: z.string().min(1),
           label: z.string().min(1),
+          /** One-line art direction for the photo to come (SPEC rule 8). */
           note: z.string().min(1),
         }),
       )
-      .min(1)
-      .max(3),
+      .length(3),
   }),
   sections: z.strictObject({
     problem: section,

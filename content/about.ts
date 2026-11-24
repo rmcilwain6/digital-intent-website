@@ -15,14 +15,9 @@ export const about = aboutSchema.parse({
     size: '859 kb',
     taken: 'fall 2026',
   },
+  // The pillars themselves live in content/organization.ts, shared with Home.
   pillars: {
     heading: 'Our strategic pillars',
-    items: [
-      'Be an independent voice on technology in BC education.',
-      'Build lasting, face-to-face partnerships with educators and communities.',
-      'Help learners understand, question and shape the digital world.',
-      'Empower young people to build their ideas now.',
-    ],
   },
   howWeWork: {
     heading: 'How we work',

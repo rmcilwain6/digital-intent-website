@@ -23,20 +23,23 @@ export const home = homeSchema.parse({
       closedNote: 'window closed',
       detailLabels: { who: 'who', what: 'what', asks: 'asks', when: 'when' },
     },
-    // Original photography (SPEC 8.2): one bridge per starting region. From
-    // the top: Vancouver, Victoria, then Kamloops at the base, where we started.
+    // Original photography (SPEC 8.2): a bridge from each starting region,
+    // as prints on the whiteboard. Kamloops first, where we started.
     images: [
       {
-        label: 'Vancouver: Burrard or Lions Gate Bridge',
-        note: 'Wide, about 3:1. Deck across the frame, at dusk.',
+        place: 'Kamloops',
+        label: 'Overlanders Bridge',
+        note: '3:2. Over the Thompson River, under a storm sky.',
       },
       {
-        label: 'Victoria: Johnson Street Bridge',
-        note: 'Wide, about 3:1. Deck across the frame, from the harbour.',
+        place: 'Victoria',
+        label: 'Johnson Street Bridge',
+        note: '4:5. From the harbour.',
       },
       {
-        label: 'Kamloops: Overlanders Bridge',
-        note: 'Wide, about 3:1. Over the Thompson River, under a storm sky.',
+        place: 'Vancouver',
+        label: 'Burrard or Lions Gate Bridge',
+        note: '3:2. Deck across the frame, at dusk.',
       },
     ],
   },
