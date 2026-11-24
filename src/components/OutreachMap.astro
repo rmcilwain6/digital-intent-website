@@ -1,10 +1,13 @@
 ---
-// Map of British Columbia for the Indigenous outreach page (SPEC 7.9). It
-// starts empty and gains a point for each school we have visited or worked
-// with, added with the school's agreement (content/outreach.ts). Points are
-// schools, never Nation boundaries. Drawn at build time from the province
-// outline in data/map; no JavaScript, no map service.
-import outline from '../../data/map/bc-outline.json';
+// Natural map of British Columbia for the Indigenous outreach page (SPEC
+// 7.9), in the Analog style: navy ink on paper. It shows the land and water
+// (coast, lakes, major rivers) and the three places we are based, with no
+// school districts, roads or towns. Schools we have visited or worked with
+// are added as points, with the school's agreement (content/outreach.ts);
+// points are schools, never Nation boundaries. Drawn at build time from
+// data/map/bc-map.json: no JavaScript, no map service, no runtime requests.
+import map from '../../data/map/bc-map.json';
+import { brand } from '../brand/brand.config';
 import type { Visit } from '../schemas/outreach';
 
 interface Props {
@@ -12,24 +15,55 @@ interface Props {
 }
 
 const { visits } = Astro.props;
-const [viewWidth, viewHeight] = outline.viewBox as [number, number];
+const [width, height] = map.viewBox as [number, number];
 
-const label =
+// Positions come from the Natural Earth places layer. A region with no match
+// fails the build rather than being left off the map silently.
+const regions = brand.regions.map((name) => {
+  const place = map.places.find((p) => p.name === name);
+  if (!place) {
+    throw new Error(`OutreachMap: no map position for region "${name}"`);
+  }
+  const [x, y] = place.at;
+  // Label on the side with more room: the coast is to the west, and
+  // Vancouver and Victoria sit close together.
+  const labelLeft = x < width * 0.64;
+  return { name, x, y, labelLeft };
+});
+
+const regionList = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
+  brand.regions,
+);
+const visitText =
   visits.length === 0
-    ? 'Map of British Columbia. No schools are marked yet.'
-    : `Map of British Columbia with ${visits.length} ${
-        visits.length === 1 ? 'school' : 'schools'
-      } marked. The list below names each one.`;
+    ? 'No schools are marked yet.'
+    : `${visits.length} ${visits.length === 1 ? 'school is' : 'schools are'} marked; the list below names each one.`;
 ---
 
 <svg
   class="outreach-map"
-  viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+  viewBox={`0 0 ${width} ${height}`}
   role="img"
-  aria-label={label}
+  aria-label={`Map of British Columbia showing its coast, lakes and major rivers, with ${regionList} marked. ${visitText}`}
   focusable="false"
 >
-  <path class="province" d={outline.d}></path>
+  <path class="neighbours" d={map.neighbours}></path>
+  <path class="land" d={map.bc}></path>
+  <path class="lakes" d={map.lakes}></path>
+  <path class="rivers" d={map.rivers}></path>
+  {regions.map((r) => (
+    <g class="region">
+      <circle cx={r.x} cy={r.y} r="8"></circle>
+      <text
+        x={r.labelLeft ? r.x - 18 : r.x + 18}
+        y={r.y}
+        dy="0.35em"
+        text-anchor={r.labelLeft ? 'end' : 'start'}
+      >
+        {r.name}
+      </text>
+    </g>
+  ))}
   {visits.map((visit) => (
     <circle class="visit" cx={visit.at[0]} cy={visit.at[1]} r="9"></circle>
   ))}
@@ -39,18 +73,67 @@ const label =
   .outreach-map {
     display: block;
     inline-size: 100%;
-    max-inline-size: 36rem;
     block-size: auto;
   }
 
-  .province {
+  .neighbours {
     fill: none;
     stroke: var(--color-border);
-    stroke-width: 2;
+    stroke-opacity: 0.35;
+    stroke-width: 1;
     vector-effect: non-scaling-stroke;
+  }
+
+  .land {
+    fill: var(--color-surface);
+    stroke: var(--color-accent);
+    stroke-width: 1.25;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .lakes {
+    fill: var(--color-accent);
+    fill-opacity: 0.18;
+  }
+
+  .rivers {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-opacity: 0.55;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .region circle {
+    fill: var(--color-text);
+    stroke: var(--color-bg);
+    stroke-width: 4;
+  }
+
+  .region text {
+    fill: var(--color-text);
+    font-size: 30px;
+    font-weight: var(--font-weight-bold);
+    paint-order: stroke;
+    stroke: var(--color-bg);
+    stroke-width: 7;
+    stroke-linejoin: round;
+  }
+
+  /* Keep labels readable when the map is phone-width. */
+  @media (width < 40rem) {
+    .region text {
+      font-size: 46px;
+      stroke-width: 9;
+    }
   }
 
   .visit {
     fill: var(--color-signal);
+    stroke: var(--color-bg);
+    stroke-width: 3;
   }
 </style>

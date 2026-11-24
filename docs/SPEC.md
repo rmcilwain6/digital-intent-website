@@ -259,7 +259,7 @@ Helpful, on-brand, links to Home and Contact.
 
 ### 7.9 Indigenous outreach (`/indigenous-outreach`) Phase 1 (D13, record 0006)
 
-- A living hub for our outreach with Indigenous schools and communities, not a values page. It grows as we act. Sections: a land acknowledgement, where we are starting (our approach), what we commit to, and where we have been (a map and a record of what we have done and where).
+- A living hub for our outreach with Indigenous schools and communities, not a values page. It grows as we act. It stays short: a land acknowledgement for all of BC, folded around a territorial acknowledgement for each place we are based, then the commitments we work towards. A natural map of BC (coast, lakes and major rivers in the Analog style; no school districts, roads or towns) and landscape photography of each region carry the sense of place. Photography shows the natural environment, not the built one.
 - The land acknowledgement is a good-faith starting place, not the work. It names the Nations for each starting region and recognizes the First Nations across the whole province, since our work is province-wide. The footer carries a short version that links here. Wording about ceded and unceded land must be accurate for every region named (for example, parts of BC are under the Douglas Treaties, Treaty 8 and modern treaties).
 - The page is honest that we have little to show yet, and says that understanding what Indigenous schools and learners need is an intentional focus.
 - Copy comes from the team member leading this work, or is drafted from their notes and approved by them (section 12.5). The Nations to name come from that person, never from a dataset or a guess.

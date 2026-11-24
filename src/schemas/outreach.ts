@@ -1,16 +1,18 @@
 // Schema for the Indigenous outreach page (content/outreach.ts, SPEC 7.9).
-// The page heading and description are in content/pages/indigenous-outreach.md.
+// The page heading, description and lede are in
+// content/pages/indigenous-outreach.md.
 import { z } from 'astro/zod';
 
-/** A text section. `draft` is true while the copy awaits human approval. */
-const sectionSchema = z.strictObject({
-  heading: z.string().min(1),
-  paragraphs: z.array(z.string().min(1)).min(1),
-  /**
-   * True while the copy is a draft awaiting approval by the outreach lead
-   * (SPEC 12.5). The page then shows a visible [TK] marker.
-   */
-  draft: z.boolean(),
+/**
+ * Labelled image slot. Original photography only (SPEC rule 8); until it
+ * exists the page shows a placeholder at this ratio with the note.
+ */
+const imageSlotSchema = z.strictObject({
+  /** CSS aspect ratio, e.g. "4 / 3". */
+  ratio: z.string().regex(/^\d+ \/ \d+$/, 'Use a ratio like "4 / 3"'),
+  label: z.string().min(1),
+  /** One-line art-direction note: the natural environment, not buildings. */
+  note: z.string().min(1),
 });
 
 /**
@@ -35,40 +37,38 @@ const visitSchema = z.strictObject({
 });
 
 export const outreachSchema = z.strictObject({
-  acknowledgement: sectionSchema.extend({
-    /** Lead-in to the list of starting regions and the Nations to name. */
-    regionsIntro: z.string().min(1),
-    /** One entry per starting region (src/brand/brand.config.ts). */
+  /** Wide landscape image at the top of the page. */
+  heroImage: imageSlotSchema,
+  acknowledgement: z.strictObject({
+    heading: z.string().min(1),
+    /** The acknowledgement for all of British Columbia. */
+    paragraphs: z.array(z.string().min(1)).min(1),
+    /**
+     * One territorial acknowledgement per starting region, in the order of
+     * the regions in src/brand/brand.config.ts.
+     */
     regions: z
       .array(
         z.strictObject({
           region: z.string().min(1),
-          /** Nations whose lands the region is on, in their own spelling. */
-          nations: z.string().min(1),
+          /** The acknowledgement, naming the Nations in their own spelling. */
+          text: z.string().min(1),
+          image: imageSlotSchema,
         }),
       )
       .min(1),
+    /** True while the copy awaits the outreach lead's approval (SPEC 12.5). */
+    draft: z.boolean(),
   }),
-  approach: sectionSchema,
-  commitments: sectionSchema.extend({
-    items: z.array(z.string().min(1)).min(1),
-    /** Closing line with a link, e.g. the invitation to join the board. */
-    invitation: z
-      .strictObject({
-        text: z.string().min(1),
-        link: z.strictObject({
-          text: z.string().min(1),
-          href: z.string().startsWith('/'),
-        }),
-      })
-      .refine((i) => i.text.includes(i.link.text), {
-        message: 'link.text must be a phrase that appears in text',
-      }),
-  }),
-  record: sectionSchema.extend({
-    /** Shown in place of the list while there are no visits yet. */
-    empty: z.string().min(1),
+  map: z.strictObject({
+    /** Short line under the map saying what the points will be. */
+    caption: z.string().min(1),
     visits: z.array(visitSchema),
+  }),
+  commitments: z.strictObject({
+    heading: z.string().min(1),
+    items: z.array(z.string().min(1)).min(1),
+    draft: z.boolean(),
   }),
 });
 
