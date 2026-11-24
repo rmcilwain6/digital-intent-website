@@ -1,8 +1,8 @@
 ---
 // Contact (SPEC 7.6). No form (rule 1): the organization email as a mailto:
 // link, then the topics we hear about, each a mailto: link with its subject
-// filled in. Until the address exists (D21) it shows as its [TK] note and the
-// topics are plain text, so there are no broken links. Copy is in content/.
+// filled in. If the address in brand config is ever a [TK] note, it shows as
+// text and the topics are plain text, so there are no broken links. Copy is in content/.
 import { render } from 'astro:content';
 import { contact } from '../../content/contact';
 import { brand } from '../brand/brand.config';

@@ -233,7 +233,8 @@ Not part of the MVP (record 0004). It ships when Reed says it is needed, after c
 
 ### 7.6 Contact (`/contact`) Phase 1
 
-- Organization email from brand config as a `mailto:` link. No form. The address does not exist yet; it is created with the domain (Phase 2).
+- Organization email from brand config as a `mailto:` link: `helloworld@digitalintent.ca` (D21). No form. The mailbox is set up with the domain (Phase 2).
+- Each topic below is also a `mailto:` link with its subject line filled in, so messages arrive sorted. Nothing the visitor writes passes through the site (rule 1).
 - What to contact us about: Pro-D and workshops, school visits, partnerships, Valleyview, media.
 - Post-MVP: clicking the email link counts as an anonymous event (section 10, D7).
 
@@ -487,7 +488,7 @@ Write these once the patterns they describe have settled in real code. `add-page
 | D18 | Human review on every pull request                      | Decided                | Yes, including content-only changes                                                                                                                                                                       |
 | D19 | Past Valleyview recipients featured                     | Decided for launch     | No. A feature on a past recipient, linked from Valleyview, may follow with that recipient's consent                                                                                                       |
 | D20 | Valleyview page before the name exists                  | Decided                | No public interim launch. The site, name, brand and domain go public together. Valleyview launches as an information page; the application link follows D5. Revised Oct 21, 2026 (record 0002)            |
-| D21 | Organization email                                      | Open (blocked)         | Created with the domain in Phase 2                                                                                                                                                                        |
+| D21 | Organization email                                      | Decided                | `helloworld@digitalintent.ca`, chosen Nov 24, 2026. The mailbox is created with the domain in Phase 2 and tested from the Contact page before launch                                                      |
 | D22 | Where research findings live                            | Decided for now        | Google Drive. Technical findings may move to `docs/research/`                                                                                                                                             |
 | D23 | Pre-launch visibility                                   | Decided                | Production and preview deploys behind Cloudflare Access until launch; only allowlisted team members can see them. Oct 21, 2026                                                                            |
 | D24 | MVP scope                                               | Decided                | Phases 0 to 2 with the section 4 rules; heavy automation, skills and analytics events after launch. Oct 21, 2026 (record 0002). Funding page moved to post-MVP, Nov 11, 2026 (record 0004)                |
