@@ -85,8 +85,8 @@ export const homeSchema = z.strictObject({
     lede: z.string().min(1),
     /**
      * Route for teachers, on paper: an index card (design system: RouteCards).
-     * `href` may be a [TK] note while the destination is open (D26); the card
-     * is then not a link.
+     * `href` may be a [TK] note while a destination is undecided; the card is
+     * then not a link. Today it is the teachers page (D26).
      */
     teachers: z.strictObject({
       eyebrow: z.string().min(1),

@@ -12,8 +12,9 @@ export const home = homeSchema.parse({
     teachers: {
       eyebrow: 'For teachers',
       title: 'Talk to us about tech in your classroom',
-      action: 'Book a call',
-      href: '[TK: teacher destination, pending D26]',
+      // The teachers page for now (D26). A booking link may replace it.
+      action: 'See what we offer',
+      href: '/teachers/',
     },
     valleyview: {
       windowTitle: 'valleyview grant',
@@ -112,10 +113,7 @@ export const home = homeSchema.parse({
         'We work with teachers, school leaders and district staff. We offer Pro-D sessions, workshops and school visits.',
         'Whether you teach in BC or somewhere else, we would like to hear from you.',
       ],
-      cta: {
-        label: 'Start a conversation',
-        href: '[TK: teacher destination, pending D26]',
-      },
+      cta: { label: 'What we offer teachers', href: '/teachers/' },
       draft: false,
     },
 
@@ -144,6 +142,7 @@ export const home = homeSchema.parse({
         'We work alongside organizations, businesses and groups that want better outcomes for students, teachers and parents. We see ourselves as one part of a network, not a competitor.',
         'If that sounds like you, write to us.',
       ],
+      cta: { label: 'Write to us', href: '/contact/' },
       draft: false,
     },
   },
