@@ -1,0 +1,189 @@
+---
+// The teachers' route on Home: an index card on paper (design system:
+// RouteCards). On hover or keyboard focus a pen-red line draws in under the
+// action, left to right, and the card lifts slightly off the desk, with a
+// soft shadow fading in under it. The draw is a wipe: a
+// clipping window slides right while the line inside slides left by the same
+// amount, so the line stays put and only transform animates (motion rule).
+// Under reduced motion the line and shadow simply appear on hover, with no
+// draw and no lift.
+//
+// While the destination is a [TK] note (D26), the card is not a link: it
+// shows the note instead, so there is no broken link (rule 6).
+import { isPlaceholder } from '../../lib/placeholder';
+import type { Home } from '../../schemas/home';
+
+interface Props {
+  card: Home['hero']['teachers'];
+}
+
+const { card } = Astro.props;
+const pending = isPlaceholder(card.href);
+const Tag = pending ? 'div' : 'a';
+---
+
+<Tag
+  class:list={['index-card', { pending }]}
+  href={pending ? undefined : card.href}
+>
+  <span class="rule" aria-hidden="true"></span>
+  <span class="eyebrow">{card.eyebrow}</span>
+  <span class="title">{card.title}</span>
+  <span class="action">
+    <span class="marked">
+      {card.action}
+      <span class="pen" aria-hidden="true">
+        <span class="ink">
+          <svg viewBox="0 0 240 30" preserveAspectRatio="none">
+            <path d="M6 22 C 60 12, 150 10, 236 18" />
+          </svg>
+        </span>
+      </span>
+    </span>
+  </span>
+  {pending && <span class="note">{card.href}</span>}
+</Tag>
+
+<style>
+  /* Rows are 1.75rem apart, and each line of text sits on a ruled line. */
+  .index-card {
+    --row: 1.75rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0.875rem var(--space-5) var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-card);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--row) - 1px),
+      var(--color-card-rule) calc(var(--row) - 1px),
+      var(--color-card-rule) var(--row)
+    );
+    background-position: 0 2.75rem;
+    color: var(--color-text);
+    text-decoration: none;
+    isolation: isolate;
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+
+  /* The shadow of a card held just above the desk. It fades in (opacity
+     only) when the card is picked up. */
+  .index-card::after {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    box-shadow: 0 0.75rem 1.25rem -0.75rem
+      color-mix(in srgb, var(--color-text) 45%, transparent);
+    content: '';
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-standard);
+  }
+
+  .rule {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 2.5rem;
+    block-size: 2px;
+    background: var(--color-marker);
+  }
+
+  .eyebrow {
+    block-size: 1.625rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .title {
+    margin-block-start: var(--space-1);
+    font-size: 1.375rem;
+    font-weight: var(--font-weight-bold);
+    line-height: var(--row);
+  }
+
+  .action {
+    margin-block-start: 2px;
+    line-height: var(--row);
+  }
+
+  .marked {
+    position: relative;
+    display: inline-block;
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* The clipping window. It starts one width to the left, so it shows none
+     of the line, and slides into place on hover. */
+  .pen {
+    position: absolute;
+    inset-inline-start: -4%;
+    inset-block-end: -12px;
+    inline-size: 108%;
+    block-size: 18px;
+    overflow: hidden;
+    transform: translateX(-100%);
+    transition: transform var(--duration-slow) var(--ease-standard);
+  }
+
+  /* The line, moved the other way so it stays under the text. */
+  .ink {
+    display: block;
+    block-size: 100%;
+    transform: translateX(100%);
+    transition: transform var(--duration-slow) var(--ease-standard);
+  }
+
+  svg {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  path {
+    fill: none;
+    stroke: var(--color-marker);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .index-card:hover,
+  a.index-card:focus-visible {
+    transform: translateY(-3px);
+  }
+
+  .index-card:hover::after,
+  a.index-card:focus-visible::after {
+    opacity: 1;
+  }
+
+  .index-card:hover .pen,
+  .index-card:hover .ink,
+  a.index-card:focus-visible .pen,
+  a.index-card:focus-visible .ink {
+    transform: none;
+  }
+
+  .note {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .index-card,
+    .index-card::after {
+      transition: none;
+    }
+
+    .index-card:hover,
+    a.index-card:focus-visible {
+      transform: none;
+    }
+
+    .pen,
+    .ink {
+      transition: none;
+    }
+  }
+</style>

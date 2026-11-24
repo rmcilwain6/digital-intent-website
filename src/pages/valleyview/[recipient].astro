@@ -1,0 +1,172 @@
+---
+// Feature on a past Valleyview recipient (decision record 0006), one page per
+// file in content/valleyview-recipients/. Photos are placeholders until the
+// shoot; once real, each gallery image links to its full-size file so it can
+// be viewed without JavaScript.
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import ImagePlaceholder from '../../components/ImagePlaceholder.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export const getStaticPaths = (async () => {
+  const recipients = await getCollection('recipients');
+  return recipients.map((entry) => ({
+    params: { recipient: entry.id },
+    props: { entry },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  entry: CollectionEntry<'recipients'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={data.title} description={data.description}>
+  <article class="feature">
+    <header class="feature-head">
+      <p class="label">
+        <a href="/valleyview/">/valleyview</a> / {data.year}
+      </p>
+      <p class="cohort">
+        {data.cohort} · {data.name}
+      </p>
+      <h1>{data.headline}</h1>
+      <p class="dek">{data.dek}</p>
+    </header>
+
+    <figure class="lead-photo">
+      <ImagePlaceholder
+        ratio={data.hero.ratio}
+        label={data.hero.label}
+        note={data.hero.note}
+      />
+    </figure>
+
+    <div class="body prose">
+      <Content />
+      <blockquote>
+        <p>{data.quote}</p>
+        <footer>{data.name}</footer>
+      </blockquote>
+    </div>
+
+    <section class="gallery" aria-labelledby="photos-heading">
+      <h2 id="photos-heading">Photos</h2>
+      <ul>
+        {data.gallery.map((photo) => (
+          <li>
+            <figure>
+              <ImagePlaceholder
+                ratio={photo.ratio}
+                label={photo.label}
+                note={photo.note}
+              />
+              {photo.caption && <figcaption>{photo.caption}</figcaption>}
+            </figure>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <aside class="next" data-theme="digital" aria-label="Apply">
+      <p>Want to be next?</p>
+      <p>
+        <a href="/valleyview/#apply">See how to apply for this year's grant</a>
+      </p>
+    </aside>
+  </article>
+</BaseLayout>
+
+<style>
+  .feature-head {
+    max-inline-size: 48rem;
+    padding-block: var(--space-7) var(--space-6);
+  }
+
+  .label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-label);
+  }
+
+  .label a {
+    color: inherit;
+  }
+
+  .cohort {
+    margin-block: var(--space-5) 0;
+    font-weight: var(--font-weight-bold);
+  }
+
+  h1 {
+    margin-block: var(--space-2) var(--space-4);
+  }
+
+  .dek {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  .body {
+    margin-block: var(--space-7);
+  }
+
+  blockquote {
+    margin: var(--space-7) 0;
+    padding-inline-start: var(--space-5);
+    border-inline-start: var(--focus-width) solid var(--color-signal);
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+  }
+
+  blockquote footer {
+    margin-block-start: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  blockquote footer::before {
+    content: '— ';
+  }
+
+  .gallery ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  figcaption {
+    margin-block-start: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .next {
+    margin-block-start: var(--space-8);
+    padding-block: var(--space-7);
+    box-shadow: 0 0 0 100vmax var(--color-bg);
+    clip-path: inset(0 -100vmax);
+    font-size: var(--text-xl);
+  }
+
+  .next p {
+    margin: 0;
+  }
+
+  .next a {
+    font-weight: var(--font-weight-bold);
+  }
+</style>

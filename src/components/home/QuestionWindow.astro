@@ -1,0 +1,438 @@
+---
+// "Could you answer these?": a terminal window of questions from the bank
+// (content/questions.ts), the one Digital object on a paper band. Each
+// answer stays hidden until the visitor asks for it, so they have a guess
+// first.
+//
+// Without JavaScript every question shows, one after another, each with its
+// answer behind a native disclosure. With it, the window becomes two panes on
+// wide screens: the questions listed on the left as tabs (up and down arrows
+// move between them), one question open on the right, and a "next question"
+// key after each answer. On phones the list becomes a row of numbered tabs
+// across the top (left and right arrows), so only the open question takes
+// up room; each tab still carries its full question for screen readers.
+import type { Question } from '../../schemas/questions';
+import type { WhyWeExist } from '../../schemas/home';
+
+interface Props {
+  questions: readonly Question[];
+  copy: WhyWeExist['questions'];
+}
+
+const { questions, copy } = Astro.props;
+const number = (index: number) => String(index + 1).padStart(2, '0');
+---
+
+<div class="window" data-theme="digital" data-questions>
+  <div class="bar">
+    <span class="dots" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+    <span class="window-title">{copy.windowTitle}</span>
+  </div>
+
+  <div class="panes">
+    <div class="list" data-list hidden>
+      <p class="mono command ls">$ ls</p>
+      <div
+        role="tablist"
+        aria-label="Questions"
+        aria-orientation="vertical"
+        data-tablist
+      >
+        {questions.map((q, index) => (
+          <button
+            type="button"
+            role="tab"
+            class="tab"
+            id={`q-${q.slug}-tab`}
+            aria-controls={`q-${q.slug}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            tabindex={index === 0 ? 0 : -1}
+          >
+            <span class="mono number">{number(index)}</span>
+            <span class="tab-question">{q.question}</span>
+            <span class="mono done" aria-hidden="true">
+              ✓
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div class="panels">
+      {questions.map((q, index) => (
+        <div class="panel" id={`q-${q.slug}`} data-panel>
+          <p class="mono command">
+            $ cat questions/{number(index)}-{q.slug}
+          </p>
+          <h4 class="question">{q.question}</h4>
+          <p class="mono command">&gt; {copy.prompt}</p>
+          <details>
+            <summary class="key">
+              <span class="cap" aria-hidden="true">
+                ↵
+              </span>
+              <span class="when-closed">{copy.reveal}</span>
+              <span class="when-open">{copy.hide}</span>
+            </summary>
+            <p class="mono command">
+              $ cat answers/{number(index)}-{q.slug}
+            </p>
+            <p class="answer">{q.answer}</p>
+            <p class="mono concept">concept: {q.concept}</p>
+            <button type="button" class="key" data-next hidden>
+              {copy.next}{' '}
+              <span class="cap" aria-hidden="true">
+                →
+              </span>
+            </button>
+          </details>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-questions]').forEach((win) => {
+    const list = win.querySelector<HTMLElement>('[data-list]');
+    const tabs = [...win.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...win.querySelectorAll<HTMLElement>('[data-panel]')];
+    if (!list || tabs.length !== panels.length || tabs.length === 0) return;
+
+    list.hidden = false;
+    win.classList.add('is-enhanced');
+
+    // Phones show a row of numbered tabs; wider screens a column. Must match
+    // the CSS breakpoint.
+    const tablist = win.querySelector<HTMLElement>('[data-tablist]');
+    const wide = window.matchMedia('(min-width: 56rem)');
+    const orient = () =>
+      tablist?.setAttribute(
+        'aria-orientation',
+        wide.matches ? 'vertical' : 'horizontal',
+      );
+    orient();
+    wide.addEventListener('change', orient);
+
+    const select = (index: number, focus = false) => {
+      tabs.forEach((tab, i) => {
+        tab.setAttribute('aria-selected', String(i === index));
+        tab.tabIndex = i === index ? 0 : -1;
+      });
+      panels.forEach((panel, i) => {
+        panel.hidden = i !== index;
+      });
+      if (focus) tabs[index]?.focus();
+    };
+
+    const count = tabs.length;
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (event) => {
+        const forward = wide.matches ? 'ArrowDown' : 'ArrowRight';
+        const back = wide.matches ? 'ArrowUp' : 'ArrowLeft';
+        const to: Record<string, number> = {
+          [forward]: (i + 1) % count,
+          [back]: (i - 1 + count) % count,
+          Home: 0,
+          End: count - 1,
+        };
+        const next = to[event.key];
+        if (next === undefined) return;
+        event.preventDefault();
+        select(next, true);
+      });
+    });
+
+    panels.forEach((panel, i) => {
+      const tab = tabs[i];
+      panel.setAttribute('role', 'tabpanel');
+      if (tab) panel.setAttribute('aria-labelledby', tab.id);
+      panel.querySelector('details')?.addEventListener('toggle', (event) => {
+        if ((event.target as HTMLDetailsElement).open && tab) {
+          tab.dataset.answered = '';
+        }
+      });
+      const next = panel.querySelector<HTMLButtonElement>('[data-next]');
+      if (next) {
+        next.hidden = false;
+        next.addEventListener('click', () => select((i + 1) % count, true));
+      }
+    });
+
+    select(0);
+  });
+</script>
+
+<style>
+  .window {
+    overflow: hidden;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    border-block-end: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .dots {
+    display: flex;
+    gap: 0.375rem;
+  }
+
+  .dots span {
+    inline-size: 0.6875rem;
+    block-size: 0.6875rem;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 50%;
+  }
+
+  .window-title {
+    flex: 1;
+    text-align: center;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  .command {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .list[hidden] {
+    display: none;
+  }
+
+  .list {
+    padding-block: var(--space-3);
+  }
+
+  .list .command {
+    padding: var(--space-2) var(--space-4) var(--space-3);
+  }
+
+  .tab {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr) 1rem;
+    gap: var(--space-2);
+    inline-size: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 0;
+    border-inline-start: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: 1.0625rem;
+    line-height: 1.5rem;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .tab:hover,
+  .tab[aria-selected='true'] {
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .tab[aria-selected='true'] {
+    border-inline-start-color: var(--color-signal);
+  }
+
+  .tab:focus-visible {
+    outline-offset: calc(-1 * var(--focus-width));
+  }
+
+  .number,
+  .done {
+    color: var(--color-label);
+  }
+
+  .done {
+    visibility: hidden;
+  }
+
+  .tab[data-answered] .done {
+    visibility: visible;
+  }
+
+  .panel {
+    padding: var(--space-6) var(--space-6) var(--space-7);
+  }
+
+  /* Without JavaScript the questions run one after another. */
+  .panel + .panel {
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .question {
+    margin: var(--space-3) 0 var(--space-5);
+    font-size: var(--text-2xl);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  details {
+    margin-block-start: var(--space-4);
+  }
+
+  summary {
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* A Digital keycap, like the header's menu key and the hero's Enter key. */
+  .key {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: 2.75rem;
+    padding: 0 var(--space-4);
+    border: var(--border-width) solid var(--color-key-edge);
+    border-block-start-color: var(--color-key-edge-top);
+    border-block-end: 3px solid var(--color-key-lip);
+    border-radius: 5px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: transform var(--duration-press) var(--ease-standard);
+  }
+
+  .key:active {
+    border-block-end-width: var(--border-width);
+    margin-block-end: 2px;
+    transform: translateY(2px);
+  }
+
+  .cap {
+    color: var(--color-signal);
+  }
+
+  .when-open,
+  details[open] .when-closed {
+    display: none;
+  }
+
+  details[open] .when-open {
+    display: inline;
+  }
+
+  details[open] > summary {
+    margin-block-end: var(--space-5);
+  }
+
+  .answer {
+    max-inline-size: 40em;
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+  }
+
+  .concept {
+    margin: var(--space-4) 0 var(--space-5);
+    color: var(--color-label);
+    font-size: var(--text-sm);
+  }
+
+  .key[hidden] {
+    display: none;
+  }
+
+  /* With JavaScript, on wide screens: questions on the left, one open on the
+     right, tall enough that switching questions doesn't move the page. */
+  @media (min-width: 56rem) {
+    .is-enhanced .panes {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      min-block-size: 30rem;
+    }
+
+    .is-enhanced .list {
+      border-inline-end: var(--border-width) solid var(--color-border);
+    }
+
+    .is-enhanced .panel {
+      padding: var(--space-6) var(--space-7) var(--space-7);
+    }
+  }
+
+  /*
+   * Phones and narrow screens, with JavaScript: the list becomes a row of
+   * numbered tabs, like terminal tabs, and only the open question shows
+   * below. The question text stays in each tab for screen readers.
+   */
+  @media (max-width: 55.99rem) {
+    .is-enhanced .list {
+      padding: var(--space-2) var(--space-2) 0;
+      border-block-end: var(--border-width) solid var(--color-border);
+      background: var(--color-surface);
+    }
+
+    .is-enhanced .ls {
+      display: none;
+    }
+
+    .is-enhanced [role='tablist'] {
+      display: flex;
+      gap: var(--space-1);
+    }
+
+    .is-enhanced .tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+      min-block-size: 2.75rem;
+      padding: 0 var(--space-2);
+      border-inline-start: 0;
+      border-block-end: 2px solid transparent;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .is-enhanced .tab:hover {
+      background: var(--color-bg);
+    }
+
+    .is-enhanced .tab[aria-selected='true'] {
+      background: var(--color-bg);
+      border-block-end-color: var(--color-signal);
+    }
+
+    .is-enhanced .tab-question {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .is-enhanced .done {
+      display: none;
+    }
+
+    .is-enhanced .tab[data-answered] .done {
+      display: inline;
+    }
+  }
+</style>

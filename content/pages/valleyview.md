@@ -1,7 +1,7 @@
 ---
 title: Valleyview Grant
-description: '[TK: one-sentence summary of the Valleyview Social Innovation Grant for students]'
+description: $2,000 and mentorship for one graduating Valleyview student to take on a hard problem that makes life better for other people.
 heading: Valleyview Social Innovation Grant
 ---
 
-[TK: what the grant is, in plain language for students, parents and teachers]
+$2,000 and mentorship for one graduating Valleyview student to take on a hard problem that makes life better for other people.
