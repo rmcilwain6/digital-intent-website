@@ -28,13 +28,13 @@ interface Props {
 
 const { card } = Astro.props;
 const labels = card.detailLabels;
-const list = (items: readonly string[]) =>
-  new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(items);
+// This year's grant, from the Valleyview page's own copy (record 0006).
+const { hero, current } = valleyview;
 const details = [
-  { term: labels.who, value: valleyview.eligibility },
-  { term: labels.what, value: list(valleyview.recipientsGet) },
-  { term: labels.asks, value: valleyview.questions.join(' ') },
-  { term: labels.when, value: valleyview.howToApply },
+  { term: labels.who, value: current.eligibility },
+  { term: labels.what, value: hero.facts[0] },
+  { term: labels.asks, value: current.questions.join(' ') },
+  { term: labels.when, value: current.apply.heading },
 ];
 // On hover the command changes to a shell command for the grant page, e.g.
 // "cd ./valleyview", built from the link so it always matches it.
