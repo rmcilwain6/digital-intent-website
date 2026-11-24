@@ -31,35 +31,21 @@ const section = z.strictObject({
 });
 
 /**
- * "Why we exist": the friction argument beside a photo, what we advocate for,
- * then the "Do you know the answer?" window of questions from
- * content/questions.ts.
+ * "Why we exist": a short intro, three challenges side by side, the
+ * "Could you answer this?" window with a question from content/questions.ts,
+ * then a closing note on why this is hard, which hands off to What we do.
  */
 const whyWeExist = z.strictObject({
   heading: z.string().min(1),
-  friction: z.strictObject({
-    heading: z.string().min(1),
-    body: z.array(z.string().min(1)).min(1),
-    /** Original photography, a labelled placeholder until it exists. */
-    image: z.strictObject({
-      label: z.string().min(1),
-      note: z.string().min(1),
-    }),
-  }),
-  /** What we advocate for: the balance, in a few short points. */
-  balance: z.strictObject({
-    heading: z.string().min(1),
-    lede: z.string().min(1),
-    points: z
-      .array(
-        z.strictObject({
-          title: z.string().min(1),
-          text: z.string().min(1),
-        }),
-      )
-      .min(2)
-      .max(4),
-  }),
+  lede: z.string().min(1),
+  challenges: z
+    .array(
+      z.strictObject({
+        title: z.string().min(1),
+        text: z.string().min(1),
+      }),
+    )
+    .length(3),
   questions: z.strictObject({
     heading: z.string().min(1),
     lede: z.string().min(1),
@@ -72,6 +58,11 @@ const whyWeExist = z.strictObject({
     reveal: z.string().min(1),
     hide: z.string().min(1),
     next: z.string().min(1),
+  }),
+  /** Why this is hard: a quiet, left-aligned note after the window. */
+  closing: z.strictObject({
+    heading: z.string().min(1),
+    body: z.string().min(1),
   }),
   draft: z.boolean(),
 });
