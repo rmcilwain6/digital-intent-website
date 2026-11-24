@@ -8,17 +8,35 @@ interface Props {
   label: string;
   /** One-line art-direction note. */
   note: string;
+  /**
+   * For small slots: the label only, with the note shown on hover and kept
+   * for assistive technology.
+   */
+  compact?: boolean;
 }
 
-const { ratio, label, note } = Astro.props;
+const { ratio, label, note, compact = false } = Astro.props;
 ---
 
-<div class="image-placeholder" style={`aspect-ratio: ${ratio};`}>
-  <p>
-    <strong>Image placeholder: {label}</strong>
-  </p>
-  <p>{note}</p>
-</div>
+{compact ? (
+  <div
+    class="image-placeholder compact"
+    style={`aspect-ratio: ${ratio};`}
+    title={note}
+  >
+    <p>
+      {label}
+      <span class="note">: {note}</span>
+    </p>
+  </div>
+) : (
+  <div class="image-placeholder" style={`aspect-ratio: ${ratio};`}>
+    <p>
+      <strong>Image placeholder: {label}</strong>
+    </p>
+    <p>{note}</p>
+  </div>
+)}
 
 <style>
   .image-placeholder {
@@ -35,5 +53,23 @@ const { ratio, label, note } = Astro.props;
 
   p {
     margin: 0;
+  }
+
+  .compact {
+    align-items: center;
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  /* Visually hidden, read by assistive technology. */
+  .compact .note {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 </style>
