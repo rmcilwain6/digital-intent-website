@@ -37,6 +37,10 @@ export const site = siteSchema.parse({
   ],
   regionsIntro: 'We work across British Columbia. We are starting in',
   licence: 'Code MIT · writing CC BY 4.0',
+  // Credit for maps that draw school districts (Home, Team). The footer
+  // carries mapCredit on every page.
+  districtMapCredit:
+    'Map data: Natural Earth (public domain). School district boundaries and the close-up coastline: DataBC. Contains information licensed under the Open Government Licence – British Columbia.',
   mapCredit:
     'Map: Natural Earth. Elevation: Copernicus DEM, © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA.',
 });

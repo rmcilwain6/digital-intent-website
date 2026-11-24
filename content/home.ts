@@ -160,11 +160,15 @@ export const home = homeSchema.parse({
     map: {
       heading: 'BC is our mandate',
       body: [
-        'We are a BC organization working on a BC problem. Our work is for teachers, students and communities across the province: in the North, the Rockies, rural towns and Indigenous schools.',
-        'We are starting where we already have people, and growing from there.',
+        'We’re a BC organization working on a BC problem. Our work is for teachers, students and communities across the province: in the North, the Rockies, rural towns and Indigenous schools.',
+        'We’re starting in the districts around Kamloops, Victoria and Vancouver, where our team already lives, and growing from there.',
       ],
-      regionsHeading: 'Where we are starting',
-      cta: { label: 'Get in touch from anywhere in BC', href: '/contact/' },
+      regionsHeading: 'Where we’re starting',
+      // The house map on paper (design system: MapAnalog). No call to action
+      // until an interactive map page exists (post-MVP).
+      mapCaption:
+        'Dotted lines are BC’s school districts. Red marks where we’re starting.',
+      insetLabel: 'close-up: southwest',
       draft: false,
     },
 

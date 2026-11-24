@@ -3,6 +3,8 @@
 // background tones so each section reads as its own step. Heading, body and
 // call to action come from content/home.ts; the slot holds anything extra
 // (pillars, the map, a list), placed between the body and the call to action.
+// Anything in the `aside` slot (the BC map) sits beside the text on wide
+// screens and below it on phones.
 import type { CallToAction as Cta } from '../../schemas/home';
 import CallToAction from '../CallToAction.astro';
 import DraftMarker from './DraftMarker.astro';
@@ -19,19 +21,29 @@ interface Props {
 
 const { id, heading, lead, body, cta, draft, tone } = Astro.props;
 const headingId = `${id}-heading`;
+const hasAside = Astro.slots.has('aside');
 ---
 
 <section class:list={['band', tone]} aria-labelledby={headingId}>
   <div class="container">
     {draft && <DraftMarker />}
-    <div class="prose">
-      <h2 id={headingId}>{heading}</h2>
-      {lead && <p class="lead">{lead}</p>}
-      {body.map((paragraph) => (
-        <p>{paragraph}</p>
-      ))}
+    <div class:list={[{ split: hasAside }]}>
+      <div class="main">
+        <div class="prose">
+          <h2 id={headingId}>{heading}</h2>
+          {lead && <p class="lead">{lead}</p>}
+          {body.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+        <slot />
+      </div>
+      {hasAside && (
+        <div class="aside">
+          <slot name="aside" />
+        </div>
+      )}
     </div>
-    <slot />
     {cta && (
       <p class="cta-row">
         <CallToAction cta={cta} variant="secondary" />
@@ -62,6 +74,24 @@ const headingId = `${id}-heading`;
     font-size: var(--text-xl);
     font-weight: var(--font-weight-bold);
     line-height: var(--leading-tight);
+  }
+
+  .split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-7) var(--space-8);
+    align-items: center;
+  }
+
+  .split .main {
+    flex: 1 1 20rem;
+    max-width: 32rem;
+    min-width: 0;
+  }
+
+  .split .aside {
+    flex: 999 1 35rem;
+    min-width: 0;
   }
 
   .cta-row {

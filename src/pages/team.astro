@@ -22,6 +22,7 @@ import {
   union,
 } from '../lib/map';
 import { getPage } from '../lib/pages';
+import { site } from '../../content/site';
 
 const page = await getPage('team');
 const { Content } = await render(page);
@@ -187,11 +188,7 @@ const views: MapView[] = members.map((m) => {
         ))}
       </ol>
 
-      <p class="credits">
-        Map data: Natural Earth (public domain). School district boundaries and
-        the close-up coastline: DataBC. Contains information licensed under the
-        Open Government Licence – British Columbia.
-      </p>
+      <p class="credits">{site.districtMapCredit}</p>
     </div>
 
     <div class="map-panel">
