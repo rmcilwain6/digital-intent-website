@@ -1,0 +1,480 @@
+---
+// The Valleyview route on Home: a small window on navy, the hero's one
+// Digital object (design system: RouteCards). Without JavaScript it is a
+// plain link to the grant page. With it, the title bar buttons work:
+// minimize folds the window to its title bar, maximize shows the grant
+// details, close leaves a note with a reopen button and the link.
+//
+// On hover or focus the window becomes the active window: its title bar
+// brightens, the command line types itself out as "cd ./valleyview" (and
+// goes back to the resting command afterwards), the cursor keeps
+// blinking, and the Enter key sits pressed down, ready to go.
+// While the pointer is over the link, the command line takes typing (an
+// easter egg) and Enter follows the link whatever it says. Under reduced
+// motion the hover command appears at once, the cursor does not blink and the
+// key does not move. Touch screens have no hover, so they do not show the
+// key.
+//
+// Information only (D5): the window links to the grant page and never to an
+// application.
+import { valleyview } from '../../../content/valleyview';
+import { site } from '../../../content/site';
+import { brand } from '../../brand/brand.config';
+import type { Home } from '../../schemas/home';
+
+interface Props {
+  card: Home['hero']['valleyview'];
+}
+
+const { card } = Astro.props;
+const labels = card.detailLabels;
+const list = (items: readonly string[]) =>
+  new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(items);
+const details = [
+  { term: labels.who, value: valleyview.eligibility },
+  { term: labels.what, value: list(valleyview.recipientsGet) },
+  { term: labels.asks, value: valleyview.questions.join(' ') },
+  { term: labels.when, value: valleyview.howToApply },
+];
+// On hover the command changes to a shell command for the grant page, e.g.
+// "cd ./valleyview", built from the link so it always matches it.
+const hoverCommand = `cd .${card.href.replace(/\/$/, '')}`;
+const pageLabel =
+  site.primaryNav.find((item) => item.href === card.href)?.label ?? card.title;
+---
+
+<div class="window" data-theme="digital" data-window data-state="normal">
+  <div class="bar">
+    <img src={brand.logo.mark} alt="" width="16" height="16" />
+    <span class="window-title">{card.windowTitle}</span>
+    <span class="controls" data-controls hidden>
+      <button type="button" data-action="min" aria-label="Minimize window">
+        –
+      </button>
+      <button type="button" data-action="max" aria-label="Maximize window">
+        □
+      </button>
+      <button type="button" data-action="close" aria-label="Close window">
+        ×
+      </button>
+    </span>
+  </div>
+
+  <div class="body" data-body>
+    <a class="go" href={card.href}>
+      <span class="go-title">{card.title}</span>
+      <span class="command" aria-hidden="true">
+        <span class="prompt">
+          &gt;{' '}
+          <span data-typed data-hover={hoverCommand}>
+            {card.command}
+          </span>
+          <span class="cursor"></span>
+        </span>
+        <kbd class="enter">↵ enter</kbd>
+      </span>
+    </a>
+    <dl class="details" data-details hidden>
+      {details.map((item) => (
+        <>
+          <dt>{item.term}</dt>
+          <dd>{item.value}</dd>
+        </>
+      ))}
+    </dl>
+  </div>
+
+  <div class="closed" data-closed hidden>
+    <span>&gt; {card.closedNote}</span>
+    <button type="button" class="reopen" data-action="reopen">
+      reopen
+    </button>
+    <a href={card.href}>{pageLabel}</a>
+  </div>
+</div>
+
+<script>
+  type State = 'normal' | 'min' | 'max' | 'closed';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-window]').forEach((win) => {
+    const q = <T extends HTMLElement>(selector: string) =>
+      win.querySelector<T>(selector);
+    const controls = q('[data-controls]');
+    const body = q('[data-body]');
+    const details = q('[data-details]');
+    const closed = q('[data-closed]');
+    const minButton = q<HTMLButtonElement>('[data-action="min"]');
+    const maxButton = q<HTMLButtonElement>('[data-action="max"]');
+    const reopen = q<HTMLButtonElement>('[data-action="reopen"]');
+    const link = q<HTMLAnchorElement>('.go');
+    const typed = q('[data-typed]');
+    if (!controls || !body || !details || !closed || !link || !typed) return;
+
+    controls.hidden = false;
+
+    const setState = (state: State) => {
+      win.dataset.state = state;
+      body.hidden = state === 'min' || state === 'closed';
+      details.hidden = state !== 'max';
+      closed.hidden = state !== 'closed';
+      minButton?.setAttribute(
+        'aria-label',
+        state === 'min' ? 'Restore window' : 'Minimize window',
+      );
+      maxButton?.setAttribute(
+        'aria-label',
+        state === 'max' ? 'Restore window size' : 'Maximize window',
+      );
+    };
+
+    win.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>(
+        '[data-action]',
+      );
+      if (!button) return;
+      const current = win.dataset.state as State;
+      switch (button.dataset.action) {
+        case 'min':
+          setState(current === 'min' ? 'normal' : 'min');
+          break;
+        case 'max':
+          setState(current === 'max' ? 'normal' : 'max');
+          break;
+        case 'close':
+          setState('closed');
+          reopen?.focus();
+          break;
+        case 'reopen':
+          setState('normal');
+          link.focus();
+          break;
+      }
+    });
+
+    let hovered = false;
+
+    // On hover or focus the command types itself out as the shell command
+    // for the grant page; when the pointer and focus leave, it goes back.
+    const rest = typed.textContent ?? '';
+    const full = typed.dataset.hover ?? rest;
+    let timer: number | undefined;
+    const stopTyping = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+    };
+    // Once the link is followed, the command line stays as it is while the
+    // next page loads. Clicking also focuses the link, which would otherwise
+    // start the typing again.
+    let leaving = false;
+    link.addEventListener('click', (event) => {
+      const newTab =
+        event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey;
+      if (!newTab) leaving = true;
+    });
+    window.addEventListener('pageshow', () => {
+      leaving = false;
+    });
+
+    const type = () => {
+      if (leaving) return;
+      stopTyping();
+      if (reduceMotion.matches) {
+        typed.textContent = full;
+        return;
+      }
+      let i = 0;
+      typed.textContent = '';
+      timer = window.setInterval(() => {
+        i += 1;
+        typed.textContent = full.slice(0, i);
+        if (i >= full.length) stopTyping();
+      }, 34);
+    };
+    const untype = () => {
+      if (leaving) return;
+      stopTyping();
+      typed.textContent = rest;
+    };
+    // Focus from a click arrives while hovered, and the typing has already
+    // started, so only keyboard focus starts it.
+    link.addEventListener('focus', () => {
+      if (!hovered) type();
+    });
+    link.addEventListener('blur', () => {
+      if (!hovered) untype();
+    });
+
+    // A small easter egg: while the pointer is over the link, the command
+    // line takes typing. Letters add to it and Backspace removes them.
+    // Whatever it says, Enter goes to the grant page. Keys are left alone
+    // when focus is on another control, or with Ctrl, Alt or Cmd held.
+    const maxLength = 24;
+    link.addEventListener('mouseenter', () => {
+      hovered = true;
+      type();
+    });
+    link.addEventListener('mouseleave', () => {
+      hovered = false;
+      if (document.activeElement !== link) untype();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (!hovered || event.isComposing) return;
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      const state = win.dataset.state;
+      if (state !== 'normal' && state !== 'max') return;
+      const active = document.activeElement;
+      if (active && active !== document.body && active !== link) return;
+
+      // If the command is still typing itself, finish it first.
+      const finishTyping = () => {
+        if (timer === undefined) return;
+        stopTyping();
+        typed.textContent = full;
+      };
+
+      if (event.key === 'Enter') {
+        // A focused link already follows itself on Enter.
+        if (active === link || event.repeat) return;
+        event.preventDefault();
+        link.click();
+      } else if (event.key === 'Backspace') {
+        event.preventDefault();
+        finishTyping();
+        typed.textContent = (typed.textContent ?? '').slice(0, -1);
+      } else if (event.key.length === 1) {
+        event.preventDefault();
+        finishTyping();
+        const text = typed.textContent ?? '';
+        if (text.length < maxLength) typed.textContent = text + event.key;
+      }
+    });
+  });
+</script>
+
+<style>
+  .window {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.3125rem var(--space-2) 0.3125rem 0.875rem;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .bar img {
+    border-radius: 3px;
+    opacity: 0.6;
+    transition: opacity var(--duration-base) var(--ease-standard);
+  }
+
+  /* The active window: its title bar brightens on hover or focus. */
+  .window:hover .bar,
+  .window:focus-within .bar {
+    color: var(--color-text);
+  }
+
+  .window:hover .bar img,
+  .window:focus-within .bar img {
+    opacity: 1;
+  }
+
+  .window-title {
+    flex: 1;
+  }
+
+  .controls {
+    display: flex;
+  }
+
+  .controls[hidden] {
+    display: none;
+  }
+
+  .controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2rem;
+    block-size: 1.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: none;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .controls button:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .go {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: 0.875rem 1.375rem 1.125rem;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .go:focus-visible {
+    outline-offset: calc(-1 * var(--focus-width));
+  }
+
+  .go-title {
+    font-size: 1.375rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.75rem;
+  }
+
+  .command {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: space-between;
+    min-block-size: 1.5rem;
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+
+  /* The text cursor: blinks twice on load, then stays. While the window is
+     active it keeps blinking, and it stops when the pointer or focus leaves,
+     so nothing blinks on its own for more than a moment (WCAG 2.2.2). */
+  .cursor {
+    display: inline-block;
+    inline-size: var(--cursor-width);
+    block-size: var(--cursor-height);
+    margin-inline-start: var(--cursor-gap);
+    border-radius: var(--radius-sm);
+    background: var(--color-signal);
+    vertical-align: var(--cursor-drop);
+    animation: blink var(--duration-blink) steps(1) 2;
+  }
+
+  /* The Enter key, a Digital keycap like the header's menu key. */
+  .enter {
+    flex: none;
+    padding: 0.125rem var(--space-2);
+    border: var(--border-width) solid var(--color-key-edge);
+    border-block-start-color: var(--color-key-edge-top);
+    border-block-end: 3px solid var(--color-key-lip);
+    border-radius: 5px;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    transition: transform var(--duration-press) var(--ease-standard);
+  }
+
+  /* Pressed while the link is hovered or focused: the key sinks to the
+     ground and its lip disappears, like the header's open menu key. */
+  .go:hover .enter,
+  .go:focus-visible .enter {
+    border-block-end: var(--border-width) solid var(--color-key-edge);
+    margin-block-end: 2px;
+    background: var(--color-bg);
+    box-shadow: inset 0 2px 0 var(--color-key-lip);
+    color: var(--color-text);
+    transform: translateY(2px);
+  }
+
+  /* No hover on touch screens, so no keyboard hint. */
+  @media (hover: none) {
+    .enter {
+      display: none;
+    }
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .window:hover .cursor,
+  .window:focus-within .cursor {
+    animation: blink var(--duration-blink) steps(1) infinite;
+  }
+
+  /* Typed text stays on one line, clear of the Enter key. */
+  .prompt {
+    min-inline-size: 0;
+    overflow-x: clip;
+    white-space: nowrap;
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.375rem var(--space-4);
+    margin: 0;
+    padding: 0 1.375rem 1.25rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .details[hidden],
+  .closed[hidden],
+  .body[hidden] {
+    display: none;
+  }
+
+  dt {
+    color: var(--color-label);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .closed {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) 1.375rem var(--space-4);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .reopen {
+    padding: var(--space-1) 0.625rem;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 3px;
+    background: none;
+    color: var(--color-label);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .closed a {
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-code);
+    font-weight: var(--font-weight-bold);
+    text-underline-offset: 0.2em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor,
+    .window:hover .cursor,
+    .window:focus-within .cursor {
+      animation: none;
+    }
+  }
+</style>

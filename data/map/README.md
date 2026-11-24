@@ -1,6 +1,6 @@
 # BC map data
 
-Open data for a map of British Columbia, projected to BC Albers (EPSG:3005) and simplified for the web. The site header draws the elevation profile and the footer draws a small outline of the province; how prominent the full map becomes is still open (SPEC D25). Any map built from it is drawn at build time, with no map tiles and no map service, so showing it sends no requests to anyone.
+Open data for a map of British Columbia, projected to BC Albers (EPSG:3005) and simplified for the web. The site header draws the elevation profile, the footer draws a small outline of the province, and Home draws the province and the starting regions (`src/components/BcMap.astro`); how prominent the map becomes is still open (SPEC D25). Any map built from it is drawn at build time, with no map tiles and no map service, so showing it sends no requests to anyone.
 
 Rebuild everything with `bash tools/map/build-map.sh`. To rebuild only `bc-map.json` from the files here, run `node tools/map/build-svg.mjs`.
 

@@ -26,6 +26,11 @@
   --color-on-highlight: var(--color-navy);
   --color-marker: var(--color-red);
 
+  /* Index card, the Analog world's route card: lighter paper with faint
+     ruled lines and a pen-red header rule. */
+  --color-card: #fbf8f1;
+  --color-card-rule: color-mix(in srgb, var(--color-navy) 15%, transparent);
+
   /* Keycaps, the Digital world's button: a light top edge and a deep lip.
      The key face is the Digital surface; pressed, it sinks to the ground. */
   --color-key-lip: #051a2e;
@@ -50,10 +55,13 @@
   --text-xl: 1.5rem;
   --text-2xl: clamp(1.75rem, 1.5rem + 1vw, 2rem);
   --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+  /* The Home hero headline: 40px on phones up to 72px. */
+  --text-display: clamp(2.5rem, 1.4rem + 3.6vw, 4.5rem);
 
   --leading-tight: 1.2;
   --leading-normal: 1.6;
   --tracking-tight: -0.01em;
+  --tracking-display: -0.022em;
 
   /* Space */
   --space-1: 0.25rem;
@@ -89,6 +97,8 @@
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 400ms;
+  /* One on-off cycle of the text cursor, which blinks twice then stays solid. */
+  --duration-blink: 1060ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-enter: cubic-bezier(0, 0, 0, 1);
   --ease-exit: cubic-bezier(0.3, 0, 1, 1);
@@ -146,6 +156,7 @@
     --duration-fast: 0ms;
     --duration-base: 0ms;
     --duration-slow: 0ms;
+    --duration-blink: 0ms;
     --motion-distance-sm: 0;
     --motion-distance-md: 0;
   }
