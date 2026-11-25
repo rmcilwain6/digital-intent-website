@@ -24,8 +24,6 @@ const photoSchema = z.strictObject({
   caption: z.string().min(1),
   /** When it was taken, shown under the photo, e.g. "May 2025". */
   taken: z.string().min(1),
-  /** Who took it, shown under the photo. */
-  credit: z.string().min(1),
 });
 
 /**

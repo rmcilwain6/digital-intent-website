@@ -9,8 +9,9 @@
 // before launch. Victoria is under the Douglas Treaties, so its wording does
 // not say "unceded".
 // Photos are original (SPEC rule 8), of the natural environment rather than
-// the built one, taken by a member of our team. Each caption says where and
-// when it was really taken, since none is of the city itself; each place is within the territories its
+// the built one. The footer credits the photographer once, for the whole
+// site. Each caption says where and when the photo was really taken, since
+// none is of the city itself; each place is within the territories its
 // acknowledgement names.
 import lynnValleyFalls from '../src/assets/photos/lynn-valley-falls.jpg';
 import mountPaulMountPeter from '../src/assets/photos/mount-paul-mount-peter.jpg';
@@ -33,8 +34,7 @@ export const outreach = outreachSchema.parse({
           src: mountPaulMountPeter,
           alt: 'Low sun lights the rocky face of a grassland hill dotted with pines, under pink and grey cloud.',
           caption: 'Mount Paul and Mount Peter, Kamloops',
-          taken: '[TK: month and year taken]',
-          credit: '[TK: photographer credit, as it should appear]',
+          taken: 'May 2025',
         },
       },
       {
@@ -44,8 +44,7 @@ export const outreach = outreachSchema.parse({
           src: swartzBayFerry,
           alt: 'A pink and orange sky over calm water, between forested islands in silhouette.',
           caption: 'Leaving Swartz Bay by ferry',
-          taken: '[TK: month and year taken]',
-          credit: '[TK: photographer credit, as it should appear]',
+          taken: 'January 2025',
         },
       },
       {
@@ -55,8 +54,7 @@ export const outreach = outreachSchema.parse({
           src: lynnValleyFalls,
           alt: 'A waterfall pours through a narrow, rocky canyon between dense cedar and fir.',
           caption: 'Lynn Valley, North Vancouver',
-          taken: '[TK: month and year taken]',
-          credit: '[TK: photographer credit, as it should appear]',
+          taken: 'January 2025',
         },
       },
     ],

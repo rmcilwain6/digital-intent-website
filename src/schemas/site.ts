@@ -49,6 +49,8 @@ export const siteSchema = z.strictObject({
   licence: z.string().min(1),
   /** Credit for the map data drawn in the header and footer (data/map/README.md). */
   districtMapCredit: z.string().min(1),
+  /** Credit for the site's photography, shown in the footer on every page. */
+  photoCredit: z.string().min(1),
   mapCredit: z.string().min(1),
 });
 
