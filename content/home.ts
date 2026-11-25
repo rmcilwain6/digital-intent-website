@@ -200,18 +200,23 @@ export const home = homeSchema.parse({
     // it links to the grant page and never to an application.
     valleyview: {
       year: 'year 2',
-      yearNote: 'the grant’s second year · 2027',
-      heading: 'Valleyview Grade 12s: got an idea?',
+      yearNote: '2026/27',
+      heading: 'Valleyview Grade 12s: bet on yourself',
       body: [
         'The Valleyview Social Innovation Grant gives one graduating student $2,000 and mentorship to take on a hard problem that makes life better for other people.',
-        'You don’t need top grades, a long list of accomplishments or a finished plan. Applying starts with three questions.',
+        'You don’t need top grades, a long list of accomplishments or a finished plan. Applying starts with a problem you care about solving.',
       ],
       details: [
         {
           term: 'who',
           // Kamloops: confirmed by Reed, November 25, 2026.
           value:
-            'Grade 12s at Valleyview Secondary in Kamloops, graduating in June 2027. Only Valleyview.',
+            'Grade 12s at Valleyview Secondary in Kamloops, graduating in June 2027.',
+        },
+        {
+          term: 'why',
+          value:
+            'To learn, to invest in your community and to make the world a better place.',
         },
         { term: 'when', value: valleyview.current.apply.heading },
       ],

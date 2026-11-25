@@ -86,15 +86,22 @@ const headingId = `${id}-heading`;
     letter-spacing: var(--tracking-tight);
   }
 
+  /* Stacked on small screens. On wide ones the facts sit at the band's right
+     edge, with the copy at reading width on the left. */
   .columns {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: var(--space-6) var(--space-8);
-    align-items: flex-start;
+    align-items: start;
+  }
+
+  @media (min-width: 64rem) {
+    .columns {
+      grid-template-columns: minmax(0, var(--width-prose)) minmax(20rem, 34rem);
+      justify-content: space-between;
+    }
   }
 
   .body {
-    flex: 3 1 24rem;
     max-inline-size: var(--width-prose);
     min-inline-size: 0;
   }
@@ -112,7 +119,6 @@ const headingId = `${id}-heading`;
   }
 
   .details {
-    flex: 2 1 20rem;
     min-inline-size: 0;
     margin: 0;
     font-family: var(--font-mono);
