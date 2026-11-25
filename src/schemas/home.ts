@@ -176,6 +176,55 @@ const valleyviewSection = z.strictObject({
   draft: z.boolean(),
 });
 
+/**
+ * The Partnerships band (SPEC 7.1 item 8, D27): an invitation to work
+ * together, a hand-drawn web of the groups we sit among (Digital Intent is
+ * one node in it, not the hub), an email action, and a logo bank that stays
+ * hidden until a partnership is real.
+ */
+const partnershipsSection = z.strictObject({
+  heading: z.string().min(1),
+  /** One phrase of the heading, shown with the highlighter. */
+  highlight: z.string().min(1),
+  body: z.array(z.string().min(1)).min(1),
+  /** Opens the visitor's own email app; nothing is submitted to us. */
+  email: z.strictObject({
+    label: z.string().min(1),
+    subject: z.string().min(1),
+  }),
+  network: z.strictObject({
+    /** Accessible name for the drawing. */
+    label: z.string().min(1),
+    /**
+     * The six groups around us, in drawing order: schools, tech companies,
+     * post-secondary, families, science centres, nonprofits. One or two
+     * lines each, as they should wrap inside their oval.
+     */
+    groups: z.array(z.array(z.string().min(1)).min(1).max(2)).length(6),
+  }),
+  partners: z.strictObject({
+    heading: z.string().min(1),
+    /**
+     * Organizations we have worked with, added only with their OK. Empty
+     * hides the logo bank. `logo` is a self-hosted file in public/partners/.
+     */
+    items: z.array(
+      z.strictObject({
+        name: z.string().min(1),
+        logo: z
+          .string()
+          .regex(
+            /^\/partners\/[a-z0-9-]+\.(svg|png|webp)$/,
+            'Use a file in public/partners/, like /partners/name.svg',
+          )
+          .optional(),
+        href: z.url({ protocol: /^https$/ }).optional(),
+      }),
+    ),
+  }),
+  draft: z.boolean(),
+});
+
 export const sectionKeys = [
   'problem',
   'mission',
@@ -260,7 +309,7 @@ export const homeSchema = z.strictObject({
     library: librarySection,
     valleyview: valleyviewSection,
     outreach: section,
-    partnerships: section,
+    partnerships: partnershipsSection,
   }),
   /** Section order after the hero. Every section appears exactly once (D30). */
   order: z
@@ -274,4 +323,5 @@ export const homeSchema = z.strictObject({
 export type Home = z.infer<typeof homeSchema>;
 export type WhyWeExist = z.infer<typeof whyWeExist>;
 export type WhatWeDo = z.infer<typeof whatWeDo>;
+export type Partnerships = z.infer<typeof partnershipsSection>;
 export type CallToAction = z.infer<typeof callToAction>;
