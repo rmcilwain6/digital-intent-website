@@ -69,8 +69,6 @@ export const outreachSchema = z.strictObject({
         }),
       )
       .min(1),
-    /** True while the copy awaits the outreach lead's approval (SPEC 12.5). */
-    draft: z.boolean(),
   }),
   map: z.strictObject({
     /** Short line under the map saying what the points will be. */
@@ -87,7 +85,6 @@ export const outreachSchema = z.strictObject({
     /** What the work rests on, shown under the pillar. */
     foundation: z.string().min(1),
     items: z.array(z.string().min(1)).min(1),
-    draft: z.boolean(),
   }),
 });
 

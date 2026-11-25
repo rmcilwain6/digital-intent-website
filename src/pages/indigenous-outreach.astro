@@ -21,8 +21,6 @@ if (!pillar) {
   throw new Error(`No pillar ${commitments.pillar.number} in organization.ts`);
 }
 
-const draftMarker = '[TK: draft copy, needs human approval]';
-
 const monthFormat = new Intl.DateTimeFormat('en-CA', {
   month: 'long',
   year: 'numeric',
@@ -36,7 +34,6 @@ const formatMonth = (date: string) =>
   <article>
     <section class="acknowledgement" aria-labelledby="acknowledgement">
       <div class="ack-text">
-        {acknowledgement.draft && <p class="draft-marker">{draftMarker}</p>}
         <h1 id="acknowledgement">{acknowledgement.heading}</h1>
         {acknowledgement.paragraphs.map((text) => (
           <p class="ack-lede">{text}</p>
@@ -73,8 +70,8 @@ const formatMonth = (date: string) =>
                 widths={[480, 720, 960, 1280]}
                 sizes={
                   photo.src.height > photo.src.width
-                    ? '(min-width: 56rem) 24rem, min(24rem, calc(100vw - 2.5rem))'
-                    : '(min-width: 56rem) 40rem, calc(100vw - 2.5rem)'
+                    ? '(min-width: 56rem) 17rem, min(17rem, calc(100vw - 2.5rem))'
+                    : '(min-width: 56rem) 30rem, calc(100vw - 2.5rem)'
                 }
               />
               <figcaption>
@@ -108,7 +105,6 @@ const formatMonth = (date: string) =>
     <section class="commitments" aria-labelledby="commitments">
       <div class="commitments-list">
         <h2 id="commitments">{commitments.heading}</h2>
-        {commitments.draft && <p class="draft-marker">{draftMarker}</p>}
         <ol>
           {commitments.items.map((item) => (
             <li>{item}</li>
@@ -128,16 +124,6 @@ const formatMonth = (date: string) =>
 <style>
   h2 {
     margin-block: 0 var(--space-5);
-  }
-
-  .draft-marker {
-    display: inline-block;
-    margin-block: 0 var(--space-4);
-    padding: var(--space-1) var(--space-2);
-    border: var(--border-width) dashed var(--color-border);
-    border-radius: var(--radius-sm);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
   }
 
   /* The acknowledgement beside a large map; stacked on narrow screens. */
@@ -184,15 +170,23 @@ const formatMonth = (date: string) =>
     list-style: none;
   }
 
+  /*
+   * The photo is the smaller column, so it supports the text rather than
+   * outweighing it. Kamloops starts with the photo on the left.
+   */
   .regions li {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
     gap: var(--space-7);
     align-items: center;
   }
 
-  .regions li:nth-child(even) .region-text {
-    order: 2;
+  .regions li:nth-child(odd) .region-photo {
+    order: -1;
+  }
+
+  .regions li:nth-child(even) {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
   }
 
   .region-photo {
@@ -209,7 +203,7 @@ const formatMonth = (date: string) =>
   /* A tall photo would dwarf its text on wide screens, so it is narrower. */
   .region-photo.portrait {
     justify-self: center;
-    inline-size: min(100%, 24rem);
+    inline-size: min(100%, 17rem);
   }
 
   .region-photo figcaption {
@@ -318,8 +312,8 @@ const formatMonth = (date: string) =>
       gap: var(--space-5);
     }
 
-    /* Stacked, every region reads name and text first, then the image. */
-    .regions li:nth-child(even) .region-text {
+    /* Stacked, every region reads name and text first, then the photo. */
+    .regions li:nth-child(odd) .region-photo {
       order: 0;
     }
   }

@@ -1,6 +1,7 @@
-// Indigenous outreach page (SPEC 7.9, decision record 0007). Draft copy from
-// notes of conversations with the team. Anything marked `draft: true` needs
-// the outreach lead's approval before launch (SPEC 12.5).
+// Indigenous outreach page (SPEC 7.9, decision record 0007). Copy drafted
+// from conversations with the team. It states the organization's position,
+// so a person approves it in review, and the outreach lead approves it
+// before launch (SPEC 12.5).
 // Region acknowledgements are drafted from the standard public wording for
 // each place (Kamloops: City of Kamloops, Thompson Rivers University and
 // Tk'emlúps te Secwépemc's own template; Victoria: City of Victoria and the
@@ -58,7 +59,6 @@ export const outreach = outreachSchema.parse({
         },
       },
     ],
-    draft: true,
   },
 
   map: {
@@ -72,13 +72,12 @@ export const outreach = outreachSchema.parse({
     // The pillar's wording comes from content/organization.ts.
     pillar: { number: 2, label: 'Pillar 2 of our mission' },
     foundation:
-      'Our outreach with Indigenous communities falls under this pillar. Its foundation is lasting, face-to-face relationships with Indigenous schools and communities. We start near where we live, and we listen before we start any project.',
+      'Our outreach with Indigenous communities falls under this pillar. Our commitments are only credible if they rest on face-to-face relationships with Indigenous schools and communities, built and kept in good faith. We are starting where we live, in the communities we already call home, and will grow from there.',
     items: [
-      'Offer guidance on digital technology to Indigenous communities that ask for it, to support their own teaching and learning.',
-      "Work on each community's terms. We use a community's name, language or logo only with its agreement, and we follow its wishes on privacy, data and the use of AI.",
-      'Seek out Indigenous perspectives on how technology comes into classrooms and communities, so that it comes in a sustainable way. Where communities want their perspectives amplified, help those voices reach teachers across BC. Seek Indigenous representation on our board.',
-      'Set quarterly objectives for our outreach with Indigenous communities. Report on them, and on what we have done, by updating this page.',
+      'We will offer guidance on digital technology to Indigenous communities that ask for it, to support their own teaching and learning.',
+      "We will work on each community's terms. We will use a community's name, language or logo only with their agreement, and we will follow their wishes on privacy, data and the use of AI.",
+      'We will seek out and amplify Indigenous perspectives on digital technology, including on the resources we make and the work we do. We will work with communities to find solutions and arrangements that work for them. We will also seek Indigenous representation on our board.',
+      'We will set quarterly objectives for our outreach with Indigenous communities, and update this page to report on them and on what we have done.',
     ],
-    draft: true,
   },
 });
