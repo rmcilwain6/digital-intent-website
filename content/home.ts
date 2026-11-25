@@ -237,14 +237,33 @@ export const home = homeSchema.parse({
       draft: false,
     },
 
+    // Partnerships (D27 leans to a section with an email). Headline and first
+    // sentence are Reed's (Nov 24); the second sentence is an agent draft.
     partnerships: {
-      heading: 'Partnerships',
+      heading:
+        'If you care about how young people grow up with technology, let’s work together.',
+      highlight: 'let’s work together.',
       body: [
-        'We work alongside organizations, businesses and groups that want better outcomes for students, teachers and parents. We see ourselves as one part of a network, not a competitor.',
-        'If that sounds like you, write to us.',
+        'We’re one node in a bigger network of people who care about kids and technology. We want to help ideas and opportunities move between everyone in it, and build connections that last.',
       ],
-      cta: { label: 'Write to us', href: '/contact/' },
-      draft: false,
+      email: { label: 'Email us', subject: 'Partnership' },
+      network: {
+        label: 'A hand-drawn web of the groups we work among',
+        groups: [
+          ['Schools and districts'],
+          ['Tech companies'],
+          ['Colleges and', 'universities'],
+          ['Families and', 'parent groups'],
+          ['Science centres', 'and makerspaces'],
+          ['Nonprofits and', 'local groups'],
+        ],
+      },
+      partners: {
+        heading: 'organizations we’ve worked with',
+        // Empty until a partner says yes to being listed.
+        items: [],
+      },
+      draft: true,
     },
   },
 

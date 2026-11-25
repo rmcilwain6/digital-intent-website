@@ -12,6 +12,7 @@ import HomeHero from '../components/home/HomeHero.astro';
 import HomeSection from '../components/home/HomeSection.astro';
 import LibrarySection from '../components/home/LibrarySection.astro';
 import ValleyviewSection from '../components/home/ValleyviewSection.astro';
+import PartnershipsSection from '../components/home/PartnershipsSection.astro';
 import QuestionBreak from '../components/home/QuestionBreak.astro';
 import WhatWeDo from '../components/home/WhatWeDo.astro';
 import WhyWeExist from '../components/home/WhyWeExist.astro';
@@ -45,6 +46,15 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
         <LibrarySection
           id={key}
           section={sections.library}
+          tone={tone(index)}
+        />
+      );
+    }
+    if (key === 'partnerships') {
+      return (
+        <PartnershipsSection
+          id={key}
+          section={sections.partnerships}
           tone={tone(index)}
         />
       );
