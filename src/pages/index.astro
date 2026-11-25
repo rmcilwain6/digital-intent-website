@@ -6,12 +6,12 @@
 import { home } from '../../content/home';
 import { site } from '../../content/site';
 import { regionDistricts } from '../../content/team';
-import { valleyview } from '../../content/valleyview';
 import { brand } from '../brand/brand.config';
 import BcMap from '../components/BcMap.astro';
 import HomeHero from '../components/home/HomeHero.astro';
 import HomeSection from '../components/home/HomeSection.astro';
 import LibrarySection from '../components/home/LibrarySection.astro';
+import ValleyviewSection from '../components/home/ValleyviewSection.astro';
 import QuestionBreak from '../components/home/QuestionBreak.astro';
 import WhatWeDo from '../components/home/WhatWeDo.astro';
 import WhyWeExist from '../components/home/WhyWeExist.astro';
@@ -36,6 +36,9 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
       return (
         <WhyWeExist id={key} section={sections.problem} tone={tone(index)} />
       );
+    }
+    if (key === 'valleyview') {
+      return <ValleyviewSection id={key} section={sections.valleyview} />;
     }
     if (key === 'library') {
       return (
@@ -86,19 +89,6 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
             insetLabel={sections.map.insetLabel}
             credit={site.districtMapCredit}
           />
-        )}
-
-        {key === 'valleyview' && (
-          <div class="prose">
-            <p>{valleyview.current.eligibility}</p>
-            <h3>{sections.valleyview.questionsHeading}</h3>
-            <ol>
-              {valleyview.current.questions.map((question) => (
-                <li>{question}</li>
-              ))}
-            </ol>
-            <p>{valleyview.current.apply.text}</p>
-          </div>
         )}
       </HomeSection>
     );

@@ -3,6 +3,7 @@
 // marker until a human approves it and sets `draft: false`.
 import { brand } from '../src/brand/brand.config';
 import { homeSchema } from '../src/schemas/home';
+import { valleyview } from './valleyview';
 
 export const home = homeSchema.parse({
   hero: {
@@ -195,13 +196,35 @@ export const home = homeSchema.parse({
       draft: false,
     },
 
+    // The Valleyview band (#66): Digital, for students. Information only (D5):
+    // it links to the grant page and never to an application.
     valleyview: {
-      heading: 'The Valleyview Social Innovation Grant',
+      year: 'year 2',
+      yearNote: '2026/27',
+      heading: 'Valleyview Grade 12s: bet on yourself',
       body: [
-        'A grant for Grade 12 students at Valleyview who have an idea and want to build it now. Recipients get funding and mentorship, and they agree to follow-up that shows how the grant helped them learn.',
+        'The Valleyview Social Innovation Grant gives one graduating student $2,000 and mentorship to take on a hard problem that makes life better for other people.',
+        'You don’t need top grades, a long list of accomplishments or a finished plan. Applying starts with a problem you care about solving.',
       ],
-      questionsHeading: 'What we ask you',
-      cta: { label: 'Read about the grant', href: '/valleyview/' },
+      details: [
+        {
+          term: 'who',
+          // Kamloops: confirmed by Reed, November 25, 2026.
+          value:
+            'Grade 12s at Valleyview Secondary in Kamloops, graduating in June 2027.',
+        },
+        {
+          term: 'why',
+          value:
+            'To learn, to invest in your community and to make the world a better place.',
+        },
+        { term: 'when', value: valleyview.current.apply.heading },
+      ],
+      cta: { label: 'read about the grant', href: '/valleyview/' },
+      school: {
+        label: 'Want this at your school? Let us know',
+        href: '/contact/',
+      },
       draft: false,
     },
 
