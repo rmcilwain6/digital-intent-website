@@ -35,7 +35,7 @@ export const site = siteSchema.parse({
       description: 'Pro-D, school visits, partnerships and media.',
     },
   ],
-  // Draft wording, pending approval by the outreach lead (decision record 0006).
+  // Draft wording, pending approval by the outreach lead (decision record 0007).
   acknowledgement: {
     text: 'We are grateful to live, work and play in British Columbia, on the lands of the many First Nations who have cared for them since time immemorial, much of it unceded.',
     link: {

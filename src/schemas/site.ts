@@ -36,7 +36,7 @@ export const siteSchema = z.strictObject({
   nextStops: z.array(nextStop).min(1),
   /**
    * Short land acknowledgement on every page, linking to the Indigenous
-   * outreach page, which holds the full one (decision record 0006). Needs
+   * outreach page, which holds the full one (decision record 0007). Needs
    * human approval (SPEC 12.5).
    */
   acknowledgement: z.strictObject({

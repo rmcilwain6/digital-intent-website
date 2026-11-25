@@ -160,7 +160,7 @@ Rules:
 
 ## 7. Site map and page requirements
 
-All pages share: header with primary navigation, footer (contact, regions, a short land acknowledgement that links to the Indigenous outreach page, privacy link), skip link, page title and meta description. Navigation goes to separate pages; no anchor-scroll menus. The full land acknowledgement lives on the outreach page only (D13, record 0006).
+All pages share: header with primary navigation, footer (contact, regions, a short land acknowledgement that links to the Indigenous outreach page, privacy link), skip link, page title and meta description. Navigation goes to separate pages; no anchor-scroll menus. The full land acknowledgement lives on the outreach page only (D13, record 0007).
 
 ### 7.1 Home (`/`) Phase 1
 
@@ -257,7 +257,7 @@ Terms of service: Reed checks whether one is legally needed (D28). If so, it is 
 
 Helpful, on-brand, links to Home and Contact.
 
-### 7.9 Indigenous outreach (`/indigenous-outreach`) Phase 1 (D13, record 0006)
+### 7.9 Indigenous outreach (`/indigenous-outreach`) Phase 1 (D13, record 0007)
 
 - A living hub for our outreach with Indigenous schools and communities, not a values page. It grows as we act. It stays short: a land acknowledgement for all of BC, folded around a territorial acknowledgement for each place we are based, then the commitments we work towards. A natural map of BC (coast, lakes and major rivers in the Analog style; no school districts, roads or towns) and landscape photography of each region carry the sense of place. Photography shows the natural environment, not the built one.
 - The land acknowledgement is a good-faith starting place, not the work. It names the Nations for each starting region and recognizes the First Nations across the whole province, since our work is province-wide. The footer carries a short version that links here. Wording about ceded and unceded land must be accurate for every region named (for example, parts of BC are under the Douglas Treaties, Treaty 8 and modern treaties).
@@ -487,7 +487,7 @@ Write these once the patterns they describe have settled in real code. `add-page
 | D10 | Dark mode                                               | Decided                | Replaced by the two worlds (Analog and Digital); no dark mode or toggle (record 0005, Nov 21, 2026)                                                                                                                                                                       |
 | D11 | Funding disclosure                                      | Open (board)           | Every funder is thanked publicly, and we take no money from anyone who wants it kept quiet (Nov 11, 2026). Amounts and format open. Values only until the funding page ships                                                                                              |
 | D12 | Donations                                               | Decided                | Out of scope                                                                                                                                                                                                                                                              |
-| D13 | Land acknowledgement / Indigenous outreach page         | Decided                | A land acknowledgement on the outreach page (section 7.9) as a good-faith starting place, with a short version in the footer that links there. The page goes beyond it: approach, commitments and a map that fills in as we work with schools. Nov 24, 2026 (record 0006) |
+| D13 | Land acknowledgement / Indigenous outreach page         | Decided                | A land acknowledgement on the outreach page (section 7.9) as a good-faith starting place, with a short version in the footer that links there. The page goes beyond it: approach, commitments and a map that fills in as we work with schools. Nov 24, 2026 (record 0007) |
 | D14 | Regional leads shown publicly                           | Open (board)           | Not shown                                                                                                                                                                                                                                                                 |
 | D15 | Tool Guide names specific products                      | Open (board)           | Phase 3                                                                                                                                                                                                                                                                   |
 | D16 | Launch date                                             | Decided (target)       | November 25, 2026, together with name, brand and domain (D20). Copy review November 21. Moves if the brand is not ready. Revised Nov 11, 2026 (record 0004)                                                                                                               |

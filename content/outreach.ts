@@ -1,4 +1,4 @@
-// Indigenous outreach page (SPEC 7.9, decision record 0006). Draft copy from
+// Indigenous outreach page (SPEC 7.9, decision record 0007). Draft copy from
 // notes of a conversation with the team member leading this work. Anything
 // marked `draft: true` needs that person's approval before launch (SPEC
 // 12.5). The Nations to name for each region are [TK] until the lead

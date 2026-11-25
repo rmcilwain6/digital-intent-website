@@ -1,4 +1,4 @@
-# 0006: A land acknowledgement on the Indigenous outreach page
+# 0007: A land acknowledgement on the Indigenous outreach page
 
 - Status: Proposed
 - Date: 2026-11-24
