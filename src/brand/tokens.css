@@ -92,6 +92,10 @@
   --cursor-gap: 0.07em;
   --cursor-drop: -0.13em;
 
+  /* Cursors. The barcode scanner over the Teacher Library card; clicks land
+     on the middle of its laser line. The usual pointer is the fallback. */
+  --cursor-scanner: url('/brand/scanner-cursor.svg') 24 40, pointer;
+
   /* Motion. Animate transform and opacity only (SPEC 8.2). */
   --duration-press: 80ms;
   --duration-fast: 120ms;

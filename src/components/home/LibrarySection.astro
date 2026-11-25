@@ -1,0 +1,71 @@
+---
+// The Teacher Library band on Home (SPEC 7.1, #61): heading and copy beside
+// one library card, which is the band's only call to action. Same band
+// tones as the other Home sections. Copy is in content/home.ts.
+import type { Home } from '../../schemas/home';
+import DraftMarker from './DraftMarker.astro';
+import LibraryCard from './LibraryCard.astro';
+
+interface Props {
+  id: string;
+  section: Home['sections']['library'];
+  tone: 'base' | 'surface';
+}
+
+const { id, section, tone } = Astro.props;
+const headingId = `${id}-heading`;
+---
+
+<section class:list={['band', tone]} aria-labelledby={headingId}>
+  <div class="container">
+    {section.draft && <DraftMarker />}
+    <div class="split">
+      <div class="text">
+        <h2 id={headingId}>{section.heading}</h2>
+        {section.body.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+      <div class="card">
+        <LibraryCard card={section.card} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    padding-block: var(--space-8);
+    background: var(--band-bg);
+  }
+
+  .base {
+    --band-bg: var(--color-bg);
+  }
+
+  .surface {
+    --band-bg: var(--color-surface);
+  }
+
+  .split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-7) var(--space-8);
+    align-items: center;
+  }
+
+  .text {
+    flex: 1 1 26rem;
+    max-inline-size: 34rem;
+    min-inline-size: 0;
+  }
+
+  h2 {
+    margin-block-start: 0;
+  }
+
+  .card {
+    flex: 1 1 26rem;
+    min-inline-size: 0;
+  }
+</style>
