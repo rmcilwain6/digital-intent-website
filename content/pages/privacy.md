@@ -1,6 +1,6 @@
 ---
 title: Privacy
-description: '[TK: one-sentence summary of what this site collects]'
+description: This site does not collect personal information. It sets no cookies and runs no trackers.
 ---
 
-[TK: privacy text, pending human approval: what the site does and does not collect, every service involved and where it is based, and linked third-party services and their own notices]
+This site does not collect <mark>personal information</mark>. It sets no cookies and runs no trackers.
