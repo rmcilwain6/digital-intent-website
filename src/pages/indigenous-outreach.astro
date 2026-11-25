@@ -58,7 +58,12 @@ const formatMonth = (date: string) =>
               <h3>{region}</h3>
               <p>{text}</p>
             </div>
-            <figure class="region-photo">
+            <figure
+              class:list={[
+                'region-photo',
+                { portrait: photo.src.height > photo.src.width },
+              ]}
+            >
               <Picture
                 class="photo"
                 src={photo.src}
@@ -66,9 +71,15 @@ const formatMonth = (date: string) =>
                 formats={['avif', 'webp']}
                 quality={50}
                 widths={[480, 720, 960, 1280]}
-                sizes="(min-width: 56rem) 40rem, calc(100vw - 2.5rem)"
+                sizes={
+                  photo.src.height > photo.src.width
+                    ? '(min-width: 56rem) 24rem, min(24rem, calc(100vw - 2.5rem))'
+                    : '(min-width: 56rem) 40rem, calc(100vw - 2.5rem)'
+                }
               />
-              <figcaption>{photo.caption}</figcaption>
+              <figcaption>
+                {photo.caption} · {photo.taken} · {photo.credit}
+              </figcaption>
             </figure>
           </li>
         ))}
@@ -192,9 +203,13 @@ const formatMonth = (date: string) =>
     display: block;
     inline-size: 100%;
     block-size: auto;
-    aspect-ratio: 3 / 2;
-    object-fit: cover;
     border-radius: var(--radius-lg);
+  }
+
+  /* A tall photo would dwarf its text on wide screens, so it is narrower. */
+  .region-photo.portrait {
+    justify-self: center;
+    inline-size: min(100%, 24rem);
   }
 
   .region-photo figcaption {

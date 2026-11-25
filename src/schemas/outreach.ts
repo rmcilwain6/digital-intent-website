@@ -6,7 +6,8 @@ import { z } from 'astro/zod';
 /**
  * A landscape photo of a region, imported from src/assets/photos/ so the
  * build can resize it. Original photography only (SPEC rule 8), of the
- * natural environment rather than the built one. Shown at 3:2.
+ * natural environment rather than the built one. Shown at its own shape;
+ * portrait photos are drawn narrower on wide screens.
  */
 const photoSchema = z.strictObject({
   src: z.custom<ImageMetadata>(
@@ -21,6 +22,10 @@ const photoSchema = z.strictObject({
   alt: z.string().min(1),
   /** Where it was taken, shown under the photo. */
   caption: z.string().min(1),
+  /** When it was taken, shown under the photo, e.g. "May 2025". */
+  taken: z.string().min(1),
+  /** Who took it, shown under the photo. */
+  credit: z.string().min(1),
 });
 
 /**
