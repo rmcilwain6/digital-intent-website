@@ -205,8 +205,8 @@ export const home = homeSchema.parse({
       draft: false,
     },
 
-    // Kept quiet on purpose: it sits between the navy Valleyview band and
-    // the Partnerships drawing. Copy follows the outreach page
+    // Kept plain on purpose: the last band on Home, after Partnerships.
+    // Copy follows the outreach page
     // (content/outreach.ts) and needs the same approval (SPEC 12.5).
     outreach: {
       heading: 'Indigenous outreach',
@@ -236,7 +236,7 @@ export const home = homeSchema.parse({
     'map',
     'library',
     'valleyview',
-    'outreach',
     'partnerships',
+    'outreach',
   ],
 });

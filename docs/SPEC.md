@@ -174,8 +174,8 @@ Sections, in order (teachers above Valleyview is a preference, not settled; D30)
 4. **BC map.** Its own section below the fold, not merged with the pillars. Shows the province with Victoria, Vancouver and Kamloops highlighted as where we start. Copy says we are a BC organization and BC is our mandate, so the starting regions do not read as our boundary (section 2). Built on the province outline from #23; weight budget per #16. The map is not permanently on screen.
 5. **Teacher Library.** The Digital Intent Teacher Library: tips, lessons and training materials that build teachers' own digital skills, free to use, change and share, and growing over time. Open to teachers anywhere, not only in BC. Its one call to action is a library card that links to the library on `/teachers` (#61). Booking a call belongs to the hero's teachers card; if that destination is a booking, it is an outbound link to a third-party scheduler, never a booking form on our site (rule 1), and the Privacy page names it.
 6. **Valleyview grant.** What it is, how to apply, what we look for; links to `/valleyview`.
-7. **Commitment to Indigenous outreach.** Links to the outreach page (section 7.9).
-8. **Partnerships.** An invitation to organizations, businesses and groups working to improve outcomes for students, teachers and parents. We have partners, not competitors: one node in a network, not a hierarchy. Own page or a section with a contact email (D27).
+7. **Partnerships.** An invitation to organizations, businesses and groups working to improve outcomes for students, teachers and parents. We have partners, not competitors: one node in a network, not a hierarchy. Own page or a section with a contact email (D27).
+8. **Commitment to Indigenous outreach.** Links to the outreach page (section 7.9).
 9. Footer.
 
 ### 7.2 About (`/about`) Phase 1
