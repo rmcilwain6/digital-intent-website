@@ -8,8 +8,13 @@
 // The outreach lead confirms the Nations, the spellings and the wording
 // before launch. Victoria is under the Douglas Treaties, so its wording does
 // not say "unceded".
-// Image slots stay placeholders until original photography exists (SPEC
-// rule 8). Art direction: the natural environment, not the built one.
+// Photos are original (SPEC rule 8), of the natural environment rather than
+// the built one. Each caption says where it was really taken, since none is
+// of the city itself; each place is within the territories its
+// acknowledgement names.
+import kamloopsHills from '../src/assets/photos/kamloops-hills.jpg';
+import lynnValleyFalls from '../src/assets/photos/lynn-valley-falls.jpg';
+import swartzBayFerry from '../src/assets/photos/swartz-bay-ferry.jpg';
 import { outreachSchema } from '../src/schemas/outreach';
 
 export const outreach = outreachSchema.parse({
@@ -24,28 +29,28 @@ export const outreach = outreachSchema.parse({
       {
         region: 'Kamloops',
         text: 'Kamloops is on the traditional and unceded territory of Tk’emlúps te Secwépemc, within Secwepemcúl’ecw, the ancestral lands of the Secwépemc Nation.',
-        image: {
-          ratio: '4 / 3',
-          label: 'Kamloops',
-          note: 'Dry grassland hills and sage above the Thompson River. No buildings or roads.',
+        photo: {
+          src: kamloopsHills,
+          alt: 'Low sun lights the rocky face of a grassland hill dotted with pines, under pink and grey cloud.',
+          caption: 'The hills above Kamloops',
         },
       },
       {
         region: 'Victoria',
         text: 'Victoria is on the traditional territory of the lək̓ʷəŋən (Lekwungen) peoples, the Songhees and Xʷsepsəm (Esquimalt) Nations. We also recognize the W̱SÁNEĆ peoples, whose relationships with this land continue today.',
-        image: {
-          ratio: '4 / 3',
-          label: 'Victoria',
-          note: 'Rocky shoreline and open ocean, with Garry oaks or arbutus if possible. No buildings.',
+        photo: {
+          src: swartzBayFerry,
+          alt: 'A pink and orange sky over calm water, between forested islands in silhouette.',
+          caption: 'Leaving Swartz Bay by ferry',
         },
       },
       {
         region: 'Vancouver',
         text: 'Vancouver is on the unceded traditional territories of the xʷməθkʷəy̓əm (Musqueam), Sḵwx̱wú7mesh (Squamish) and səlilwətaɬ (Tsleil-Waututh) Nations.',
-        image: {
-          ratio: '4 / 3',
-          label: 'Vancouver',
-          note: 'Coast mountains meeting the water, or a forest creek. No city skyline.',
+        photo: {
+          src: lynnValleyFalls,
+          alt: 'A waterfall pours through a narrow, rocky canyon between dense cedar and fir.',
+          caption: 'Lynn Valley, North Vancouver',
         },
       },
     ],

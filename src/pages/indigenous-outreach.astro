@@ -3,13 +3,13 @@
 // our land acknowledgement for all of BC, beside a natural map of the
 // province that gains a point for each school, Nation or band we work with.
 // Then a territorial acknowledgement for each place we are based, in rows
-// that alternate text and landscape image, then our commitments. It holds
+// that alternate text and a landscape photo, then our commitments. It holds
 // the site's only full land acknowledgement; the footer carries a short one
 // that links here. Copy is in content/outreach.ts. Drafts show a visible
 // [TK] marker until the outreach lead approves them.
 import { organization } from '../../content/organization';
+import { Picture } from 'astro:assets';
 import { outreach } from '../../content/outreach';
-import ImagePlaceholder from '../components/ImagePlaceholder.astro';
 import OutreachMap from '../components/OutreachMap.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
@@ -52,13 +52,24 @@ const formatMonth = (date: string) =>
     <section class="regions" aria-labelledby="regions">
       <h2 id="regions">{acknowledgement.regionsHeading}</h2>
       <ul>
-        {acknowledgement.regions.map(({ region, text, image }) => (
+        {acknowledgement.regions.map(({ region, text, photo }) => (
           <li>
             <div class="region-text">
               <h3>{region}</h3>
               <p>{text}</p>
             </div>
-            <ImagePlaceholder {...image} />
+            <figure class="region-photo">
+              <Picture
+                class="photo"
+                src={photo.src}
+                alt={photo.alt}
+                formats={['avif', 'webp']}
+                quality={50}
+                widths={[480, 720, 960, 1280]}
+                sizes="(min-width: 56rem) 40rem, calc(100vw - 2.5rem)"
+              />
+              <figcaption>{photo.caption}</figcaption>
+            </figure>
           </li>
         ))}
       </ul>
@@ -171,6 +182,25 @@ const formatMonth = (date: string) =>
 
   .regions li:nth-child(even) .region-text {
     order: 2;
+  }
+
+  .region-photo {
+    margin: 0;
+  }
+
+  .region-photo :global(.photo) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  .region-photo figcaption {
+    margin-block-start: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
   }
 
   .regions h3 {

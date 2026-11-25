@@ -1,18 +1,26 @@
 // Schema for the Indigenous outreach page (content/outreach.ts, SPEC 7.9).
-// The page heading, description and lede are in
-// content/pages/indigenous-outreach.md.
+// The page title and description are in content/pages/indigenous-outreach.md.
+import type { ImageMetadata } from 'astro';
 import { z } from 'astro/zod';
 
 /**
- * Labelled image slot. Original photography only (SPEC rule 8); until it
- * exists the page shows a placeholder at this ratio with the note.
+ * A landscape photo of a region, imported from src/assets/photos/ so the
+ * build can resize it. Original photography only (SPEC rule 8), of the
+ * natural environment rather than the built one. Shown at 3:2.
  */
-const imageSlotSchema = z.strictObject({
-  /** CSS aspect ratio, e.g. "4 / 3". */
-  ratio: z.string().regex(/^\d+ \/ \d+$/, 'Use a ratio like "4 / 3"'),
-  label: z.string().min(1),
-  /** One-line art-direction note: the natural environment, not buildings. */
-  note: z.string().min(1),
+const photoSchema = z.strictObject({
+  src: z.custom<ImageMetadata>(
+    (value) =>
+      typeof value === 'object' &&
+      value !== null &&
+      'src' in value &&
+      'width' in value &&
+      'height' in value,
+    { message: 'photo.src must be an imported image from src/assets/' },
+  ),
+  alt: z.string().min(1),
+  /** Where it was taken, shown under the photo. */
+  caption: z.string().min(1),
 });
 
 /**
@@ -54,7 +62,7 @@ export const outreachSchema = z.strictObject({
           region: z.string().min(1),
           /** The acknowledgement, naming the Nations in their own spelling. */
           text: z.string().min(1),
-          image: imageSlotSchema,
+          photo: photoSchema,
         }),
       )
       .min(1),
