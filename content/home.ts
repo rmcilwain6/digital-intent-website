@@ -1,6 +1,7 @@
 // Home page sections (SPEC 7.1, record 0004). Copy marked `draft: true` is an
 // agent draft built only from ideas in the spec. It shows a visible [TK]
 // marker until a human approves it and sets `draft: false`.
+import { brand } from '../src/brand/brand.config';
 import { homeSchema } from '../src/schemas/home';
 
 export const home = homeSchema.parse({
@@ -167,13 +168,26 @@ export const home = homeSchema.parse({
       draft: false,
     },
 
-    teachers: {
-      heading: 'For teachers',
+    // The Teacher Library band (#61): one library card is the call to
+    // action. Booking a call stays with the hero's teachers card.
+    library: {
+      heading: `The ${brand.shortName} Teacher Library`,
       body: [
-        'We work with teachers, school leaders and district staff. We offer Pro-D sessions, workshops and school visits.',
-        'Whether you teach in BC or somewhere else, we would like to hear from you.',
+        'We want to be a place teachers come back to: for tips, lessons and training materials that build your own skills with digital technology, so you can bring them into your class.',
+        'Everything in it is free to use, change and share. There are no due dates. Take what helps and make it fit your students.',
+        'We add to the library as we go. It starts with a lesson or two, and grows.',
       ],
-      cta: { label: 'What we offer teachers', href: '/teachers/' },
+      card: {
+        kind: 'library card',
+        name: 'Teacher Library',
+        note: 'open to everyone · cc by 4.0',
+        holder: 'You',
+        holderLabel: 'cardholder',
+        // Made up: a library card number, drawn as a barcode.
+        number: '2 9412 00026 0001',
+        action: 'Browse the Teacher Library',
+        href: '/teachers/#library',
+      },
       draft: false,
     },
 
@@ -207,12 +221,12 @@ export const home = homeSchema.parse({
     },
   },
 
-  // Teachers above Valleyview is a lean, not settled (D30).
+  // The library (for teachers) above Valleyview is a lean, not settled (D30).
   order: [
     'problem',
     'mission',
     'map',
-    'teachers',
+    'library',
     'valleyview',
     'outreach',
     'partnerships',

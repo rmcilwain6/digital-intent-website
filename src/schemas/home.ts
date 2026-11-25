@@ -68,6 +68,41 @@ const whyWeExist = z.strictObject({
 });
 
 /**
+ * The Teacher Library band: heading and copy, and one library card that is
+ * the band's only call to action (#61).
+ */
+const librarySection = z.strictObject({
+  heading: z.string().min(1),
+  body: z.array(z.string().min(1)).min(1),
+  card: z.strictObject({
+    /** Mono label at the card's top right. */
+    kind: z.string().min(1),
+    /** The library's name, as printed on the card. */
+    name: z.string().min(1),
+    /** A short mono line under the name. */
+    note: z.string().min(1),
+    /** Written on the signature line. */
+    holder: z.string().min(1),
+    /** Printed under the signature line. */
+    holderLabel: z.string().min(1),
+    /** A made-up card number, digits in groups. The barcode is drawn from it. */
+    number: z
+      .string()
+      .regex(/^\d+( \d+)*$/, 'Digits in groups, like 2 9412 0001'),
+    /** The link text under the card. */
+    action: z.string().min(1),
+    /** A site path, optionally to a section on it (/teachers/#library). */
+    href: z
+      .string()
+      .regex(
+        /^\/([a-z0-9-]+\/)*(#[a-z0-9-]+)?$/,
+        'Use a site path like /teachers/ or /teachers/#library',
+      ),
+  }),
+  draft: z.boolean(),
+});
+
+/**
  * One thing we are doing under a pillar. `title` may be a `[TK: ...]` note
  * while we decide what goes there.
  */
@@ -121,7 +156,7 @@ export const sectionKeys = [
   'problem',
   'mission',
   'map',
-  'teachers',
+  'library',
   'valleyview',
   'outreach',
   'partnerships',
@@ -192,7 +227,7 @@ export const homeSchema = z.strictObject({
     problem: whyWeExist,
     mission: whatWeDo,
     map: section.extend({ regionsHeading: z.string().min(1) }),
-    teachers: section,
+    library: librarySection,
     valleyview: section.extend({ questionsHeading: z.string().min(1) }),
     outreach: section,
     partnerships: section,

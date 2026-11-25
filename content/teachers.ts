@@ -25,7 +25,8 @@ export const teachers = teachersSchema.parse({
   },
 
   lessons: {
-    heading: 'Lessons to use',
+    // Matches the library card on Home, which links here (#61).
+    heading: 'Teacher Library',
     intro:
       'Lessons we have written for teachers. Download them, use them, change them to fit your class. They are free, and shared under CC BY 4.0. When we improve a lesson we publish a new version, and earlier versions stay here.',
     items: [

@@ -1,0 +1,237 @@
+---
+// The Teacher Library's library card (#61): a card that reads like a real
+// library card, with our wordmark, the library's name, a signature line, and
+// a barcode drawn from a made-up card number. The card and the line under it
+// are one link to the library.
+//
+// Nothing moves or animates. The card is decorative for screen readers, so
+// the link's name is the line under it, which contains the visible name on
+// the card.
+import { brand } from '../../brand/brand.config';
+import type { Home } from '../../schemas/home';
+
+interface Props {
+  card: Home['sections']['library']['card'];
+}
+
+const { card } = Astro.props;
+
+// The barcode. Each digit sets the widths of two bars and the gaps after
+// them, between start and stop guards, so the bars always follow the number.
+// It is not a real symbology and does not scan.
+const bars: { x: number; width: number }[] = [];
+let length = 0;
+const bar = (width: number, gap: number) => {
+  bars.push({ x: length, width });
+  length += width + gap;
+};
+bar(1, 1);
+bar(1, 1);
+for (const digit of card.number.replace(/ /g, '')) {
+  const d = Number(digit);
+  bar(1 + (d % 3), 1 + ((d + 1) % 2));
+  bar(1 + ((d >> 1) % 2), 2 + (d % 2));
+}
+bar(1, 1);
+bar(1, 0);
+---
+
+<div class="library-card">
+  <a class="go" href={card.href}>
+    <span class="card" aria-hidden="true">
+      <span class="head">
+        <img
+          class="logo"
+          src={brand.logo.full}
+          width={brand.logo.width}
+          height={brand.logo.height}
+          alt=""
+        />
+        <span class="kind">{card.kind}</span>
+      </span>
+      <span class="rule"></span>
+      <span class="middle">
+        <span>
+          <span class="name">{card.name}</span>
+          <span class="note">{card.note}</span>
+        </span>
+        <span class="holder">
+          <span class="signature">{card.holder}</span>
+          <span class="holder-label">{card.holderLabel}</span>
+        </span>
+      </span>
+      <span class="code">
+        <svg
+          class="bars"
+          viewBox={`0 0 ${length} 40`}
+          preserveAspectRatio="none"
+          focusable="false"
+        >
+          {bars.map((b) => (
+            <rect x={b.x} y="0" width={b.width} height="40" />
+          ))}
+        </svg>
+        <span class="number">
+          {card.number.split(' ').map((group) => (
+            <span>{group}</span>
+          ))}
+        </span>
+      </span>
+    </span>
+    <span class="action">
+      {card.action} <span aria-hidden="true">→</span>
+    </span>
+  </a>
+</div>
+
+<style>
+  /* The card's size follows the space it has, up to 21px type; every size
+     inside it is in em. */
+  .library-card {
+    container-type: inline-size;
+    display: flex;
+    justify-content: center;
+  }
+
+  .go {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .go:focus-visible {
+    outline: none;
+  }
+
+  .go:focus-visible .card {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    inline-size: 26.25em;
+    block-size: 16.5em;
+    padding: 0.875em 1.375em;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-card);
+    box-shadow: 0 0.75em 1.25em -0.875em
+      color-mix(in srgb, var(--color-text) 35%, transparent);
+    font-size: min(1.3125rem, calc(100cqi / 26.25));
+    line-height: var(--leading-tight);
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    block-size: 1.75em;
+  }
+
+  /* Never below the wordmark's minimum width of 96px (design system). */
+  .logo {
+    display: block;
+    inline-size: auto;
+    block-size: max(1.55em, 1.525rem);
+  }
+
+  .kind {
+    font-family: var(--font-mono);
+    font-size: 0.75em;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .rule {
+    block-size: 2px;
+    margin: 0.625em -1.375em 0.75em;
+    background: var(--color-marker);
+  }
+
+  .middle {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1em;
+  }
+
+  .name {
+    display: block;
+    font-size: 1.5em;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.15;
+  }
+
+  .note,
+  .holder-label,
+  .number {
+    font-family: var(--font-mono);
+    color: var(--color-text-muted);
+  }
+
+  .note {
+    display: block;
+    margin-block-start: 0.3em;
+    font-size: 0.6875em;
+  }
+
+  .holder {
+    flex: none;
+    inline-size: 8.5em;
+  }
+
+  .signature {
+    display: block;
+    padding-inline-start: 0.2em;
+    border-block-end: var(--border-width) solid var(--color-border);
+    font-size: 1.375em;
+    font-style: italic;
+    line-height: 1.35;
+  }
+
+  .holder-label {
+    display: block;
+    margin-block-start: 0.2em;
+    font-size: 0.625em;
+    letter-spacing: 0.06em;
+  }
+
+  .code {
+    margin-block-start: auto;
+  }
+
+  .bars {
+    display: block;
+    inline-size: 100%;
+    block-size: 3em;
+    fill: var(--color-text);
+  }
+
+  .number {
+    display: flex;
+    justify-content: space-between;
+    margin-block-start: 0.3em;
+    color: var(--color-text);
+    font-size: 0.75em;
+  }
+
+  .action {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-bold);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  .go:hover .action,
+  .go:focus-visible .action {
+    text-decoration-thickness: 2px;
+  }
+</style>

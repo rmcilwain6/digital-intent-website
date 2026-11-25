@@ -9,6 +9,7 @@ import { brand } from '../brand/brand.config';
 import BcMap from '../components/BcMap.astro';
 import HomeHero from '../components/home/HomeHero.astro';
 import HomeSection from '../components/home/HomeSection.astro';
+import LibrarySection from '../components/home/LibrarySection.astro';
 import QuestionBreak from '../components/home/QuestionBreak.astro';
 import WhatWeDo from '../components/home/WhatWeDo.astro';
 import WhyWeExist from '../components/home/WhyWeExist.astro';
@@ -31,6 +32,15 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
     if (key === 'problem') {
       return (
         <WhyWeExist id={key} section={sections.problem} tone={tone(index)} />
+      );
+    }
+    if (key === 'library') {
+      return (
+        <LibrarySection
+          id={key}
+          section={sections.library}
+          tone={tone(index)}
+        />
       );
     }
     if (key === 'mission') {
