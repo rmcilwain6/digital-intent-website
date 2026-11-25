@@ -37,9 +37,10 @@ export const site = siteSchema.parse({
   ],
   // Draft wording, pending approval by the outreach lead (decision record 0007).
   acknowledgement: {
-    text: 'We are grateful to live, work and play in British Columbia, on the lands of the many First Nations who have cared for them since time immemorial, much of it unceded.',
+    // Matches the opening of the outreach page's acknowledgement.
+    text: 'We are grateful to live, work and play in British Columbia, the land of many First Nations who have cared for it since time immemorial.',
     link: {
-      label: 'Our commitment to reconciliation and Indigenous outreach',
+      label: 'Our land acknowledgement and commitments',
       href: '/indigenous-outreach/',
     },
   },
