@@ -4,6 +4,8 @@
 // content/organization.ts; the section order is data (D30). The <title> is
 // the organization name alone.
 import { home } from '../../content/home';
+import { site } from '../../content/site';
+import { regionDistricts } from '../../content/team';
 import { valleyview } from '../../content/valleyview';
 import { brand } from '../brand/brand.config';
 import BcMap from '../components/BcMap.astro';
@@ -14,6 +16,7 @@ import QuestionBreak from '../components/home/QuestionBreak.astro';
 import WhatWeDo from '../components/home/WhatWeDo.astro';
 import WhyWeExist from '../components/home/WhyWeExist.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { district } from '../lib/map';
 import { getPage } from '../lib/pages';
 
 const page = await getPage('home');
@@ -60,17 +63,29 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
         tone={tone(index)}
       >
         {key === 'map' && (
-          <div class="map-layout">
-            <div>
-              <h3>{sections.map.regionsHeading}</h3>
-              <ul>
-                {brand.regions.map((region) => (
-                  <li>{region}</li>
-                ))}
-              </ul>
-            </div>
-            <BcMap />
+          <div class="regions">
+            <h3>{sections.map.regionsHeading}</h3>
+            <ul>
+              {brand.regions.map((region) => (
+                <li>
+                  <strong>{region}</strong>
+                  <span class="districts">
+                    {(regionDistricts[region] ?? [])
+                      .map((n) => `SD\u00a0${n} ${district(n).name}`)
+                      .join(', ')}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
+        )}
+        {key === 'map' && (
+          <BcMap
+            slot="aside"
+            caption={sections.map.mapCaption}
+            insetLabel={sections.map.insetLabel}
+            credit={site.districtMapCredit}
+          />
         )}
 
         {key === 'valleyview' && (
@@ -91,15 +106,39 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
 </BaseLayout>
 
 <style>
-  .map-layout {
-    display: grid;
-    gap: var(--space-6);
-    align-items: start;
+  .regions h3 {
+    margin-block: var(--space-6) var(--space-3);
   }
 
-  @media (min-width: 48rem) {
-    .map-layout {
-      grid-template-columns: 1fr 2fr;
-    }
+  .regions ul {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* A pen-red dot per region, matching the map, so the list reads as its key. */
+  .regions li {
+    position: relative;
+    padding-inline-start: var(--space-5);
+  }
+
+  .regions li::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.55em;
+    inline-size: 0.625rem;
+    block-size: 0.625rem;
+    border-radius: 50%;
+    background: var(--color-marker);
+  }
+
+  .districts {
+    display: block;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
   }
 </style>

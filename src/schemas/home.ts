@@ -226,7 +226,13 @@ export const homeSchema = z.strictObject({
   sections: z.strictObject({
     problem: whyWeExist,
     mission: whatWeDo,
-    map: section.extend({ regionsHeading: z.string().min(1) }),
+    map: section.extend({
+      regionsHeading: z.string().min(1),
+      /** Under the map: how to read it. */
+      mapCaption: z.string().min(1),
+      /** Mono label on the close-up of the southwest. */
+      insetLabel: z.string().min(1),
+    }),
     library: librarySection,
     valleyview: section.extend({ questionsHeading: z.string().min(1) }),
     outreach: section,
