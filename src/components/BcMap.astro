@@ -311,30 +311,22 @@ const label =
   }
 
   /*
-   * A narrow map (phones, or stacked below the text): it is drawn small, so
-   * labels are larger in map units, and the close-up sits below the map at
-   * full width. Sized on the map's own width, not the screen's.
+   * A narrow map (phones, or stacked below the text), sized on the map's own
+   * width, not the screen's. The map is drawn small, so its labels are larger
+   * in map units. The close-up moves below the map at about the size it has
+   * on desktop, so its labels keep their desktop sizes. The side-by-side
+   * layout never gets this narrow (its map is at least 35rem).
    */
-  @container (max-width: 40rem) {
+  @container (max-width: 34rem) {
     .sheet {
-      --label-size: 28px;
-      --scale-size: 24px;
+      --label-size: 32px;
+      --scale-size: 26px;
     }
 
     .inset {
       position: static;
-      inline-size: 100%;
+      inline-size: min(100%, 16rem);
       margin-block-start: var(--space-4);
-    }
-
-    .inset .region text {
-      font-size: 4px;
-      stroke-width: 1.2px;
-    }
-
-    .inset .number {
-      font-size: 3.4px;
-      stroke-width: 1px;
     }
 
     figcaption {
@@ -342,21 +334,11 @@ const label =
     }
   }
 
-  /* Phones: smaller again, so labels grow again in map units. */
+  /* Phones: smaller again, so the main map's labels grow again in map units. */
   @container (max-width: 26rem) {
     .sheet {
       --label-size: 44px;
       --scale-size: 36px;
-    }
-
-    .inset .region text {
-      font-size: 6px;
-      stroke-width: 2px;
-    }
-
-    .inset .number {
-      font-size: 5px;
-      stroke-width: 1.6px;
     }
   }
 </style>

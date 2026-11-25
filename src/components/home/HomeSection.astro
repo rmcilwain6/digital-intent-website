@@ -85,7 +85,7 @@ const hasAside = aside.trim() !== '';
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-7) var(--space-8);
-    align-items: center;
+    align-items: start;
   }
 
   .split .main {
@@ -100,12 +100,19 @@ const hasAside = aside.trim() !== '';
   }
 
   /*
-   * Once the aside wraps below the text (main 20rem + gap 4rem + aside
-   * 35rem), keep it to a modest width instead of letting it fill the band.
+   * Side by side (main 20rem + gap 4rem + aside 35rem): the aside starts just
+   * above the heading, so the top of the map sits a touch higher than it.
    */
+  @container (min-width: 59rem) {
+    .split .aside {
+      margin-block-start: calc(-1 * var(--space-4));
+    }
+  }
+
+  /* Stacked below the text: keep the aside modest instead of filling the band. */
   @container (max-width: 58.99rem) {
     .split .aside {
-      max-inline-size: 36rem;
+      max-inline-size: 28rem;
     }
   }
 
