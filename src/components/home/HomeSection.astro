@@ -21,7 +21,11 @@ interface Props {
 
 const { id, heading, lead, body, cta, draft, tone } = Astro.props;
 const headingId = `${id}-heading`;
-const hasAside = Astro.slots.has('aside');
+// Render the aside rather than trusting Astro.slots.has: Home passes the map
+// as `{key === 'map' && <BcMap slot="aside" />}`, and Astro registers that
+// slot on every section in the loop, even where it renders nothing.
+const aside = await Astro.slots.render('aside');
+const hasAside = aside.trim() !== '';
 ---
 
 <section class:list={['band', tone]} aria-labelledby={headingId}>
@@ -40,7 +44,7 @@ const hasAside = Astro.slots.has('aside');
       </div>
       {hasAside && (
         <div class="aside">
-          <slot name="aside" />
+          <Fragment set:html={aside} />
         </div>
       )}
     </div>
@@ -77,6 +81,7 @@ const hasAside = Astro.slots.has('aside');
   }
 
   .split {
+    container-type: inline-size;
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-7) var(--space-8);
@@ -92,6 +97,16 @@ const hasAside = Astro.slots.has('aside');
   .split .aside {
     flex: 999 1 35rem;
     min-width: 0;
+  }
+
+  /*
+   * Once the aside wraps below the text (main 20rem + gap 4rem + aside
+   * 35rem), keep it to a modest width instead of letting it fill the band.
+   */
+  @container (max-width: 58.99rem) {
+    .split .aside {
+      max-inline-size: 36rem;
+    }
   }
 
   .cta-row {

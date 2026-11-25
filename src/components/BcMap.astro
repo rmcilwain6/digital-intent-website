@@ -18,6 +18,7 @@ import {
   map,
   placePoint,
   scaleBarKm,
+  union,
 } from '../lib/map';
 
 interface Props {
@@ -43,6 +44,11 @@ const inset: Box = {
   width: insetWidth,
   height: insetHeight,
 };
+// The main map's frame: the province, stretched just enough to show the
+// close-up's frame whole (it reaches a little past the province's southern
+// edge), plus room for the frame's stroke.
+const sheetFrame = union([bcFrame], [[inset.x, inset.y + inset.height + 2]]);
+
 const inInset = ([x, y]: [number, number], margin = 0) =>
   x > inset.x + margin &&
   x < inset.x + inset.width - margin &&
@@ -103,7 +109,7 @@ const label =
 
 <figure class="bc-map">
   <div class="sheet" role="img" aria-label={label}>
-    <svg viewBox={box(bcFrame)} aria-hidden="true" focusable="false">
+    <svg viewBox={box(sheetFrame)} aria-hidden="true" focusable="false">
       <path class="land" d={map.bc}></path>
       <path class="district-lines" d={map.districtLines}></path>
       {outline(map.districts).map((d) => (
@@ -178,6 +184,7 @@ const label =
 
 <style>
   .bc-map {
+    container-type: inline-size;
     max-inline-size: 48rem;
     margin: 0 0 0 auto;
   }
@@ -304,13 +311,14 @@ const label =
   }
 
   /*
-   * Phones: the map is drawn small, so labels are larger in map units, and
-   * the close-up sits below the map at full width.
+   * A narrow map (phones, or stacked below the text): it is drawn small, so
+   * labels are larger in map units, and the close-up sits below the map at
+   * full width. Sized on the map's own width, not the screen's.
    */
-  @media (max-width: 40rem) {
+  @container (max-width: 40rem) {
     .sheet {
-      --label-size: 44px;
-      --scale-size: 36px;
+      --label-size: 28px;
+      --scale-size: 24px;
     }
 
     .inset {
@@ -320,15 +328,35 @@ const label =
     }
 
     .inset .region text {
-      font-size: 6px;
+      font-size: 4px;
+      stroke-width: 1.2px;
     }
 
     .inset .number {
-      font-size: 5px;
+      font-size: 3.4px;
+      stroke-width: 1px;
     }
 
     figcaption {
       padding-inline-start: 0;
+    }
+  }
+
+  /* Phones: smaller again, so labels grow again in map units. */
+  @container (max-width: 26rem) {
+    .sheet {
+      --label-size: 44px;
+      --scale-size: 36px;
+    }
+
+    .inset .region text {
+      font-size: 6px;
+      stroke-width: 2px;
+    }
+
+    .inset .number {
+      font-size: 5px;
+      stroke-width: 1.6px;
     }
   }
 </style>
