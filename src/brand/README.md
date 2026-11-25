@@ -8,15 +8,15 @@ Changes here need approval from a person (AGENTS.md).
 
 ## Files
 
-| File                     | What it holds                                                                                          |
-| ------------------------ | ------------------------------------------------------------------------------------------------------ |
-| `brand.config.ts`        | Name, contact details, regions, paths to logo and images                                               |
-| `tokens.css`             | Colours (Analog and Digital), type, spacing, layout, shape, motion                                     |
-| `fonts.css`              | `@font-face` rules for self-hosted fonts                                                               |
-| `fonts/`                 | Font files and their licences                                                                          |
-| `brand.css`              | Imports `fonts.css` and `tokens.css`; layouts import this file                                         |
-| `public/brand/`          | `logo.svg`, `logo-on-dark.svg`, `logo-mark.svg`, `favicon.svg`, `og-default.png`, `scanner-cursor.svg` |
-| `/fixtures/orthography/` | Page that renders the SPEC section 6 sample strings in every weight                                    |
+| File                     | What it holds                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| `brand.config.ts`        | Name, contact details, regions, paths to logo and images                         |
+| `tokens.css`             | Colours (Analog and Digital), type, spacing, layout, shape, motion               |
+| `fonts.css`              | `@font-face` rules for self-hosted fonts                                         |
+| `fonts/`                 | Font files and their licences                                                    |
+| `brand.css`              | Imports `fonts.css` and `tokens.css`; layouts import this file                   |
+| `public/brand/`          | `logo.svg`, `logo-on-dark.svg`, `logo-mark.svg`, `favicon.svg`, `og-default.png` |
+| `/fixtures/orthography/` | Page that renders the SPEC section 6 sample strings in every weight              |
 
 ## Config values (`brand.config.ts`)
 
@@ -107,12 +107,6 @@ Any font must render the orthography fixture correctly (SPEC section 6). If you 
 | `--focus-width`, `--focus-offset`           | Focus outline size and gap      |
 | `--cursor-width`, `--cursor-height`         | The thin cursor, in em          |
 | `--cursor-gap`, `--cursor-drop`             | Gap before it, drop below line  |
-
-### Cursor
-
-| Token              | Use                                                                                                                       |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `--cursor-scanner` | Barcode-scanner cursor over the Teacher Library card on Home (`public/brand/scanner-cursor.svg`, 48 × 48, hotspot 24, 40) |
 
 ### Motion
 

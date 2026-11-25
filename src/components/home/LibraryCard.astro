@@ -4,10 +4,9 @@
 // a barcode drawn from a made-up card number. The card and the line under it
 // are one link to the library.
 //
-// Over the card the cursor becomes a barcode scanner (--cursor-scanner),
-// with the usual pointer as the fallback. Nothing moves or animates. The card
-// is decorative for screen readers, so the link's name is the line under it,
-// which contains the visible name on the card.
+// Nothing moves or animates. The card is decorative for screen readers, so
+// the link's name is the line under it, which contains the visible name on
+// the card.
 import { brand } from '../../brand/brand.config';
 import type { Home } from '../../schemas/home';
 
@@ -126,7 +125,6 @@ bar(1, 0);
       color-mix(in srgb, var(--color-text) 35%, transparent);
     font-size: min(1.3125rem, calc(100cqi / 26.25));
     line-height: var(--leading-tight);
-    cursor: var(--cursor-scanner);
   }
 
   .head {
