@@ -264,7 +264,7 @@ Helpful, on-brand, links to Home and Contact.
 - The page is honest that we have little to show yet, and says that understanding what Indigenous schools and learners need is an intentional focus.
 - Copy comes from the team member leading this work, or is drafted from their notes and approved by them (section 12.5). The Nations to name are drafted from the standard public acknowledgement for each place and confirmed by that person, never filled in from a dataset or a guess.
 - The map starts empty. An Indigenous school, Nation or band is added as a point once we have worked with them, with their agreement. Points mark a place, never Nation boundaries. No dataset of First Nations schools is loaded to fill it in (R6). Community names, languages and logos appear only with the community's agreement.
-- Home links to it (section 7.1). Not in the primary navigation until the copy is approved; the footer acknowledgement links to it.
+- Home links to it (section 7.1). It is in the footer's list of pages and the phone menu, but not the wide-screen header; the footer acknowledgement also links to it.
 
 ### 7.10 Phase 3 pages
 

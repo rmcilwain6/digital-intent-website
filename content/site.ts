@@ -8,6 +8,11 @@ export const site = siteSchema.parse({
     { label: 'About', href: '/about/' },
     { label: 'Our team', href: '/team/' },
     { label: 'Valleyview Grant', href: '/valleyview/', featured: true },
+    {
+      label: 'Indigenous outreach',
+      href: '/indigenous-outreach/',
+      phoneOnly: true,
+    },
     { label: 'Contact', href: '/contact/' },
   ],
   footerNav: [
@@ -15,6 +20,7 @@ export const site = siteSchema.parse({
     { label: 'About', href: '/about/' },
     { label: 'Our team', href: '/team/' },
     { label: 'Valleyview Grant', href: '/valleyview/' },
+    { label: 'Indigenous outreach', href: '/indigenous-outreach/' },
     { label: 'Contact', href: '/contact/' },
     { label: 'Privacy', href: '/privacy/' },
   ],

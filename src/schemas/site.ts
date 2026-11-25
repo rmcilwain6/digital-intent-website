@@ -14,6 +14,11 @@ const internalLink = z.strictObject({
 const navLink = internalLink.extend({
   /** Takes the full-width key in the phone menu. One item at most. */
   featured: z.boolean().optional(),
+  /**
+   * Shown in the phone menu (and the 404 page's list) but not in the
+   * wide-screen header, which has room for only a few pages.
+   */
+  phoneOnly: z.boolean().optional(),
 });
 
 const nextStop = internalLink.extend({
