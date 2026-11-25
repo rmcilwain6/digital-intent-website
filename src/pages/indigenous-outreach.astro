@@ -7,6 +7,7 @@
 // the site's only full land acknowledgement; the footer carries a short one
 // that links here. Copy is in content/outreach.ts. Drafts show a visible
 // [TK] marker until the outreach lead approves them.
+import { organization } from '../../content/organization';
 import { outreach } from '../../content/outreach';
 import ImagePlaceholder from '../components/ImagePlaceholder.astro';
 import OutreachMap from '../components/OutreachMap.astro';
@@ -15,6 +16,10 @@ import { getPage } from '../lib/pages';
 
 const page = await getPage('indigenous-outreach');
 const { acknowledgement, map, commitments } = outreach;
+const pillar = organization.pillars[commitments.pillar.number - 1];
+if (!pillar) {
+  throw new Error(`No pillar ${commitments.pillar.number} in organization.ts`);
+}
 
 const draftMarker = '[TK: draft copy, needs human approval]';
 
@@ -79,14 +84,21 @@ const formatMonth = (date: string) =>
     )}
 
     <section class="commitments" aria-labelledby="commitments">
-      <h2 id="commitments">{commitments.heading}</h2>
-      {commitments.draft && <p class="draft-marker">{draftMarker}</p>}
-      <p class="foundation">{commitments.foundation}</p>
-      <ul>
-        {commitments.items.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
+      <div class="commitments-list">
+        <h2 id="commitments">{commitments.heading}</h2>
+        {commitments.draft && <p class="draft-marker">{draftMarker}</p>}
+        <ol>
+          {commitments.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ol>
+      </div>
+
+      <aside class="pillar" aria-label={commitments.pillar.label}>
+        <p class="pillar-label">{commitments.pillar.label}</p>
+        <p class="pillar-title">{pillar}</p>
+        <p>{commitments.foundation}</p>
+      </aside>
     </section>
   </article>
 </BaseLayout>
@@ -195,39 +207,68 @@ const formatMonth = (date: string) =>
     font-size: var(--text-sm);
   }
 
+  /* The list on the left; the pillar it falls under across from it. */
   .commitments {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-7);
+    align-items: start;
     margin-block-start: var(--space-8);
     padding-block-start: var(--space-7);
     border-block-start: var(--border-width) solid var(--color-border);
   }
 
-  /* Face-to-face relationships come first and carry the most weight. */
-  .foundation {
-    max-inline-size: 40ch;
-    margin: var(--space-6) auto var(--space-7);
-    font-size: var(--text-xl);
-    line-height: var(--leading-tight);
-    text-align: center;
-  }
-
-  .commitments ul {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5) var(--space-7);
+  .commitments ol {
     margin: 0;
     padding: 0;
     list-style: none;
+    counter-reset: commitment;
   }
 
   .commitments li {
-    padding-block-start: var(--space-3);
+    counter-increment: commitment;
+    display: grid;
+    grid-template-columns: 3ch minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-block: var(--space-4);
     border-block-start: var(--border-width) solid var(--color-accent);
     max-inline-size: var(--width-prose);
   }
 
+  .commitments li::before {
+    content: counter(commitment, decimal-leading-zero);
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+
+  .pillar {
+    padding: var(--space-5);
+    border-inline-start: var(--border-width) solid var(--color-accent);
+  }
+
+  .pillar p {
+    margin: 0;
+  }
+
+  .pillar-label {
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .pillar .pillar-title {
+    margin-block: var(--space-2) var(--space-4);
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--leading-tight);
+  }
+
   @media (width < 56rem) {
     .acknowledgement,
-    .regions li {
+    .regions li,
+    .commitments {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-5);
     }
@@ -235,12 +276,6 @@ const formatMonth = (date: string) =>
     /* Stacked, every region reads name and text first, then the image. */
     .regions li:nth-child(even) .region-text {
       order: 0;
-    }
-  }
-
-  @media (width < 40rem) {
-    .commitments ul {
-      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

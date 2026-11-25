@@ -68,7 +68,12 @@ export const outreachSchema = z.strictObject({
   }),
   commitments: z.strictObject({
     heading: z.string().min(1),
-    /** The commitment everything else rests on, shown first and largest. */
+    /** The strategic pillar this work falls under (content/organization.ts). */
+    pillar: z.strictObject({
+      number: z.number().int().min(1),
+      label: z.string().min(1),
+    }),
+    /** What the work rests on, shown under the pillar. */
     foundation: z.string().min(1),
     items: z.array(z.string().min(1)).min(1),
     draft: z.boolean(),

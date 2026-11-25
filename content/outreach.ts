@@ -60,13 +60,15 @@ export const outreach = outreachSchema.parse({
 
   commitments: {
     heading: 'Our commitments',
+    // The pillar's wording comes from content/organization.ts.
+    pillar: { number: 2, label: 'Pillar 2 of our mission' },
     foundation:
-      'Build lasting, face-to-face relationships with Indigenous schools and communities. This is the foundation of everything else on this page. We start near where we live, and we listen before we start any project.',
+      'Our outreach with Indigenous communities falls under this pillar. Its foundation is lasting, face-to-face relationships with Indigenous schools and communities. We start near where we live, and we listen before we start any project.',
     items: [
       'Offer guidance on digital technology to Indigenous communities that ask for it, to support their own teaching and learning.',
       "Work on each community's terms. We use a community's name, language or logo only with its agreement, and we follow its wishes on privacy, data and the use of AI.",
-      'Seek out Indigenous perspectives on how technology comes into classrooms and communities, so that it is done in a way that is sustainable and respects the land. Where communities want them shared, help those voices reach teachers across BC. This includes seeking Indigenous representation on our board.',
-      'Set quarterly objectives for this work, and report on them, and on what we have done, on this page.',
+      'Seek out Indigenous perspectives on how technology comes into classrooms and communities, so that it comes in a sustainable way. Where communities want their perspectives amplified, help those voices reach teachers across BC. Seek Indigenous representation on our board.',
+      'Set quarterly objectives for our outreach with Indigenous communities. Report on them, and on what we have done, by updating this page.',
     ],
     draft: true,
   },
