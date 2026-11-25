@@ -89,11 +89,71 @@ export const home = homeSchema.parse({
       draft: false,
     },
 
+    // The mission and the pillars are in content/organization.ts, shared with
+    // About. `focus` follows the pillars' order. Its items are stand-ins
+    // built from pages we have; Reed will choose the real ones (Nov 24).
     mission: {
       heading: 'What we do',
-      body: ['Our work rests on four pillars, set by our board.'],
-      cta: { label: 'Our mission and how we work', href: '/about/' },
-      draft: false,
+      focusHeading: 'What we focus on',
+      labels: { now: 'Now', next: 'In the works' },
+      focus: [
+        {
+          highlight: 'independent',
+          now: {
+            title: 'This website',
+            text: 'Built the way we think technology should be: fast, accessible and private, with no tracking and no cookies.',
+            cta: { label: 'How we handle privacy', href: '/privacy/' },
+          },
+          next: {
+            title: 'Our positions, published in the open',
+            text: '[TK: our first published position, once the board signs off]',
+          },
+        },
+        {
+          highlight: 'face-to-face',
+          now: {
+            title: 'Partnerships across BC',
+            text: 'Whether you teach, lead a school or run a community group, we would like to hear from you.',
+            cta: { label: 'Get in touch', href: '/contact/' },
+          },
+          next: {
+            title: 'Book a call with us',
+            text: '[TK: when teachers can book a call]',
+          },
+        },
+        {
+          highlight: 'shape',
+          now: {
+            title: 'Lessons for teachers',
+            text: 'Free lessons to download, use and change to fit your class.',
+            cta: { label: 'What we offer teachers', href: '/teachers/' },
+          },
+          next: {
+            title: 'Technology camps, with the Big Little Science Centre',
+            text: '[TK: what the camps are, who they are for, and when they run]',
+          },
+        },
+        {
+          highlight: 'now',
+          now: {
+            title: 'The Valleyview Social Innovation Grant',
+            text: 'For Grade 12 students at Valleyview who have an idea and want to build it now.',
+            cta: { label: 'Read about the grant', href: '/valleyview/' },
+          },
+          next: {
+            title: '[TK: what comes next for this pillar]',
+          },
+        },
+      ],
+      controls: {
+        label: 'Choose a focus',
+        previous: 'Previous focus',
+        next: 'Next focus',
+      },
+      cta: { label: 'More about our mission', href: '/about/' },
+      approach:
+        'There is no single fix for any of this. We expect to try many things at once: workshops for teachers, school visits, grants for students, and partnerships across the province. Then we keep what works.',
+      draft: true,
     },
 
     map: {

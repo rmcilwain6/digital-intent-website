@@ -4,7 +4,6 @@
 // portrait photo that stays in view on tall screens, then our story across
 // the full width. Copy is in content/.
 import { Picture } from 'astro:assets';
-import { render } from 'astro:content';
 import { about } from '../../content/about';
 import { organization } from '../../content/organization';
 import { brand } from '../brand/brand.config';
@@ -14,7 +13,6 @@ import { getPage } from '../lib/pages';
 import type { About } from '../schemas/about';
 
 const page = await getPage('about');
-const { Content } = await render(page);
 
 const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
   brand.regions,
@@ -75,7 +73,7 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
     <div class="intro">
       <h1>{page.data.heading ?? page.data.title}</h1>
       <div class="lede">
-        <Content />
+        <p>{organization.mission}</p>
       </div>
     </div>
 

@@ -4,13 +4,13 @@
 // content/organization.ts; the section order is data (D30). The <title> is
 // the organization name alone.
 import { home } from '../../content/home';
-import { organization } from '../../content/organization';
 import { valleyview } from '../../content/valleyview';
 import { brand } from '../brand/brand.config';
 import BcMap from '../components/BcMap.astro';
 import HomeHero from '../components/home/HomeHero.astro';
 import HomeSection from '../components/home/HomeSection.astro';
 import QuestionBreak from '../components/home/QuestionBreak.astro';
+import WhatWeDo from '../components/home/WhatWeDo.astro';
 import WhyWeExist from '../components/home/WhyWeExist.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
@@ -33,6 +33,11 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
         <WhyWeExist id={key} section={sections.problem} tone={tone(index)} />
       );
     }
+    if (key === 'mission') {
+      return (
+        <WhatWeDo id={key} section={sections.mission} tone={tone(index)} />
+      );
+    }
     const section = sections[key];
     return (
       <HomeSection
@@ -44,25 +49,6 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
         draft={section.draft}
         tone={tone(index)}
       >
-        {key === 'mission' && (
-          <div class="mission">
-            <p class="prose">{organization.mission}</p>
-            <ol class="pillars">
-              {organization.pillars.map((pillar) => (
-                <li>
-                  <h3>{pillar}</h3>
-                </li>
-              ))}
-            </ol>
-            <h3>Our goals</h3>
-            <ul>
-              {organization.goals.map((goal) => (
-                <li>{goal}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         {key === 'map' && (
           <div class="map-layout">
             <div>
@@ -95,43 +81,6 @@ const tone = (index: number) => (index % 2 === 0 ? 'base' : 'surface');
 </BaseLayout>
 
 <style>
-  .pillars {
-    display: grid;
-    gap: var(--space-4);
-    margin: var(--space-6) 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: pillar;
-  }
-
-  @media (min-width: 48rem) {
-    .pillars {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  .pillars li {
-    padding: var(--space-5);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-bg);
-    counter-increment: pillar;
-  }
-
-  .pillars li::before {
-    content: counter(pillar);
-    display: block;
-    margin-block-end: var(--space-2);
-    color: var(--color-accent);
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-bold);
-  }
-
-  .pillars h3 {
-    margin: 0;
-    font-size: var(--text-lg);
-  }
-
   .map-layout {
     display: grid;
     gap: var(--space-6);

@@ -3,7 +3,10 @@
 import { z } from 'astro/zod';
 
 export const organizationSchema = z.strictObject({
-  /** `[TK]` until the board ratifies it. */
+  /**
+   * One sentence. Home and About both show it. The site's working wording
+   * until the board ratifies one (SPEC 7.2).
+   */
   mission: z.string().min(1),
   /**
    * The four strategic pillars, in the board-voted wording and order. The

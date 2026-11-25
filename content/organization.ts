@@ -3,7 +3,10 @@
 import { organizationSchema } from '../src/schemas/organization';
 
 export const organization = organizationSchema.parse({
-  mission: '[TK: mission statement, pending board ratification]',
+  // The site's working wording, shared by Home and About. Not yet voted on;
+  // the board will ratify a mission after launch (SPEC 7.2).
+  mission:
+    'We help young people in BC understand, question and build with the technology shaping their lives, working alongside their teachers, schools and families.',
   // Board vote, Oct 15 2026 (SPEC 2).
   pillars: [
     'Be an independent voice on technology in BC education.',
