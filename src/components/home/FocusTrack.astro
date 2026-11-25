@@ -1,0 +1,149 @@
+---
+// Under one pillar on Home: one thing live now, with a link, and one thing in
+// the works, joined by a thin line like two stops on a route. A filled dot
+// for now, a dashed one for in the works. While a link's destination is a
+// [TK] note, the note shows instead of a link (rule 6).
+import { isPlaceholder } from '../../lib/placeholder';
+import type { WhatWeDo } from '../../schemas/home';
+
+interface Props {
+  focus: WhatWeDo['focus'][number];
+  labels: WhatWeDo['labels'];
+}
+
+const { focus, labels } = Astro.props;
+const { now, next } = focus;
+const pending = isPlaceholder(now.cta.href);
+---
+
+<ul class="track">
+  <li class="now">
+    <span class="dot" aria-hidden="true"></span>
+    <p class="label">{labels.now}</p>
+    <p class="title">{now.title}</p>
+    {now.text && <p class="text">{now.text}</p>}
+    <p class="action">
+      {pending ? (
+        <span>
+          {now.cta.label} <span class="note">{now.cta.href}</span>
+        </span>
+      ) : (
+        <a href={now.cta.href}>
+          {now.cta.label}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 8h10M9 4l4 4-4 4"></path>
+          </svg>
+        </a>
+      )}
+    </p>
+  </li>
+  <li class="next">
+    <span class="dot" aria-hidden="true"></span>
+    <p class="label">{labels.next}</p>
+    <p class="title">{next.title}</p>
+    {next.text && <p class="text">{next.text}</p>}
+  </li>
+</ul>
+
+<style>
+  .track {
+    position: relative;
+    display: grid;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The line joining the two stops, from the middle of one dot to the next. */
+  .track::before {
+    position: absolute;
+    inset-block: var(--space-4);
+    inset-inline-start: calc(0.625rem - 1px);
+    border-inline-start: 2px solid var(--color-border);
+    content: '';
+  }
+
+  li {
+    position: relative;
+    padding-inline-start: 2.5rem;
+  }
+
+  .dot {
+    position: absolute;
+    inset-block-start: 0.25rem;
+    inset-inline-start: 0;
+    box-sizing: border-box;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border-radius: 50%;
+    background: var(--dot-bg, var(--color-bg));
+  }
+
+  .now .dot {
+    border: 2px solid var(--color-text);
+    background: var(--color-text);
+  }
+
+  .next .dot {
+    border: 2px dashed var(--color-text-muted);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .label {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .title {
+    margin-block-start: var(--space-1);
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .text {
+    margin-block-start: var(--space-2);
+    max-inline-size: 36em;
+  }
+
+  .action {
+    margin-block-start: var(--space-2);
+  }
+
+  a {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    min-block-size: 2.75rem;
+    color: var(--color-link);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-marker);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+
+  .note {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>

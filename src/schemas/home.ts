@@ -102,6 +102,56 @@ const librarySection = z.strictObject({
   draft: z.boolean(),
 });
 
+/**
+ * One thing we are doing under a pillar. `title` may be a `[TK: ...]` note
+ * while we decide what goes there.
+ */
+const focusItem = z.strictObject({
+  title: z.string().min(1),
+  text: z.string().min(1).optional(),
+});
+
+/**
+ * "What we do": the mission (from content/organization.ts), then the four
+ * pillars as "what we focus on", each with one thing live now and one in the
+ * works, then a line on taking many approaches at once.
+ */
+const whatWeDo = z.strictObject({
+  heading: z.string().min(1),
+  /** Names the pillars on Home, in plain words. */
+  focusHeading: z.string().min(1),
+  /** Labels for the two kinds of item under each pillar. */
+  labels: z.strictObject({
+    now: z.string().min(1),
+    next: z.string().min(1),
+  }),
+  /**
+   * One entry per pillar in content/organization.ts, in the same order: one
+   * thing live now, with a link, and one thing in the works.
+   */
+  focus: z
+    .array(
+      z.strictObject({
+        /** One word of the pillar, shown with the highlighter on its card. */
+        highlight: z.string().min(1),
+        now: focusItem.extend({ cta: callToAction }),
+        next: focusItem,
+      }),
+    )
+    .length(4),
+  /** Accessible names for the dots and arrows beside the stack. */
+  controls: z.strictObject({
+    label: z.string().min(1),
+    previous: z.string().min(1),
+    next: z.string().min(1),
+  }),
+  /** Under the pillars: the mission and pillars in full, on About. */
+  cta: callToAction,
+  /** Closes the section: there is no single fix, so we try many things. */
+  approach: z.string().min(1),
+  draft: z.boolean(),
+});
+
 export const sectionKeys = [
   'problem',
   'mission',
@@ -175,7 +225,7 @@ export const homeSchema = z.strictObject({
   }),
   sections: z.strictObject({
     problem: whyWeExist,
-    mission: section,
+    mission: whatWeDo,
     map: section.extend({ regionsHeading: z.string().min(1) }),
     library: librarySection,
     valleyview: section.extend({ questionsHeading: z.string().min(1) }),
@@ -193,4 +243,5 @@ export const homeSchema = z.strictObject({
 
 export type Home = z.infer<typeof homeSchema>;
 export type WhyWeExist = z.infer<typeof whyWeExist>;
+export type WhatWeDo = z.infer<typeof whatWeDo>;
 export type CallToAction = z.infer<typeof callToAction>;

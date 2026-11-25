@@ -170,7 +170,7 @@ Sections, in order (teachers above Valleyview is a preference, not settled; D30)
 
 1. **Hero**, above the fold. Says who we are and carries the bridge idea: we connect technology and education, two groups with competing interests. Two primary calls to action (D4): one for teachers (`/teachers`, D26) and one for students and parents, linking to `/valleyview`. A Grade 12 student or parent looking for the grant must find it immediately. Image slots for original BC photography (an idea to explore: bridges in Kamloops, Vancouver and Victoria).
 2. **Problem statement.** Why we exist, before the mission.
-3. **Mission, pillars and goals**, linking to About. Stretch: a scroll-pinned section that steps through the four pillars one at a time, preferred over a carousel. Without JavaScript or with reduced motion, all four pillars show as static content.
+3. **What we do: the mission and the four pillars**, linking to About. No goals on Home. On Home the pillars are headed "What we focus on", and each shows one thing live now and one in the works. Wider screens: the pillars as a stack of index cards that stays in view and changes as you scroll past each one's items. Phones: the four cards, each opening in place. Without JavaScript, all four pillars show as a plain list.
 4. **BC map.** Its own section below the fold, not merged with the pillars. Shows the province with Victoria, Vancouver and Kamloops highlighted as where we start. Copy says we are a BC organization and BC is our mandate, so the starting regions do not read as our boundary (section 2). Built on the province outline from #23; weight budget per #16. The map is not permanently on screen.
 5. **Teacher Library.** The Digital Intent Teacher Library: tips, lessons and training materials that build teachers' own digital skills, free to use, change and share, and growing over time. Open to teachers anywhere, not only in BC. Its one call to action is a library card that links to the library on `/teachers` (#61). Booking a call belongs to the hero's teachers card; if that destination is a booking, it is an outbound link to a third-party scheduler, never a booking form on our site (rule 1), and the Privacy page names it.
 6. **Valleyview grant.** What it is, how to apply, what we look for; links to `/valleyview`.
@@ -180,7 +180,7 @@ Sections, in order (teachers above Valleyview is a preference, not settled; D30)
 
 ### 7.2 About (`/about`) Phase 1
 
-- Mission statement (`[TK]` until ratified).
+- Mission statement. The site owns its working wording, in `content/organization.ts`, until the board ratifies one after launch.
 - The four pillars in their board-voted wording (section 2), which serves as each pillar's one-line definition.
 - Values and how we work (remote-first, in person by choice, three starting regions, province-wide in scope).
 - Our story: how and why we started, after how we work.
