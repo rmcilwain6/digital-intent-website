@@ -263,7 +263,7 @@ export const home = homeSchema.parse({
         // Empty until a partner says yes to being listed.
         items: [],
       },
-      draft: true,
+      draft: false,
     },
   },
 
