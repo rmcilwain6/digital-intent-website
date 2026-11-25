@@ -16,13 +16,14 @@ const imageSlotSchema = z.strictObject({
 });
 
 /**
- * A school we have visited or worked with, shown as a point on the map.
- * Added only with the school's agreement, never from a dataset (SPEC 7.9, R6).
- * Points are schools, not Nation boundaries.
+ * An Indigenous school, Nation or band we have worked with, shown as a point
+ * on the map. Added only with their agreement, never from a dataset (SPEC
+ * 7.9, R6). Points mark a place, never Nation boundaries.
  */
 const visitSchema = z.strictObject({
-  school: z.string().min(1),
-  /** The community the school serves, named the way the community names it. */
+  /** The school, Nation or band, named the way they name themselves. */
+  name: z.string().min(1),
+  /** The community, named the way the community names it. */
   community: z.string().min(1),
   /** When it happened, as YYYY-MM. */
   date: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Use YYYY-MM'),
@@ -37,12 +38,12 @@ const visitSchema = z.strictObject({
 });
 
 export const outreachSchema = z.strictObject({
-  /** Wide landscape image at the top of the page. */
-  heroImage: imageSlotSchema,
   acknowledgement: z.strictObject({
     heading: z.string().min(1),
     /** The acknowledgement for all of British Columbia. */
     paragraphs: z.array(z.string().min(1)).min(1),
+    /** Heading over the territorial acknowledgements. */
+    regionsHeading: z.string().min(1),
     /**
      * One territorial acknowledgement per starting region, in the order of
      * the regions in src/brand/brand.config.ts.
@@ -67,6 +68,8 @@ export const outreachSchema = z.strictObject({
   }),
   commitments: z.strictObject({
     heading: z.string().min(1),
+    /** The commitment everything else rests on, shown first and largest. */
+    foundation: z.string().min(1),
     items: z.array(z.string().min(1)).min(1),
     draft: z.boolean(),
   }),

@@ -1,20 +1,20 @@
 ---
-// Indigenous outreach (SPEC 7.9, decision record 0007): our land
-// acknowledgement, for all of BC and for each place we are based, then our
-// commitments. A natural map of the province carries the sense of place and
-// will gain a point for each school we work with. It holds the site's only
-// full land acknowledgement; the footer carries a short one that links here.
-// Copy is in content/outreach.ts. Drafts show a visible [TK] marker until the
-// outreach lead approves them.
+// Indigenous outreach (SPEC 7.9, decision record 0007). The page opens on
+// our land acknowledgement for all of BC, beside a natural map of the
+// province that gains a point for each school, Nation or band we work with.
+// Then a territorial acknowledgement for each place we are based, in rows
+// that alternate text and landscape image, then our commitments. It holds
+// the site's only full land acknowledgement; the footer carries a short one
+// that links here. Copy is in content/outreach.ts. Drafts show a visible
+// [TK] marker until the outreach lead approves them.
 import { outreach } from '../../content/outreach';
 import ImagePlaceholder from '../components/ImagePlaceholder.astro';
 import OutreachMap from '../components/OutreachMap.astro';
-import PageLayout from '../layouts/PageLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
 
 const page = await getPage('indigenous-outreach');
-const { heroImage, acknowledgement, map, commitments } = outreach;
-const [intro, ...rest] = acknowledgement.paragraphs;
+const { acknowledgement, map, commitments } = outreach;
 
 const draftMarker = '[TK: draft copy, needs human approval]';
 
@@ -27,74 +27,73 @@ const formatMonth = (date: string) =>
   monthFormat.format(new Date(`${date}-01`));
 ---
 
-<PageLayout page={page}>
-  <div class="hero-image">
-    <ImagePlaceholder {...heroImage} />
-  </div>
+<BaseLayout title={page.data.title} description={page.data.description}>
+  <article>
+    <section class="acknowledgement" aria-labelledby="acknowledgement">
+      <div class="ack-text">
+        {acknowledgement.draft && <p class="draft-marker">{draftMarker}</p>}
+        <h1 id="acknowledgement">{acknowledgement.heading}</h1>
+        {acknowledgement.paragraphs.map((text) => (
+          <p class="ack-lede">{text}</p>
+        ))}
+      </div>
 
-  <section class="acknowledgement" aria-labelledby="acknowledgement">
-    <div class="ack-text">
-      <h2 id="acknowledgement">{acknowledgement.heading}</h2>
-      {acknowledgement.draft && <p class="draft-marker">{draftMarker}</p>}
-      <p class="ack-lede">{intro}</p>
-      {rest.map((text) => (
-        <p>{text}</p>
-      ))}
-    </div>
+      <figure class="map">
+        <OutreachMap visits={map.visits} />
+        <figcaption>{map.caption}</figcaption>
+      </figure>
+    </section>
 
-    <figure class="map">
-      <OutreachMap visits={map.visits} />
-      <figcaption>{map.caption}</figcaption>
-    </figure>
-  </section>
-
-  <ul class="regions" aria-label="Where we are based">
-    {acknowledgement.regions.map(({ region, text, image }) => (
-      <li>
-        <ImagePlaceholder {...image} />
-        <h3>{region}</h3>
-        <p>{text}</p>
-      </li>
-    ))}
-  </ul>
-
-  {map.visits.length > 0 && (
-    <section class="visits" aria-labelledby="visits">
-      <h2 id="visits">Schools we have worked with</h2>
-      <ol>
-        {map.visits.map((visit) => (
+    <section class="regions" aria-labelledby="regions">
+      <h2 id="regions">{acknowledgement.regionsHeading}</h2>
+      <ul>
+        {acknowledgement.regions.map(({ region, text, image }) => (
           <li>
-            <p class="visit-name">
-              {visit.school}, {visit.community}
-            </p>
-            <p class="visit-date">
-              <time datetime={visit.date}>{formatMonth(visit.date)}</time>
-            </p>
-            <p>{visit.summary}</p>
+            <div class="region-text">
+              <h3>{region}</h3>
+              <p>{text}</p>
+            </div>
+            <ImagePlaceholder {...image} />
           </li>
         ))}
-      </ol>
+      </ul>
     </section>
-  )}
 
-  <section class="commitments" aria-labelledby="commitments">
-    <h2 id="commitments">{commitments.heading}</h2>
-    {commitments.draft && <p class="draft-marker">{draftMarker}</p>}
-    <ol>
-      {commitments.items.map((item) => (
-        <li>{item}</li>
-      ))}
-    </ol>
-  </section>
-</PageLayout>
+    {map.visits.length > 0 && (
+      <section class="visits" aria-labelledby="visits">
+        <h2 id="visits">Who we have worked with</h2>
+        <ol>
+          {map.visits.map((visit) => (
+            <li>
+              <p class="visit-name">
+                {visit.name}, {visit.community}
+              </p>
+              <p class="visit-date">
+                <time datetime={visit.date}>{formatMonth(visit.date)}</time>
+              </p>
+              <p>{visit.summary}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    <section class="commitments" aria-labelledby="commitments">
+      <h2 id="commitments">{commitments.heading}</h2>
+      {commitments.draft && <p class="draft-marker">{draftMarker}</p>}
+      <p class="foundation">{commitments.foundation}</p>
+      <ul>
+        {commitments.items.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</BaseLayout>
 
 <style>
   h2 {
-    margin-block: 0 var(--space-4);
-  }
-
-  .hero-image {
-    margin-block-start: var(--space-6);
+    margin-block: 0 var(--space-5);
   }
 
   .draft-marker {
@@ -107,20 +106,21 @@ const formatMonth = (date: string) =>
     font-size: var(--text-sm);
   }
 
-  /* Text beside a large map on wide screens; stacked on narrow ones. */
+  /* The acknowledgement beside a large map; stacked on narrow screens. */
   .acknowledgement {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    margin-block-start: var(--space-6);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     gap: var(--space-7);
     align-items: center;
-    margin-block-start: var(--space-8);
   }
 
-  .ack-text p {
-    max-inline-size: var(--width-prose);
+  .ack-text h1 {
+    margin-block: 0 var(--space-5);
   }
 
   .ack-lede {
+    max-inline-size: var(--width-prose);
     font-size: var(--text-lg);
     line-height: var(--leading-normal);
   }
@@ -130,25 +130,43 @@ const formatMonth = (date: string) =>
   }
 
   .map figcaption {
-    margin-block-start: var(--space-2);
+    max-inline-size: 36ch;
+    margin: var(--space-3) auto 0;
     color: var(--color-text-muted);
     font-size: var(--text-sm);
+    text-align: center;
   }
 
+  /* Rows that alternate: text then image, image then text. */
   .regions {
+    margin-block-start: var(--space-8);
+  }
+
+  .regions ul {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-6);
-    margin: var(--space-7) 0 0;
+    gap: var(--space-7);
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
+  .regions li {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-7);
+    align-items: center;
+  }
+
+  .regions li:nth-child(even) .region-text {
+    order: 2;
+  }
+
   .regions h3 {
-    margin: var(--space-4) 0 var(--space-2);
+    margin: 0 0 var(--space-3);
   }
 
   .regions p {
+    max-inline-size: var(--width-prose);
     margin: 0;
   }
 
@@ -183,45 +201,45 @@ const formatMonth = (date: string) =>
     border-block-start: var(--border-width) solid var(--color-border);
   }
 
-  .commitments ol {
+  /* Face-to-face relationships come first and carry the most weight. */
+  .foundation {
+    max-inline-size: 40ch;
+    margin: var(--space-6) auto var(--space-7);
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+    text-align: center;
+  }
+
+  .commitments ul {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-5) var(--space-7);
     margin: 0;
     padding: 0;
     list-style: none;
-    counter-reset: commitment;
   }
 
   .commitments li {
-    counter-increment: commitment;
     padding-block-start: var(--space-3);
     border-block-start: var(--border-width) solid var(--color-accent);
     max-inline-size: var(--width-prose);
   }
 
-  .commitments li::before {
-    content: counter(commitment, decimal-leading-zero);
-    display: block;
-    margin-block-end: var(--space-2);
-    color: var(--color-label);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-
   @media (width < 56rem) {
-    .acknowledgement {
+    .acknowledgement,
+    .regions li {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-5);
     }
 
-    .regions {
-      grid-template-columns: minmax(0, 1fr);
+    /* Stacked, every region reads name and text first, then the image. */
+    .regions li:nth-child(even) .region-text {
+      order: 0;
     }
   }
 
   @media (width < 40rem) {
-    .commitments ol {
+    .commitments ul {
       grid-template-columns: minmax(0, 1fr);
     }
   }

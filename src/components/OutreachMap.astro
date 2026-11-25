@@ -1,13 +1,15 @@
 ---
 // Natural map of British Columbia for the Indigenous outreach page (SPEC
-// 7.9), in the Analog style: navy ink on paper. It shows the land and water
-// (coast, lakes, major rivers) and the three places we are based, with no
-// school districts, roads or towns. Schools we have visited or worked with
-// are added as points, with the school's agreement (content/outreach.ts);
-// points are schools, never Nation boundaries. Drawn at build time from
-// data/map/bc-map.json: no JavaScript, no map service, no runtime requests.
-import map from '../../data/map/bc-map.json';
+// 7.9), in the Analog house style of the team map (design system: Map): the
+// province alone, framed on BC, with nothing drawn outside its border. It
+// shows the land, lakes and major rivers and the three places we are based,
+// with no school districts, roads or towns. Schools, Nations and bands we
+// have worked with are added as points, with their agreement
+// (content/outreach.ts); points mark a place, never Nation boundaries.
+// Drawn at build time from data/map/bc-map.json: no JavaScript, no map
+// service, no runtime requests.
 import { brand } from '../brand/brand.config';
+import { bcFrame, map, placePoint } from '../lib/map';
 import type { Visit } from '../schemas/outreach';
 
 interface Props {
@@ -15,20 +17,13 @@ interface Props {
 }
 
 const { visits } = Astro.props;
-const [width, height] = map.viewBox as [number, number];
 
-// Positions come from the Natural Earth places layer. A region with no match
-// fails the build rather than being left off the map silently.
+// Labels sit east of the marker unless they would run off the province
+// frame. Source Code Pro is 0.6em a character; checked at the phone size.
 const regions = brand.regions.map((name) => {
-  const place = map.places.find((p) => p.name === name);
-  if (!place) {
-    throw new Error(`OutreachMap: no map position for region "${name}"`);
-  }
-  const [x, y] = place.at;
-  // Label on the side with more room: the coast is to the west, and
-  // Vancouver and Victoria sit close together.
-  const labelLeft = x < width * 0.64;
-  return { name, x, y, labelLeft };
+  const [x, y] = placePoint(name);
+  const left = x + 24 + name.length * 0.6 * 36 > bcFrame.x + bcFrame.width;
+  return { name, x, y, left };
 });
 
 const regionList = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
@@ -36,72 +31,73 @@ const regionList = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
 );
 const visitText =
   visits.length === 0
-    ? 'No schools are marked yet.'
-    : `${visits.length} ${visits.length === 1 ? 'school is' : 'schools are'} marked; the list below names each one.`;
+    ? 'No schools or communities are marked yet.'
+    : `${visits.length} ${visits.length === 1 ? 'place is' : 'places are'} marked; the list below names each one.`;
 ---
 
 <svg
   class="outreach-map"
-  viewBox={`0 0 ${width} ${height}`}
+  viewBox={[bcFrame.x, bcFrame.y, bcFrame.width, bcFrame.height]
+    .map((n) => n.toFixed(1))
+    .join(' ')}
   role="img"
-  aria-label={`Map of British Columbia showing its coast, lakes and major rivers, with ${regionList} marked. ${visitText}`}
+  aria-label={`Map of British Columbia showing its lakes and major rivers, with ${regionList} marked. ${visitText}`}
   focusable="false"
 >
-  <path class="neighbours" d={map.neighbours}></path>
+  <defs>
+    <clipPath id="outreach-map-bc">
+      <path d={map.bc}></path>
+    </clipPath>
+  </defs>
   <path class="land" d={map.bc}></path>
-  <path class="lakes" d={map.lakes}></path>
-  <path class="rivers" d={map.rivers}></path>
+  <g clip-path="url(#outreach-map-bc)">
+    <path class="lakes" d={map.lakes}></path>
+    <path class="rivers" d={map.rivers}></path>
+  </g>
+  {visits.map((visit) => (
+    <circle class="visit" cx={visit.at[0]} cy={visit.at[1]} r="6"></circle>
+  ))}
   {regions.map((r) => (
     <g class="region">
-      <circle cx={r.x} cy={r.y} r="8"></circle>
+      <circle cx={r.x} cy={r.y} r="5"></circle>
       <text
-        x={r.labelLeft ? r.x - 18 : r.x + 18}
+        x={r.left ? r.x - 14 : r.x + 14}
         y={r.y}
         dy="0.35em"
-        text-anchor={r.labelLeft ? 'end' : 'start'}
+        text-anchor={r.left ? 'end' : 'start'}
       >
         {r.name}
       </text>
     </g>
   ))}
-  {visits.map((visit) => (
-    <circle class="visit" cx={visit.at[0]} cy={visit.at[1]} r="9"></circle>
-  ))}
 </svg>
 
 <style>
   .outreach-map {
+    --label-size: 18px;
     display: block;
     inline-size: 100%;
     block-size: auto;
   }
 
-  .neighbours {
-    fill: none;
-    stroke: var(--color-border);
-    stroke-opacity: 0.35;
-    stroke-width: 1;
-    vector-effect: non-scaling-stroke;
-  }
-
   .land {
     fill: var(--color-surface);
-    stroke: var(--color-accent);
-    stroke-width: 1.25;
+    stroke: var(--color-border);
+    stroke-width: 1;
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
   }
 
   .lakes {
     fill: var(--color-accent);
-    fill-opacity: 0.18;
+    fill-opacity: 0.16;
   }
 
   .rivers {
     fill: none;
     stroke: var(--color-accent);
-    stroke-opacity: 0.55;
-    stroke-width: 1;
+    stroke-opacity: 0.4;
+    stroke-width: 0.9;
     stroke-linecap: round;
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
@@ -109,31 +105,34 @@ const visitText =
 
   .region circle {
     fill: var(--color-text);
-    stroke: var(--color-bg);
-    stroke-width: 4;
+    stroke: var(--color-surface);
+    stroke-width: 2px;
   }
 
   .region text {
     fill: var(--color-text);
-    font-size: 30px;
-    font-weight: var(--font-weight-bold);
+    font-family: var(--font-mono);
+    font-size: var(--label-size);
     paint-order: stroke;
-    stroke: var(--color-bg);
-    stroke-width: 7;
+    stroke: var(--color-surface);
+    stroke-width: 6px;
     stroke-linejoin: round;
   }
 
-  /* Keep labels readable when the map is phone-width. */
-  @media (width < 40rem) {
-    .region text {
-      font-size: 46px;
-      stroke-width: 9;
-    }
+  .visit {
+    fill: var(--color-marker);
+    stroke: var(--color-surface);
+    stroke-width: 2px;
   }
 
-  .visit {
-    fill: var(--color-signal);
-    stroke: var(--color-bg);
-    stroke-width: 3;
+  /* The map is drawn small on phones, so labels are larger in map units. */
+  @media (width < 40rem) {
+    .outreach-map {
+      --label-size: 32px;
+    }
+
+    .region circle {
+      r: 8px;
+    }
   }
 </style>

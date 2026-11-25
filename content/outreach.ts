@@ -1,32 +1,29 @@
 // Indigenous outreach page (SPEC 7.9, decision record 0007). Draft copy from
-// notes of a conversation with the team member leading this work. Anything
-// marked `draft: true` needs that person's approval before launch (SPEC
-// 12.5). The Nations to name for each region are [TK] until the lead
-// confirms them: do not fill them in from a dataset or a guess.
+// notes of conversations with the team. Anything marked `draft: true` needs
+// the outreach lead's approval before launch (SPEC 12.5).
+// Region acknowledgements are drafted from the standard public wording for
+// each place (Kamloops: City of Kamloops, Thompson Rivers University and
+// Tk'emlúps te Secwépemc's own template; Victoria: City of Victoria and the
+// University of Victoria; Vancouver: City of Vancouver, 2014 council motion).
+// The outreach lead confirms the Nations, the spellings and the wording
+// before launch. Victoria is under the Douglas Treaties, so its wording does
+// not say "unceded".
 // Image slots stay placeholders until original photography exists (SPEC
 // rule 8). Art direction: the natural environment, not the built one.
 import { outreachSchema } from '../src/schemas/outreach';
 
-const nationsTK = (region: string) =>
-  `[TK: acknowledgement for ${region}, naming the Nations, confirmed by the outreach lead]`;
-
 export const outreach = outreachSchema.parse({
-  heroImage: {
-    ratio: '21 / 9',
-    label: 'British Columbia landscape',
-    note: 'Wide view of mountains, forest and water in natural light. No buildings, roads or people.',
-  },
-
   acknowledgement: {
     heading: 'Acknowledging the land',
     paragraphs: [
-      'We are grateful to live, work and play in British Columbia, on the lands of the many First Nations who have cared for them since time immemorial, much of it unceded. Our work reaches across the province, and we recognize every Nation whose home this has always been.',
-      'We are based in three places:',
+      'We are grateful to live, work and play in British Columbia. This is the land of many First Nations, who have cared for it since time immemorial. Much of it was never ceded.',
+      'Our work reaches across the province. We recognize every Nation whose home this has always been, and we want our work to honour that.',
     ],
+    regionsHeading: 'Where we are based',
     regions: [
       {
         region: 'Kamloops',
-        text: nationsTK('Kamloops'),
+        text: 'Kamloops is on the traditional and unceded territory of Tk’emlúps te Secwépemc, within Secwepemcúl’ecw, the ancestral lands of the Secwépemc Nation.',
         image: {
           ratio: '4 / 3',
           label: 'Kamloops',
@@ -35,7 +32,7 @@ export const outreach = outreachSchema.parse({
       },
       {
         region: 'Victoria',
-        text: nationsTK('Victoria'),
+        text: 'Victoria is on the traditional territory of the lək̓ʷəŋən (Lekwungen) peoples, the Songhees and Xʷsepsəm (Esquimalt) Nations. We also recognize the W̱SÁNEĆ peoples, whose relationships with this land continue today.',
         image: {
           ratio: '4 / 3',
           label: 'Victoria',
@@ -44,7 +41,7 @@ export const outreach = outreachSchema.parse({
       },
       {
         region: 'Vancouver',
-        text: nationsTK('Vancouver'),
+        text: 'Vancouver is on the unceded traditional territories of the xʷməθkʷəy̓əm (Musqueam), Sḵwx̱wú7mesh (Squamish) and səlilwətaɬ (Tsleil-Waututh) Nations.',
         image: {
           ratio: '4 / 3',
           label: 'Vancouver',
@@ -57,17 +54,19 @@ export const outreach = outreachSchema.parse({
 
   map: {
     caption:
-      'As we work with schools, with their agreement, we will add them here.',
+      'As we work with Indigenous schools, Nations and bands, with their agreement, we will add them here.',
     visits: [],
   },
 
   commitments: {
     heading: 'Our commitments',
+    foundation:
+      'Build lasting, face-to-face relationships with Indigenous schools and communities. This is the foundation of everything else on this page. We start near where we live, and we listen before we start any project.',
     items: [
-      'Build relationships with schools in First Nations communities, starting near where we live, before we start projects.',
-      'Set quarterly objectives for this work and report on them on this page.',
-      "Use a community's name, language or logo only with that community's agreement.",
-      'Seek Indigenous representation on our board.',
+      'Offer guidance on digital technology to Indigenous communities that ask for it, to support their own teaching and learning.',
+      "Work on each community's terms. We use a community's name, language or logo only with its agreement, and we follow its wishes on privacy, data and the use of AI.",
+      'Seek out Indigenous perspectives on how technology comes into classrooms and communities, so that it is done in a way that is sustainable and respects the land. Where communities want them shared, help those voices reach teachers across BC. This includes seeking Indigenous representation on our board.',
+      'Set quarterly objectives for this work, and report on them, and on what we have done, on this page.',
     ],
     draft: true,
   },
