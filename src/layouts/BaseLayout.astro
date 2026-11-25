@@ -17,9 +17,17 @@ interface Props {
   noindex?: boolean;
   /** Let sections span the full width and set their own containers, as on Home. */
   fullWidth?: boolean;
+  /** Put the whole main area in one world, e.g. the Digital 404 page (record 0005). */
+  theme?: 'analog' | 'digital';
 }
 
-const { title, description, noindex = false, fullWidth = false } = Astro.props;
+const {
+  title,
+  description,
+  noindex = false,
+  fullWidth = false,
+  theme,
+} = Astro.props;
 const documentTitle = title ? `${title} | ${brand.name}` : brand.name;
 const lang = Astro.currentLocale ?? 'en';
 // Absolute URLs from `site` (set from brand.domain in astro.config.mjs).
@@ -74,7 +82,7 @@ const socialImage = new URL(brand.socialImage.src, Astro.site).href;
       Skip to main content
     </a>
     <SiteHeader />
-    <main id="main" class:list={[{ container: !fullWidth }]}>
+    <main id="main" class:list={[{ container: !fullWidth }]} data-theme={theme}>
       <slot />
     </main>
     <SiteFooter />

@@ -1,10 +1,513 @@
 ---
-// Built as dist/404.html, which Cloudflare serves for unknown routes
-// (wrangler.jsonc: not_found_handling "404-page").
-import PageLayout from '../layouts/PageLayout.astro';
+// Not-found page (SPEC 7.8). Built as dist/404.html, which Cloudflare serves
+// for unknown routes (wrangler.jsonc: not_found_handling "404-page").
+//
+// Digital world (record 0005): the text column (heading, plain sentence, ways
+// out) with a traceroute figure beside it on wide screens and below it on
+// phones. The figure is decoration; the caption says what it shows. Under
+// the figure, in the same column so it fits on the first screen, the address
+// taken apart, part by part.
+//
+// Without JavaScript both show an example address. With it, a small script
+// swaps in the address the visitor tried. It reads location in the browser
+// and sends nothing anywhere (rule 1).
+import { render } from 'astro:content';
+import outline from '../../data/map/bc-outline.json';
+import { notFound } from '../../content/not-found';
+import { site } from '../../content/site';
+import { brand } from '../brand/brand.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
+import { dotLeaders, splitUrl } from '../lib/url-parts';
 
 const page = await getPage('404');
+const { Content } = await render(page);
+const { trace, anatomy } = notFound;
+const [viewWidth, viewHeight] = outline.viewBox as [number, number];
+
+const [hostHop, pathHop] = dotLeaders([brand.domain, trace.examplePath]);
+const exampleParts = splitUrl(
+  new URL(trace.examplePath, `https://${brand.domain}`),
+);
 ---
 
-<PageLayout page={page} noindex />
+<BaseLayout
+  title={page.data.title}
+  description={page.data.description}
+  noindex
+  fullWidth
+  theme="digital"
+>
+  <div class="container not-found">
+    <section class="message" aria-labelledby="not-found-title">
+      <p class="eyebrow">{notFound.eyebrow}</p>
+      <h1 id="not-found-title">{page.data.heading ?? page.data.title}</h1>
+      <div class="lede">
+        <Content />
+      </div>
+      <a class="key" href={site.home.href}>
+        {notFound.homeLabel}
+        <span class="cap" aria-hidden="true">
+          ↵
+        </span>
+      </a>
+      <nav class="others" aria-labelledby="not-found-others">
+        <h2 id="not-found-others">{notFound.othersHeading}</h2>
+        <ul>
+          {site.primaryNav.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </section>
+
+    <div class="side">
+      <figure>
+        <div class="screen">
+          <pre
+            class="trace"
+            aria-hidden="true"
+          ><span class="muted">$ traceroute <span data-trace="target">{brand.domain}{trace.examplePath}</span></span><span class="muted"> 1  <span data-trace="host">{hostHop}</span> {trace.found}</span><span class="miss"> 2  <span data-trace="path">{pathHop}</span> {trace.notFound}</span><span><span class="muted">$ </span><span class="cursor"></span></span></pre>
+          <svg
+            class="map"
+            viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path class="province" d={outline.d}></path>
+            <path class="route step s1" d="M689.8 669 L579.3 765.4"></path>
+            <path class="lost step s2" d="M579.3 765.4 Q470 760 380 812"></path>
+            <circle class="hop step s1" cx="689.8" cy="669" r="20"></circle>
+            <circle class="hop step s1" cx="579.3" cy="765.4" r="20"></circle>
+            <circle class="end step s2" cx="350" cy="826" r="30"></circle>
+            <text class="step s2" x="330" y="760">
+              ?
+            </text>
+          </svg>
+        </div>
+        <figcaption>{trace.caption}</figcaption>
+      </figure>
+
+      <section
+        class="anatomy"
+        aria-labelledby="anatomy-title"
+        data-anatomy
+        data-intro={anatomy.introVisited}
+        data-copy={JSON.stringify(anatomy.parts)}
+      >
+        <h2 id="anatomy-title">{anatomy.heading}</h2>
+        <p class="anatomy-intro" data-anatomy-intro>
+          {anatomy.introExample}
+        </p>
+        <p class="address" data-anatomy-address>
+          {exampleParts.map((part) => (
+            <span class="segment" data-kind={part.kind}>
+              {part.text}
+            </span>
+          ))}
+        </p>
+        <dl class="parts" data-anatomy-parts>
+          {exampleParts.map((part) => (
+            <div class="part" data-kind={part.kind}>
+              <dt>
+                <span class="part-label">{anatomy.parts[part.kind].label}</span>
+                <code>{part.text}</code>
+              </dt>
+              <dd>{anatomy.parts[part.kind].description}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import {
+    dotLeaders,
+    shorten,
+    splitUrl,
+    type UrlPartKind,
+  } from '../lib/url-parts';
+
+  type PartsCopy = Record<UrlPartKind, { label: string; description: string }>;
+
+  const url = new URL(window.location.href);
+  const parts = splitUrl(url);
+  const path = parts.find((part) => part.kind === 'path')?.text ?? '/';
+
+  // Traceroute lines: the visitor's host and path.
+  const [host, hop] = dotLeaders([shorten(url.host, 20), shorten(path, 18)]);
+  const set = (name: string, text: string) => {
+    const el = document.querySelector(`[data-trace="${name}"]`);
+    if (el) el.textContent = text;
+  };
+  set('target', shorten(url.host + path, 32));
+  set('host', host);
+  set('path', hop);
+
+  // The address, taken apart. New nodes are clones of the build-time ones,
+  // so they keep the component's scoped styles. Text only, never HTML.
+  const section = document.querySelector<HTMLElement>('[data-anatomy]');
+  const address = section?.querySelector('[data-anatomy-address]');
+  const list = section?.querySelector('[data-anatomy-parts]');
+  const segment = address?.firstElementChild;
+  const item = list?.firstElementChild;
+  if (section && address && list && segment && item) {
+    const copy = JSON.parse(section.dataset.copy ?? '{}') as PartsCopy;
+    const intro = section.querySelector('[data-anatomy-intro]');
+    if (intro && section.dataset.intro)
+      intro.textContent = section.dataset.intro;
+
+    address.replaceChildren(
+      ...parts.map((part) => {
+        const el = segment.cloneNode(true) as HTMLElement;
+        el.dataset.kind = part.kind;
+        el.textContent = part.text;
+        return el;
+      }),
+    );
+    list.replaceChildren(
+      ...parts.map((part) => {
+        const el = item.cloneNode(true) as HTMLElement;
+        el.dataset.kind = part.kind;
+        const code = el.querySelector('code');
+        const label = el.querySelector('.part-label');
+        const description = el.querySelector('dd');
+        if (code) code.textContent = part.text;
+        if (label) label.textContent = copy[part.kind].label;
+        if (description) description.textContent = copy[part.kind].description;
+        return el;
+      }),
+    );
+  }
+</script>
+
+<style>
+  .not-found {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: var(--space-7);
+    align-items: center;
+    padding-block: var(--space-7) 0;
+  }
+
+  @media (width < 52rem) {
+    .not-found {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-6);
+      padding-block-start: var(--space-6);
+    }
+  }
+
+  .side {
+    min-inline-size: 0;
+  }
+
+  .message {
+    min-inline-size: 0;
+    max-inline-size: 34rem;
+  }
+
+  .eyebrow {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-signal);
+  }
+
+  h1 {
+    margin: 0 0 var(--space-4);
+    text-wrap: balance;
+  }
+
+  .lede {
+    margin-block-end: var(--space-6);
+    font-size: var(--text-lg);
+  }
+
+  .lede :global(p) {
+    margin: 0;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+  }
+
+  /* Keycap, the Digital world's button (as in the Home question window). */
+  .key {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: 2.75rem;
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width) solid var(--color-key-edge);
+    border-block-start-color: var(--color-key-edge-top);
+    border-block-end: 3px solid var(--color-key-lip);
+    border-radius: 5px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    text-decoration: none;
+    transition: transform var(--duration-press) var(--ease-standard);
+  }
+
+  .key:hover {
+    border-block-start-color: var(--color-signal);
+  }
+
+  .key:active {
+    transform: translateY(2px);
+  }
+
+  .cap {
+    color: var(--color-signal);
+  }
+
+  .others {
+    margin-block-start: var(--space-6);
+  }
+
+  .others h2 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-muted);
+  }
+
+  .others ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The figure: traceroute output and the map. */
+  figure {
+    min-inline-size: 0;
+    margin: 0;
+  }
+
+  .screen {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 8rem;
+    gap: var(--space-5);
+    align-items: end;
+    padding: var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  @media (width < 34rem) {
+    .screen {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .map {
+      justify-self: end;
+      max-inline-size: 12rem;
+    }
+  }
+
+  .trace {
+    min-inline-size: 0;
+    margin: 0;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    /* Shrinks on phones so the longest line fits without scrolling. */
+    font-size: min(var(--text-code), 2.9vw);
+    line-height: 1.9;
+    white-space: pre;
+  }
+
+  .trace > span {
+    display: block;
+  }
+
+  .muted {
+    color: var(--color-text-muted);
+  }
+
+  .miss {
+    color: var(--color-signal);
+  }
+
+  .cursor {
+    display: inline-block;
+    inline-size: 0.55em;
+    block-size: 1.1em;
+    background: var(--color-signal);
+    vertical-align: -0.2em;
+  }
+
+  .map {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+
+  .province {
+    fill: var(--color-bg);
+  }
+
+  .route {
+    fill: none;
+    stroke: var(--color-text-muted);
+    stroke-width: 6;
+  }
+
+  .lost {
+    fill: none;
+    stroke: var(--color-signal);
+    stroke-width: 6;
+    stroke-dasharray: 4 22;
+    stroke-linecap: round;
+  }
+
+  .hop {
+    fill: var(--color-text);
+  }
+
+  .end {
+    fill: none;
+    stroke: var(--color-signal);
+    stroke-width: 8;
+  }
+
+  .map text {
+    fill: var(--color-signal);
+    font-family: var(--font-mono);
+    font-size: 64px;
+    font-weight: var(--font-weight-bold);
+  }
+
+  figcaption {
+    margin-block-start: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  /* The address, taken apart: the whole address with each part underlined,
+     then one row per part. The path, the part we could not find, is lime. */
+  .anatomy {
+    margin-block-start: var(--space-5);
+  }
+
+  .anatomy h2 {
+    margin: 0 0 var(--space-1);
+    font-size: var(--text-lg);
+  }
+
+  .anatomy-intro {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .address {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-1);
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    overflow-wrap: anywhere;
+  }
+
+  .segment {
+    min-inline-size: 0;
+    padding-block-end: var(--space-1);
+    border-block-end: 3px solid var(--color-border);
+  }
+
+  .segment[data-kind='path'] {
+    border-block-end-color: var(--color-signal);
+    color: var(--color-signal);
+  }
+
+  .parts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+    gap: var(--space-3) var(--space-5);
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+  }
+
+  .part {
+    min-inline-size: 0;
+    padding-block-start: var(--space-2);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .part[data-kind='path'] {
+    border-block-start-color: var(--color-signal);
+  }
+
+  .part dt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-2);
+    margin-block-end: var(--space-1);
+  }
+
+  .part-label {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .part code {
+    font-family: var(--font-mono);
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  .part[data-kind='path'] code {
+    color: var(--color-signal);
+  }
+
+  .part dd {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  /* Motion: the map's hops appear in order (opacity only), then the cursor
+     blinks and stays solid. Text never waits on motion, so the traceroute
+     lines are there from the start. Still under reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .step {
+      animation: appear var(--duration-base) var(--ease-enter) backwards;
+    }
+
+    .s1 {
+      animation-delay: var(--duration-fast);
+    }
+
+    .s2 {
+      animation-delay: var(--duration-slow);
+    }
+
+    .cursor {
+      animation: blink var(--duration-blink) steps(1)
+        calc(var(--duration-slow) + var(--duration-base)) 3;
+    }
+  }
+
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+</style>
