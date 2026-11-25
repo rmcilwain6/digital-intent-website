@@ -1,0 +1,196 @@
+---
+// The Valleyview band on Home (SPEC 7.1, #66): a full-width Digital band
+// inviting Valleyview Grade 12s in, which breaks up the paper bands before
+// it. The year mark is the band's one emphasis (selected text). The facts sit
+// beside the copy so the text can stretch across the band.
+//
+// Information only (D5): the keycap goes to the grant page, and the second
+// link invites other schools to Contact. A feature of the Year 1 recipient
+// can join the band once that story is published.
+import type { Home } from '../../schemas/home';
+import DraftMarker from './DraftMarker.astro';
+
+interface Props {
+  id: string;
+  section: Home['sections']['valleyview'];
+}
+
+const { id, section } = Astro.props;
+const headingId = `${id}-heading`;
+---
+
+<section class="band" data-theme="digital" aria-labelledby={headingId}>
+  <div class="container">
+    {section.draft && <DraftMarker />}
+    <p class="mark">
+      <span class="year">{section.year}</span>
+      <span class="note">{` · ${section.yearNote}`}</span>
+    </p>
+    <h2 id={headingId}>{section.heading}</h2>
+    <div class="columns">
+      <div class="body">
+        {section.body.map((paragraph, index) => (
+          <p class:list={{ lead: index === 0 }}>{paragraph}</p>
+        ))}
+      </div>
+      <dl class="details">
+        {section.details.map((detail) => (
+          <div>
+            <dt>{detail.term}</dt>
+            <dd>{detail.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+    <p class="actions">
+      <a class="key" href={section.cta.href}>
+        {section.cta.label}
+        <span class="cap" aria-hidden="true">
+          ↵
+        </span>
+      </a>
+      <a class="school" href={section.school.href}>
+        {section.school.label} <span aria-hidden="true">→</span>
+      </a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .band {
+    padding-block: var(--space-8);
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .mark {
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+
+  /* Selected text: the Digital world's emphasis, one per band. */
+  .year {
+    padding-inline: 0.06em;
+    background: var(--color-highlight);
+    color: var(--color-on-highlight);
+  }
+
+  .note {
+    color: var(--color-text-muted);
+  }
+
+  h2 {
+    margin: 0 0 var(--space-6);
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  /* Stacked on small screens. On wide ones the facts sit at the band's right
+     edge, with the copy at reading width on the left. */
+  .columns {
+    display: grid;
+    gap: var(--space-6) var(--space-8);
+    align-items: start;
+  }
+
+  @media (min-width: 64rem) {
+    .columns {
+      grid-template-columns: minmax(0, var(--width-prose)) minmax(20rem, 34rem);
+      justify-content: space-between;
+    }
+  }
+
+  .body {
+    max-inline-size: var(--width-prose);
+    min-inline-size: 0;
+  }
+
+  .body p {
+    margin: 0 0 var(--space-4);
+  }
+
+  .body p:last-child {
+    margin-block-end: 0;
+  }
+
+  .lead {
+    font-size: var(--text-lg);
+  }
+
+  .details {
+    min-inline-size: 0;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .details div {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .details div:last-child {
+    border-block-end: var(--border-width) solid var(--color-border);
+  }
+
+  dt {
+    color: var(--color-label);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-6);
+    align-items: center;
+    margin: var(--space-7) 0 0;
+  }
+
+  /* Keycap, the Digital world's button (as on the 404 page). */
+  .key {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: 2.75rem;
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width) solid var(--color-key-edge);
+    border-block-start-color: var(--color-key-edge-top);
+    border-block-end: 3px solid var(--color-key-lip);
+    border-radius: 5px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    text-decoration: none;
+    transition: transform var(--duration-press) var(--ease-standard);
+  }
+
+  .key:hover {
+    border-block-start-color: var(--color-signal);
+  }
+
+  .key:active {
+    transform: translateY(2px);
+  }
+
+  .cap {
+    color: var(--color-signal);
+  }
+
+  .school {
+    color: var(--color-link);
+    font-weight: var(--font-weight-bold);
+    text-underline-offset: 0.18em;
+  }
+
+  .school:hover {
+    text-decoration-thickness: 2px;
+  }
+</style>

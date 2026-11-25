@@ -152,6 +152,30 @@ const whatWeDo = z.strictObject({
   draft: z.boolean(),
 });
 
+/**
+ * The Valleyview band (#66): a navy band inviting Valleyview Grade 12s in.
+ * Information only (D5): its links go to the grant page and to Contact.
+ */
+const valleyviewSection = z.strictObject({
+  /** Lowercase mono mark, shown as selected text: which year of the grant. */
+  year: z.string().min(1),
+  /** Lowercase mono note after the mark. */
+  yearNote: z.string().min(1),
+  heading: z.string().min(1),
+  body: z.array(z.string().min(1)).min(1),
+  /** Short facts as a mono list, such as who and when. */
+  details: z
+    .array(
+      z.strictObject({ term: z.string().min(1), value: z.string().min(1) }),
+    )
+    .min(1),
+  /** The keycap to the grant page. Lowercase, as typed. */
+  cta: callToAction,
+  /** An invitation for other schools, to Contact. */
+  school: callToAction,
+  draft: z.boolean(),
+});
+
 export const sectionKeys = [
   'problem',
   'mission',
@@ -234,7 +258,7 @@ export const homeSchema = z.strictObject({
       insetLabel: z.string().min(1),
     }),
     library: librarySection,
-    valleyview: section.extend({ questionsHeading: z.string().min(1) }),
+    valleyview: valleyviewSection,
     outreach: section,
     partnerships: section,
   }),
