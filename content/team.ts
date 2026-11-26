@@ -4,8 +4,6 @@
 import { brand } from '../src/brand/brand.config';
 import { regionDistrictsSchema, teamSchema } from '../src/schemas/team';
 
-const portraitNote = 'Head-and-shoulders portrait, original photography.';
-
 // The school districts outlined on the map around each starting region.
 // Modest on purpose: the districts nearest each city.
 export const regionDistricts = regionDistrictsSchema.parse({
@@ -17,7 +15,10 @@ export const regionDistricts = regionDistrictsSchema.parse({
 export const team = teamSchema.parse([
   {
     name: 'Reed McIlwain',
-    photo: { placeholder: true, note: portraitNote },
+    photo: {
+      src: '/team/reed-mcilwain.webp',
+      alt: 'Reed McIlwain smiling on a snowy riverside path, with mountains in the background.',
+    },
     // [TK: confirm role and home city with Reed]
     role: 'Executive Director',
     place: 'Kamloops',
@@ -47,7 +48,10 @@ export const team = teamSchema.parse([
   },
   {
     name: 'Carolyn Dahl',
-    photo: { placeholder: true, note: portraitNote },
+    photo: {
+      src: '/team/carolyn-dahl.webp',
+      alt: 'Carolyn Dahl smiling in a graduation gown, with the water in the background.',
+    },
     // [TK: confirm role and home city with Carolyn]
     role: 'Board Member',
     place: 'Victoria',
@@ -55,7 +59,10 @@ export const team = teamSchema.parse([
   },
   {
     name: 'Nicole Peverley',
-    photo: { placeholder: true, note: portraitNote },
+    photo: {
+      src: '/team/nicole-peverley.webp',
+      alt: 'Nicole Peverley smiling in front of a red brick wall.',
+    },
     // [TK: confirm role and home city with Nicole]
     role: 'Board Member',
     place: 'Kamloops',
