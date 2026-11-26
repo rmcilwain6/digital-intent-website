@@ -4,10 +4,6 @@
 import { brand } from '../src/brand/brand.config';
 import { regionDistrictsSchema, teamSchema } from '../src/schemas/team';
 
-// Logos stay placeholders until each organization's logo is provided, with
-// permission to use it.
-const logo = { placeholder: true } as const;
-
 // The school districts outlined on the map around each starting region.
 // Modest on purpose: the districts nearest each city.
 export const regionDistricts = regionDistrictsSchema.parse({
