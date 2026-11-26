@@ -170,9 +170,9 @@ In his career, Keaton has blended environmental services, operational excellence
     },
     role: 'Board Member',
     place: 'Victoria',
-    // Draft copy from Reed's notes, Nov 26, 2026: needs Nicole's approval.
+    // Bio worked through with Reed, Nov 26, 2026: needs Nicole's approval.
     focus:
-      'Builds the software and tools we use, and looks after the software side of our work.',
+      'Builds and maintains the tools we use, and helps shape our technology curriculum.',
     work: [
       {
         title: 'Senior Software Developer',
@@ -191,9 +191,15 @@ In his career, Keaton has blended environmental services, operational excellence
         },
       },
     ],
-    bio: `Nicole lives in Victoria, where she is a senior software developer at Shift, a software company. She studied software engineering at the University of Victoria.
+    bio: `A love of problem solving drew Nicole to technology as a kid, and it has kept her there. She studied software engineering at the University of Victoria and is now a senior software developer at Shift in Victoria. She started there part time as a student and has worked there full time for five years, where she mentors co-op students.
 
-She has always been drawn to teaching as well as software development. She is excited to build software, and to teach it, in ways that help kids.`,
+Since starting her career, Nicole has worked to bring more women into STEM, and into software development in particular. She has judged and mentored at hackathons such as cmd-f at UBC and Toast Dash, and has helped out with iWEST, which supports women in STEM. She has also mentored and judged for UVic’s Inspire program, where students build software for social good.
+
+Nicole has also been a developer through the years when AI became a defining part of the job. She has watched it change how software is built in real time, and she wants to help other developers and young people get ready for what it brings.
+
+As a board member, Nicole builds and maintains the tools we use, and helps shape our technology curriculum and how we approach technology as an organization. She brings technical depth so teachers don’t need to, and sees it as a way to put her skills to work for young people and the next generation.
+
+Outside of work, Nicole fills her calendar with all sorts of sports, played with friends.`,
   },
 ]);
 
