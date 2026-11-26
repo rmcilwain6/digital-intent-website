@@ -2,7 +2,6 @@
 // comes from `site` (brand.domain, via astro.config.mjs), so the domain lives
 // in one place (rule 7). Nothing is disallowed: pages kept out of search use
 // `noindex`, which a crawler can only see on a page it is allowed to fetch.
-// Pre-launch, `X-Robots-Tag: noindex` in public/_headers covers the whole site.
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = ({ site }) => {

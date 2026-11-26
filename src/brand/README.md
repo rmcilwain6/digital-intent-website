@@ -16,7 +16,7 @@ Changes here need approval from a person (AGENTS.md).
 | `fonts/`                 | Font files and their licences                                                                         |
 | `brand.css`              | Imports `fonts.css` and `tokens.css`; layouts import this file                                        |
 | `public/brand/`          | `logo.svg`, `logo-on-dark.svg`, `logo-mark.svg`, `favicon.svg`, `og-default.png`, `og-valleyview.png` |
-| `/fixtures/orthography/` | Page that renders the SPEC section 6 sample strings in every weight                                   |
+| `/fixtures/orthography/` | Page that renders the SPEC section 6 sample strings in every weight (`npm run dev` only)              |
 
 ## Config values (`brand.config.ts`)
 

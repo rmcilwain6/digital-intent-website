@@ -463,10 +463,10 @@ Write these once the patterns they describe have settled in real code. `add-page
 - [ ] Name, logo, colours, type and motion applied as section 6 describes
 - [ ] Pre-launch checks in section 9.2 pass with the final brand, both worlds
 - [ ] No `[TK:` placeholders remain
-- [ ] Fixture pages (`/fixtures/`) removed from the production build
+- [x] Fixture pages (`/fixtures/`) removed from the production build
 - [ ] Domain connected, HTTPS enforced, `www` redirect decided
-- [ ] Cloudflare Access removed from the production domain
-- [ ] `noindex` removed
+- [x] Cloudflare Access removed from the production domain
+- [x] `noindex` removed
 - [ ] Privacy page approved; names the analytics tool if one is in use and every linked third-party service
 - [ ] Valleyview content approved; application link included only if D5 is decided
 - [ ] Indigenous outreach page and footer acknowledgement approved by the team member leading this work; Nations named for each starting region
