@@ -109,10 +109,6 @@ export const home = homeSchema.parse({
         answerLabel: 'answer',
         next: 'next question',
       },
-      closing: {
-        heading: 'Why this is hard',
-        body: 'None of this has an easy fix, partly because the people who build technology and the people who teach often see it differently. They want different things from it, for different reasons. Finding what’s best for students means bringing those views together. That’s the bridge we’re trying to build.',
-      },
       draft: false,
     },
 
@@ -178,8 +174,6 @@ export const home = homeSchema.parse({
         next: 'Next focus',
       },
       cta: { label: 'More about our mission', href: '/about/' },
-      approach:
-        'There is no single fix for any of this. We expect to try many things at once: workshops for teachers, school visits, grants for students, and partnerships across the province. Then we keep what works.',
       draft: true,
     },
 

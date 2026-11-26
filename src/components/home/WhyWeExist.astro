@@ -1,8 +1,8 @@
 ---
 // "Why we exist" on Home (SPEC 7.1, section 2): sets up the problem before
 // What we do offers anything. A short intro, three challenges side by side,
-// "Could you answer these?" with a window of questions from the bank, then a
-// quiet note on why this is hard, which hands off to the mission and pillars.
+// "Could you answer these?" with a window of questions from the bank, which
+// hands off to the mission and pillars.
 // One paper band: the window is its only Digital object.
 import { questions } from '../../../content/questions';
 import type { WhyWeExist as Section } from '../../schemas/home';
@@ -54,11 +54,6 @@ const draft = section.draft || shown.some((q) => q.draft);
         <p>{copy.lede}</p>
       </div>
       <QuestionWindow questions={shown} copy={copy} />
-    </div>
-
-    <div class="closing">
-      <h3>{section.closing.heading}</h3>
-      <p>{section.closing.body}</p>
     </div>
   </div>
 </section>
@@ -171,21 +166,5 @@ const draft = section.draft || shown.some((q) => q.draft);
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
       gap: var(--space-8);
     }
-  }
-
-  /* Why this is hard: quiet, left-aligned, at reading width. */
-  .closing {
-    max-inline-size: var(--width-prose);
-    margin-block-start: calc(1.5 * var(--space-8));
-  }
-
-  .closing h3 {
-    margin: 0;
-    font-size: var(--text-xl);
-  }
-
-  .closing p {
-    margin: var(--space-3) 0 0;
-    font-size: var(--text-lg);
   }
 </style>

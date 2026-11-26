@@ -1,6 +1,8 @@
 ---
-// The Teacher Library band on Home (SPEC 7.1, #61): heading and copy beside
-// one library card, which is the band's only call to action. Same band
+// The Teacher Library band on Home (SPEC 7.1, #61): one library card, which
+// is the band's only call to action, with the heading and copy beside it on
+// the right. The source keeps the heading first, so phones and screen readers
+// get the heading before the card; only wide screens swap the sides. Same band
 // tones as the other Home sections. Copy is in content/home.ts.
 import type { Home } from '../../schemas/home';
 import DraftMarker from './DraftMarker.astro';
@@ -58,6 +60,13 @@ const headingId = `${id}-heading`;
     flex: 1 1 26rem;
     max-inline-size: 34rem;
     min-inline-size: 0;
+  }
+
+  /* Card on the left, words on the right, once both fit side by side. */
+  @media (min-width: 56rem) {
+    .split {
+      flex-direction: row-reverse;
+    }
   }
 
   h2 {

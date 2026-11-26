@@ -1,7 +1,7 @@
 ---
 // "What we do" on Home (SPEC 7.1 item 3): answers Why we exist. The mission
 // first, then the four pillars as "what we focus on", each with one thing live
-// now and one in the works, a link to About, and a line on trying many things.
+// now and one in the works, and a link to About.
 //
 // Wider screens: each pillar is a ruled index card beside its two items. Once
 // the script runs (and the screen is tall enough), the cards gather into one
@@ -209,8 +209,6 @@ const draft =
         <CallToAction cta={section.cta} variant="secondary" />
       </p>
     </div>
-
-    <p class="approach">{section.approach}</p>
   </div>
 </section>
 
@@ -380,24 +378,9 @@ const draft =
     margin-block: var(--space-6) 0;
   }
 
-  /* The closing line, under a rule. */
-  .approach {
-    max-inline-size: 36em;
-    margin-block: var(--space-8) 0;
-    padding-block-start: var(--space-6);
-    border-block-start: var(--border-width) solid var(--color-border);
-    font-size: var(--text-lg);
-  }
-
   /* The dashed dot is hollow: it takes the ground it sits on. */
   .wide {
     --dot-bg: var(--band-bg);
-  }
-
-  @media (min-width: 48rem) {
-    .approach {
-      margin-block-start: calc(1.5 * var(--space-8));
-    }
   }
 
   /* Only one layout at a time. */
