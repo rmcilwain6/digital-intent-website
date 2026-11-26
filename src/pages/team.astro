@@ -610,9 +610,10 @@ const views: MapView[] = members.map((m) => {
     gap: var(--space-3);
   }
 
+  /* Wide enough for a wordmark: most logos are wider than they are tall. */
   .logo {
     flex: none;
-    inline-size: var(--space-7);
+    inline-size: calc(var(--space-7) * 2);
     block-size: var(--space-7);
     object-fit: contain;
   }

@@ -38,7 +38,10 @@ export const team = teamSchema.parse([
     education: [
       {
         program: 'Bachelor of Software Engineering',
-        school: { name: 'University of Victoria', logo },
+        school: {
+          name: 'University of Victoria',
+          logo: { src: '/team/logos/uvic.webp' },
+        },
       },
     ],
     bio: `Reed grew up in Kamloops and graduated from Valleyview Secondary in 2016, where he was valedictorian. He then spent about ten years in Victoria, starting with a software engineering degree at the University of Victoria. Today he lives in Vancouver and is often in Kamloops and Victoria. He thinks of all three cities as home, which is why they are where we are building our community first.
@@ -77,7 +80,10 @@ He left software to do more of that mix. He started a photography business and d
     education: [
       {
         program: 'Natural Resource Sciences',
-        school: { name: 'Thompson Rivers University', logo },
+        school: {
+          name: 'Thompson Rivers University',
+          logo: { src: '/team/logos/tru.webp' },
+        },
       },
     ],
     // Bio as supplied by Reed, Nov 26, 2026, lightly edited: needs Keaton's
@@ -106,7 +112,10 @@ In his career, Keaton has blended environmental services, operational excellence
     education: [
       {
         program: 'Bachelor of Education',
-        school: { name: 'Vancouver Island University', logo },
+        school: {
+          name: 'Vancouver Island University',
+          logo: { src: '/team/logos/viu.webp' },
+        },
       },
     ],
     bio: `Carolyn is a primary teacher who focuses on kindergarten to Grade 3. She earned her Bachelor of Education at Vancouver Island University and lived in Nanaimo for several years. She now lives in Vancouver, where she is a teacher on call with the Vancouver School Board (School District 39).`,
@@ -131,7 +140,10 @@ In his career, Keaton has blended environmental services, operational excellence
     education: [
       {
         program: 'Bachelor of Software Engineering',
-        school: { name: 'University of Victoria', logo },
+        school: {
+          name: 'University of Victoria',
+          logo: { src: '/team/logos/uvic.webp' },
+        },
       },
     ],
     bio: `Nicole lives in Victoria, where she is a senior software developer at Shift, a software company. She studied software engineering at the University of Victoria.
