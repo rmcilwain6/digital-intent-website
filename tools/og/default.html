@@ -1,0 +1,67 @@
+<!doctype html>
+<!--
+  Default social sharing image, used on every page (public/brand/og-default.png).
+  Design A, "two worlds", approved by Reed, November 26, 2026. The team's
+  line from Home, split across the two worlds: paper above, navy below.
+-->
+<meta charset="utf-8" />
+<link rel="stylesheet" href="og.css" />
+<style>
+  .analog {
+    position: absolute;
+    inset: 0 0 50% 0;
+    padding: 40px 72px 0;
+  }
+
+  .digital {
+    position: absolute;
+    inset: 50% 0 0 0;
+    padding: 0 72px;
+    background: var(--color-navy);
+    color: var(--color-paper);
+  }
+
+  .logo {
+    display: block;
+    height: 66px;
+    margin-inline-start: -12px;
+  }
+
+  h1 {
+    position: absolute;
+    right: 72px;
+    bottom: 34px;
+    left: 72px;
+  }
+
+  h2 {
+    margin-top: 38px;
+  }
+
+  h2 span {
+    padding: 0 10px;
+    background: var(--color-lime);
+    color: var(--color-navy);
+  }
+
+  .url {
+    position: absolute;
+    bottom: 44px;
+    left: 72px;
+    color: var(--color-lime);
+    font-size: 22px;
+  }
+
+  .url::before {
+    content: '> ';
+    color: var(--color-text-muted);
+  }
+</style>
+<div class="analog">
+  <img class="logo" src="../../public/brand/logo.svg" alt="" />
+  <h1>Every student learns how the natural world works.</h1>
+</div>
+<div class="digital" data-theme="digital">
+  <h2>What about the <span>digital one?</span></h2>
+  <p class="url mono">digitalintent.ca</p>
+</div>

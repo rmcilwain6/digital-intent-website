@@ -1,5 +1,6 @@
 // Schema for the Home page sections (content/home.ts, SPEC 7.1).
 import { z } from 'astro/zod';
+import { importedImageSchema } from './image';
 
 /**
  * A call to action. `href` is a site path (`/valleyview/`), an outbound https
@@ -271,19 +272,23 @@ export const homeSchema = z.strictObject({
       }),
     }),
     /**
-     * The three prints on the whiteboard, one bridge per starting region:
-     * top left (landscape), top right (portrait), then below (landscape).
+     * The three prints on the whiteboard, one bridge per starting region,
+     * all landscape (3:2). The first is the featured print: the largest, at
+     * the top of the board.
      */
     images: z
       .array(
         z.strictObject({
-          /** The region, shown as the print's caption. */
+          /** Original photography (SPEC rule 8), at 3:2. */
+          src: importedImageSchema,
+          alt: z.string().min(1),
+          /** Where it was taken, written on the back of the print. */
           place: z.string().min(1),
           label: z.string().min(1),
-          /** One-line art direction for the photo to come (SPEC rule 8). */
-          note: z.string().min(1),
           /** When it was taken, written on the back of the print. */
           taken: z.string().min(1),
+          /** An optional pencil note on the back, e.g. what has changed since. */
+          aside: z.string().min(1).optional(),
         }),
       )
       .length(3),

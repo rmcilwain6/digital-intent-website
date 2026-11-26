@@ -2,37 +2,38 @@
 
 Everything that makes the site look and sound like the organization lives here and in `public/brand/`. Brand values stay in these two folders; brand expression such as signature visuals and layout can reach the shared layouts and named components (SPEC section 6). Components read from this layer and never hard-code a name, colour, font, duration, logo or contact detail.
 
-Colours, type, spacing, radius and the cursor come from the **Digital Intent design system** (v1.3, November 21, 2026). The logo files are the design system's outlined SVGs. The social image (`og-default.png`) is still a placeholder.
+Colours, type, spacing, radius and the cursor come from the **Digital Intent design system** (v1.3, November 21, 2026). The logo files are the design system's outlined SVGs. The social image (`og-default.png`) is drawn from the brand tokens in `tools/og/` and rendered with `node tools/og/render.mjs`; re-render it whenever the tokens or logo change.
 
 Changes here need approval from a person (AGENTS.md).
 
 ## Files
 
-| File                     | What it holds                                                                    |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| `brand.config.ts`        | Name, contact details, regions, paths to logo and images                         |
-| `tokens.css`             | Colours (Analog and Digital), type, spacing, layout, shape, motion               |
-| `fonts.css`              | `@font-face` rules for self-hosted fonts                                         |
-| `fonts/`                 | Font files and their licences                                                    |
-| `brand.css`              | Imports `fonts.css` and `tokens.css`; layouts import this file                   |
-| `public/brand/`          | `logo.svg`, `logo-on-dark.svg`, `logo-mark.svg`, `favicon.svg`, `og-default.png` |
-| `/fixtures/orthography/` | Page that renders the SPEC section 6 sample strings in every weight              |
+| File                     | What it holds                                                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `brand.config.ts`        | Name, contact details, regions, paths to logo and images                                              |
+| `tokens.css`             | Colours (Analog and Digital), type, spacing, layout, shape, motion                                    |
+| `fonts.css`              | `@font-face` rules for self-hosted fonts                                                              |
+| `fonts/`                 | Font files and their licences                                                                         |
+| `brand.css`              | Imports `fonts.css` and `tokens.css`; layouts import this file                                        |
+| `public/brand/`          | `logo.svg`, `logo-on-dark.svg`, `logo-mark.svg`, `favicon.svg`, `og-default.png`, `og-valleyview.png` |
+| `/fixtures/orthography/` | Page that renders the SPEC section 6 sample strings in every weight                                   |
 
 ## Config values (`brand.config.ts`)
 
-| Key           | Current value                                                        | Notes                                                                                                                                                             |
-| ------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `placeholder` | `false`                                                              | While `true`, pages show a "Placeholder brand" label                                                                                                              |
-| `name`        | `Digital Intent Learning Society`                                    | Full legal name (D31)                                                                                                                                             |
-| `shortName`   | `Digital Intent`                                                     | Usual short form; for tight spaces (D31)                                                                                                                          |
-| `tagline`     | `[TK]`                                                               | One line, plain language                                                                                                                                          |
-| `domain`      | `digitalintent.ca`                                                   | Bare `.ca` domain, no `https://`. Also sets `site` in `astro.config.mjs` (D2)                                                                                     |
-| `email`       | `helloworld@digitalintent.ca`                                        | Organization email (D21); the mailbox is set up with the domain                                                                                                   |
-| `social`      | none                                                                 | List of `{ label, href }`                                                                                                                                         |
-| `regions`     | Kamloops, Victoria, Vancouver                                        | Starting regions (SPEC section 2)                                                                                                                                 |
-| `logo`        | `/brand/logo.svg`, `/brand/logo-on-dark.svg`, `/brand/logo-mark.svg` | Wordmark for paper, wordmark for navy (header and footer), square icon; natural size 610 × 155; alt text. Never recolour a logo file: pick the one for the ground |
-| `favicon`     | `/brand/favicon.svg`                                                 | SVG favicon                                                                                                                                                       |
-| `socialImage` | `/brand/og-default.png`                                              | 1200 × 630, with alt text                                                                                                                                         |
+| Key                | Current value                                                        | Notes                                                                                                                                                             |
+| ------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `placeholder`      | `false`                                                              | While `true`, pages show a "Placeholder brand" label                                                                                                              |
+| `name`             | `Digital Intent Learning Society`                                    | Full legal name (D31)                                                                                                                                             |
+| `shortName`        | `Digital Intent`                                                     | Usual short form; for tight spaces (D31)                                                                                                                          |
+| `tagline`          | `[TK]`                                                               | One line, plain language                                                                                                                                          |
+| `domain`           | `digitalintent.ca`                                                   | Bare `.ca` domain, no `https://`. Also sets `site` in `astro.config.mjs` (D2)                                                                                     |
+| `email`            | `helloworld@digitalintent.ca`                                        | Organization email (D21); the mailbox is set up with the domain                                                                                                   |
+| `social`           | none                                                                 | List of `{ label, href }`                                                                                                                                         |
+| `regions`          | Kamloops, Victoria, Vancouver                                        | Starting regions (SPEC section 2)                                                                                                                                 |
+| `logo`             | `/brand/logo.svg`, `/brand/logo-on-dark.svg`, `/brand/logo-mark.svg` | Wordmark for paper, wordmark for navy (header and footer), square icon; natural size 610 × 155; alt text. Never recolour a logo file: pick the one for the ground |
+| `favicon`          | `/brand/favicon.svg`                                                 | SVG favicon                                                                                                                                                       |
+| `socialImage`      | `/brand/og-default.png`                                              | 1200 × 630, with alt text. The sharing image for every page that doesn't pick its own                                                                             |
+| `pageSocialImages` | `valleyview`: `/brand/og-valleyview.png`                             | Per-page sharing images, picked with BaseLayout's `socialImage` prop. Used on the Valleyview page and recipient stories                                           |
 
 ## Tokens (`tokens.css`)
 
