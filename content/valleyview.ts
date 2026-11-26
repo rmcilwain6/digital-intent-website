@@ -7,11 +7,8 @@ import { valleyviewSchema } from '../src/schemas/valleyview';
 export const valleyview = valleyviewSchema.parse({
   hero: {
     headline: "Pick a hard problem. We'll put $2,000 behind it.",
-    facts: [
-      '$2,000 plus mentorship',
-      'For Valleyview Grade 12s graduating in 2027',
-      'A rough idea is enough to apply',
-    ],
+    // Short form for Home's Valleyview window; not shown on this page.
+    award: '$2,000 plus mentorship',
   },
 
   pillar: {
@@ -29,15 +26,13 @@ export const valleyview = valleyviewSchema.parse({
       'Young people we mentor stay connected to us after high school, and our network opens doors for them as their ideas grow.',
       'Some of the ideas we back grow into lasting ventures.',
     ],
-    goalsNote:
-      '[TK: confirm the pillar 4 goals, drafts pending board approval]',
   },
 
   current: {
     label: 'Year 2 · 2027',
     heading: 'Apply for the 2027 grant',
     intro:
-      "$2,000 and mentorship for one graduating Valleyview student to take on a hard problem that makes life better for other people. You don't need top grades, a long list of accomplishments or a finished plan.",
+      "You don't need top grades, a long list of accomplishments or a finished plan.",
     award: [
       {
         title: '$2,000',
@@ -49,7 +44,7 @@ export const valleyview = valleyviewSchema.parse({
       },
       {
         title: 'Check-ins',
-        text: "In return, the recipient checks in with us [TK: how often, placeholder says twice] over the following year: how the money was used and how the project is going, including what didn't work.",
+        text: "In return, the recipient checks in with us a few times over the following year: how the money was used and how the project is going, including what didn't work.",
       },
     ],
     eligibility:
@@ -69,7 +64,7 @@ export const valleyview = valleyviewSchema.parse({
       },
       {
         title: 'Have a conversation with us',
-        text: "Shortlisted students meet with us at Valleyview. Take about [TK: length, placeholder says 10] minutes to walk us through your answers, then we'll ask questions. We send a template beforehand. Slides are optional.",
+        text: "Shortlisted students meet with us at Valleyview. Take about 15 minutes to walk us through your answers, then we'll ask questions. We send a template beforehand. Slides are optional.",
       },
       {
         title: 'The award',
@@ -78,13 +73,12 @@ export const valleyview = valleyviewSchema.parse({
     ],
     timeline: [
       { when: 'December 1, 2026', what: 'Applications open' },
-      { when: 'Late February or early March', what: 'Applications close' },
+      { when: 'Early March', what: 'Applications close' },
       { when: 'Late March', what: 'Shortlist notified' },
       { when: 'Last week of April', what: 'Conversations at Valleyview' },
       { when: 'May', what: 'Recipient notified' },
       { when: 'June', what: 'Valleyview Awards Banquet' },
     ],
-    timelineNote: '[TK: exact dates for the deadline, shortlist and recipient]',
     questions: [
       'What problem do you want to take on, and why does it matter?',
       'Why are you the right person to work on it?',
@@ -115,10 +109,9 @@ export const valleyview = valleyviewSchema.parse({
       },
     ],
     apply: {
-      heading: 'Applications open December 1, 2026',
-      text: 'Apply online from December 1 until late February or early March. A rough idea is enough to start.',
-      pending:
-        '[TK: apply button, once the board picks the application form (D5)]',
+      heading: 'Apply December 1 to early March',
+      text: 'Applications open online on December 1, 2026 and close in early March. A rough idea is enough to start.',
+      pending: 'The link to the application will be here when it opens.',
     },
     faq: [
       {
@@ -160,21 +153,12 @@ export const valleyview = valleyviewSchema.parse({
         answer: 'No. It can be the first steps of something much bigger.',
       },
     ],
-    team: {
-      intro:
-        'The grant was started in 2025 by two Valleyview grads who wanted to give back to the school.',
-      people: [
-        {
-          name: 'Reed McIlwain',
-          bio: 'Valleyview class of 2016 and UVic Software Engineering. Founding executive director of Digital Intent.',
-        },
-        {
-          name: '[TK: second founder, with their agreement]',
-          bio: '[TK: bio, pending their check]',
-        },
-      ],
+    // Founders confirmed by Reed, November 26, 2026.
+    founders: {
+      text: 'The Valleyview Social Innovation Grant was founded in 2025 by Reed McIlwain and Keaton Allan. It is now a program of the {organization}.',
+      link: { label: 'Read more about them on our team page', href: '/team/' },
     },
     privacy:
-      'We only ask for what we need to understand you and your idea. Applications are read only by the grant team. [TK: where application data is stored, once the form provider is chosen]',
+      'We only ask for what we need to understand you and your idea. Applications are read only by the grant team.',
   },
 });

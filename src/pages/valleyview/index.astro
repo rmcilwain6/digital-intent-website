@@ -1,7 +1,7 @@
 ---
 // Valleyview grant home (SPEC 7.4, decision record 0006). Reads top to
 // bottom: the bigger picture (pillar 4), past recipients, then this year's
-// grant and how to apply. No apply button until the board decides D5.
+// grant and how to apply. The apply link is added when applications open.
 import { getCollection, render } from 'astro:content';
 import { valleyview } from '../../../content/valleyview';
 import { brand } from '../../brand/brand.config';
@@ -31,32 +31,11 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
 >
   <article class="valleyview">
     <header class="hero">
-      <p class="label">/valleyview</p>
       <h1>{page.data.heading ?? page.data.title}</h1>
       <p class="headline">{hero.headline}</p>
       <div class="intro">
         <Content />
       </div>
-      <ul class="facts">
-        {hero.facts.map((fact) => (
-          <li>{fact}</li>
-        ))}
-      </ul>
-      <nav class="jump" aria-label="On this page">
-        <ul>
-          <li>
-            <a href="#why">Why we do this</a>
-          </li>
-          {recipients.length > 0 && (
-            <li>
-              <a href="#past">Past recipients</a>
-            </li>
-          )}
-          <li>
-            <a href="#apply">{current.label}: apply</a>
-          </li>
-        </ul>
-      </nav>
     </header>
 
     <section
@@ -81,7 +60,6 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
             <li>{goal}</li>
           ))}
         </ol>
-        {pillar.goalsNote && <p class="muted">{pillar.goalsNote}</p>}
       </div>
     </section>
 
@@ -101,14 +79,22 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
               <p class="label">{recipient.data.cohort}</p>
               <h3>Meet {recipient.data.name}</h3>
               <p>{recipient.data.dek}</p>
-              <blockquote>
-                <p>{recipient.data.quote}</p>
-              </blockquote>
-              <p>
-                <a class="more" href={`/valleyview/${recipient.id}/`}>
-                  Read {recipient.data.name}'s story
-                </a>
-              </p>
+              {recipient.data.published ? (
+                <>
+                  <blockquote>
+                    <p>{recipient.data.quote}</p>
+                  </blockquote>
+                  <p>
+                    <a class="more" href={`/valleyview/${recipient.id}/`}>
+                      Read {recipient.data.name}'s story
+                    </a>
+                  </p>
+                </>
+              ) : (
+                <p class="soon">
+                  {recipient.data.name}'s story is coming soon.
+                </p>
+              )}
             </div>
           </div>
         ))}
@@ -174,7 +160,6 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
               </li>
             ))}
           </ol>
-          {current.timelineNote && <p class="muted">{current.timelineNote}</p>}
         </div>
       </div>
 
@@ -213,16 +198,12 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
         <div>
           <h3>Who's behind it</h3>
           <p>
-            {current.team.intro} It is now a program of the {brand.name}.
+            {current.founders.text.replace('{organization}', brand.name)}{' '}
+            <a href={current.founders.link.href}>
+              {current.founders.link.label}
+            </a>
+            .
           </p>
-          <dl class="team">
-            {current.team.people.map((person) => (
-              <>
-                <dt>{person.name}</dt>
-                <dd>{person.bio}</dd>
-              </>
-            ))}
-          </dl>
         </div>
         <div>
           <h3>Contact and privacy</h3>
@@ -263,8 +244,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
   }
 
   p,
-  li,
-  dd {
+  li {
     max-inline-size: var(--width-prose);
   }
 
@@ -274,7 +254,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
   }
 
   .hero h1 {
-    margin-block: var(--space-2) 0;
+    margin: 0;
     font-size: var(--text-xl);
   }
 
@@ -289,37 +269,6 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
 
   .intro {
     font-size: var(--text-lg);
-  }
-
-  .facts,
-  .jump ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-5);
-    padding: 0;
-    list-style: none;
-  }
-
-  .facts {
-    margin-block: var(--space-5);
-    font-weight: var(--font-weight-bold);
-  }
-
-  .facts li + li::before {
-    content: '·';
-    margin-inline-end: var(--space-5);
-    color: var(--color-label);
-  }
-
-  .jump {
-    padding-block-start: var(--space-4);
-    border-block-start: var(--border-width) solid var(--color-border);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-
-  .jump ul {
-    margin: 0;
   }
 
   /* Full-width bands in the Digital world, without page overflow. */
@@ -403,6 +352,11 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     padding-inline-start: var(--space-4);
     border-inline-start: var(--focus-width) solid var(--color-signal);
     font-size: var(--text-lg);
+  }
+
+  .soon {
+    color: var(--color-text-muted);
+    font-style: italic;
   }
 
   .more {
@@ -570,15 +524,6 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
 
   details p {
     margin-block: 0 var(--space-4);
-  }
-
-  .team dt {
-    margin-block-start: var(--space-4);
-    font-weight: var(--font-weight-bold);
-  }
-
-  .team dd {
-    margin: 0;
   }
 
   @media (width < 30rem) {

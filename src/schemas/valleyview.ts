@@ -1,7 +1,7 @@
 // Schemas for the Valleyview grant pages (SPEC 7.4, decision record 0006):
 // the grant home page (content/valleyview.ts) and one feature page per past
 // recipient (content/valleyview-recipients/, loaded in src/content.config.ts).
-// There is deliberately no application link field until the board decides D5.
+// The application link is added when applications open (December 1, 2026).
 import { z } from 'astro/zod';
 
 const text = z.string().min(1);
@@ -22,8 +22,8 @@ export const imageSlotSchema = z.strictObject({
 export const valleyviewSchema = z.strictObject({
   hero: z.strictObject({
     headline: text,
-    /** Three short facts shown under the headline. */
-    facts: z.array(text).length(3),
+    /** The award in a few words, for Home's Valleyview window. */
+    award: text,
   }),
 
   /** The bigger picture: why we fund students at all (pillar 4). */
@@ -33,7 +33,6 @@ export const valleyviewSchema = z.strictObject({
     paragraphs: z.array(text).min(1),
     goalsHeading: text,
     goals: z.array(text).min(1),
-    goalsNote: text.optional(),
   }),
 
   /** This year's grant. */
@@ -55,17 +54,17 @@ export const valleyviewSchema = z.strictObject({
         }),
       )
       .min(1),
-    timelineNote: text.optional(),
     /** What's the idea, why are you the right person, how will this help. */
     questions: z.array(text).length(3),
     tipsIntro: text,
     tips: z.array(point).min(1),
-    /** How and when to apply, as text (D5). */
+    /** How and when to apply. `pending` holds the link's place until it opens. */
     apply: z.strictObject({ heading: text, text, pending: text }),
     faq: z.array(z.strictObject({ question: text, answer: text })).min(1),
-    team: z.strictObject({
-      intro: text,
-      people: z.array(z.strictObject({ name: text, bio: text })).min(1),
+    /** Who started the grant. `{organization}` becomes the organization's name. */
+    founders: z.strictObject({
+      text,
+      link: z.strictObject({ label: text, href: z.string().startsWith('/') }),
     }),
     privacy: text,
   }),

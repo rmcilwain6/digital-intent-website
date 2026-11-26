@@ -10,7 +10,11 @@ import ImagePlaceholder from '../../components/ImagePlaceholder.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export const getStaticPaths = (async () => {
-  const recipients = await getCollection('recipients');
+  // Unpublished stories get no page at all, so they can't be found or indexed.
+  const recipients = await getCollection(
+    'recipients',
+    ({ data }) => data.published,
+  );
   return recipients.map((entry) => ({
     params: { recipient: entry.id },
     props: { entry },

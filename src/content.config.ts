@@ -32,6 +32,11 @@ const recipients = defineCollection({
     year: z.number().int(),
     /** Label such as "Year 1 · 2026". */
     cohort: z.string().min(1),
+    /**
+     * False until the story is written and the recipient has approved it: no
+     * page is built, and /valleyview/ shows a "coming soon" teaser instead.
+     */
+    published: z.boolean(),
     headline: z.string().min(1),
     /** One or two sentences under the headline; also the teaser on /valleyview/. */
     dek: z.string().min(1),
