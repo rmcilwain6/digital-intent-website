@@ -140,9 +140,10 @@ Outside of work, Keaton loves to stay active, whether he’s working out, runnin
     },
     role: 'Board Member',
     place: 'Vancouver',
-    // Draft copy from Reed's notes, Nov 26, 2026: needs Carolyn's approval.
+    // Bio worked through with Reed, Nov 26, 2026: needs Carolyn's approval,
+    // especially the second paragraph.
     focus:
-      'Brings the view of a primary teacher, from kindergarten to Grade 3.',
+      'Makes sure our resources work for primary classrooms and teachers on call, and helps share our work in Vancouver.',
     work: [
       {
         title: 'Teacher on call',
@@ -161,7 +162,13 @@ Outside of work, Keaton loves to stay active, whether he’s working out, runnin
         },
       },
     ],
-    bio: `Carolyn is a primary teacher who focuses on kindergarten to Grade 3. She earned her Bachelor of Education at Vancouver Island University and lived in Nanaimo for several years. She now lives in Vancouver, where she is a teacher on call with the Vancouver School Board (School District 39).`,
+    bio: `Carolyn is a primary teacher who focuses on kindergarten to Grade 3. She earned her Bachelor of Education at Vancouver Island University and lived in Nanaimo for several years. She now lives in Vancouver, where she is a teacher on call with the Vancouver School Board (School District 39).
+
+In the classroom, Carolyn sees how differently young kids arrive at school. Some are already reading, writing and counting, while others are just getting started, and holding attention can be hard. She sees the same risk with technology. Not every child gets the same experience with it at home, and those early differences can grow into big gaps later in school. She is keen to bring new ideas into teaching, and just as keen to find the right balance, including knowing when technology doesn’t belong.
+
+As a board member, Carolyn makes sure our resources and teaching materials work for primary teachers and for teachers on call. Teachers on call are a vital part of the public school system, and our work needs to reach them as much as anyone. She also helps share our message with teachers in Vancouver.
+
+Outside of work, Carolyn loves crafting, from sewing and knitting to making small gifts for friends and family.`,
   },
   {
     name: 'Nicole Peverley',
