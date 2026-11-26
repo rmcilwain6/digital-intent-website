@@ -201,7 +201,7 @@ Outside of work, Carolyn loves crafting, from sewing and knitting to making smal
     ],
     bio: `A love of problem solving drew Nicole to technology as a kid, and it has kept her there. She studied software engineering at the University of Victoria and is now a senior software developer at Shift in Victoria. She started there part time as a student and has worked there full time for five years, where she mentors co-op students.
 
-Since starting her career, Nicole has worked to bring more women into STEM, and into software development in particular. She has judged and mentored at hackathons such as cmd-f at UBC and Toast Dash, and has helped out with iWEST, which supports women in STEM. She has also mentored and judged for UVic’s Inspire program, where students build software for social good.
+Since starting her career, Nicole has worked to bring more women into STEM, and into software development in particular. She has judged and mentored at hackathons such as cmd-f at UBC and Toast Dash, and has helped out with IWIST, Island Women in Science and Technology. She has also mentored and judged for UVic’s Inspire program, where students build software for social good.
 
 Nicole has also been a developer through the years when AI became a defining part of the job. She has watched it change how software is built in real time, and she wants to help other developers and young people get ready for what it brings.
 
