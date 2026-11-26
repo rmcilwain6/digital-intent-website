@@ -117,12 +117,30 @@ export const teachersSchema = z.strictObject({
     .strictObject({
       heading: z.string().min(1),
       intro: z.string().min(1),
+      /** A line under the folder saying more lessons are on the way. */
+      comingSoon: z.string().min(1).optional(),
+      /**
+       * Label for a quiet, unclickable tab at the end of the folder's tab
+       * row, so it is obvious at a glance that more lessons are on the way.
+       */
+      comingSoonTab: z.string().min(1).optional(),
       items: z.array(lessonSchema).min(1),
     })
     .refine(
       (s) => new Set(s.items.map((l) => l.slug)).size === s.items.length,
       { message: 'lesson slugs must be unique' },
     ),
+  /**
+   * How teachers reach us: a mailto: link to the organization email in brand
+   * config, with the subject filled in. No form (rule 1).
+   */
+  contact: z.strictObject({
+    heading: z.string().min(1),
+    /** One or more paragraphs, with a blank line between them. */
+    intro: z.string().min(1),
+    emailLabel: z.string().min(1),
+    subject: z.string().min(1),
+  }),
 });
 
 export type Teachers = z.infer<typeof teachersSchema>;

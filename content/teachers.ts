@@ -29,9 +29,13 @@ export const teachers = teachersSchema.parse({
     heading: 'Teacher Library',
     intro:
       'Lessons we have written for teachers. Download them, use them, change them to fit your class. They are free, and shared under CC BY 4.0. When we improve a lesson we publish a new version, and earlier versions stay here.',
+    comingSoonTab: 'Coming soon',
+    comingSoon:
+      'More lessons are coming soon. We are writing new ones now and will add them here as they are ready, so check back.',
     items: [
       {
-        // From the v1.0 printer-friendly PDF (Nov 23, 2026).
+        // From the v1.0 printer-friendly PDF, as reissued Nov 24, 2026 with
+        // passwordmonster.com named throughout.
         slug: 'password-cyber-sleuths',
         title: 'Password Cyber-Sleuths',
         intent: 'build a password that is strong and easy to remember',
@@ -40,7 +44,7 @@ export const teachers = teachersSchema.parse({
         grades: 'Grades 3 to 9',
         approach: 'Inquiry-based',
         devices: 'A device with a browser per pair',
-        tool: '[TK: passwordmonster.com or bitwarden.com/password-strength? The PDF names both]',
+        tool: 'passwordmonster.com',
         versions: [
           {
             version: '1.0',
@@ -59,5 +63,15 @@ export const teachers = teachersSchema.parse({
         ],
       },
     ],
+  },
+
+  contact: {
+    heading: 'Talk to us',
+    // Draft from Reed's direction, Nov 26, 2026: needs a person's approval.
+    intro: `We can only get this right by learning from teachers across the province. If something on this page speaks to you, or you think we could help in your classroom, please reach out.
+
+We would love to hear from you, hop on a call or set up a visit. Questions about a lesson and ideas for a new one are welcome too.`,
+    emailLabel: 'Email',
+    subject: 'Teacher inquiry',
   },
 });
