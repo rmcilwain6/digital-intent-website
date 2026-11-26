@@ -2,7 +2,7 @@
 // agent draft built only from ideas in the spec. It shows a visible [TK]
 // marker until a human approves it and sets `draft: false`.
 import johnsonStreetBridge from '../src/assets/photos/johnson-street-bridge-victoria.jpg';
-import kamloopsBridge from '../src/assets/photos/thompson-river-bridge-kamloops.jpg';
+import kamloopsBridge from '../src/assets/photos/overlanders-bridge-kamloops.jpg';
 import skyBridge from '../src/assets/photos/skybridge-new-westminster.jpg';
 import { brand } from '../src/brand/brand.config';
 import { homeSchema } from '../src/schemas/home';
@@ -41,10 +41,9 @@ export const home = homeSchema.parse({
       },
       {
         src: kamloopsBridge,
-        alt: 'A bridge over the Thompson River in Kamloops, under a storm sky, with sun breaking through the trees.',
+        alt: 'The Overlanders Bridge over the Thompson River in Kamloops, under a storm sky, with sun breaking through the trees.',
         place: 'Kamloops',
-        // Name as given by Reed, November 26, 2026.
-        label: 'Landsdown Bridge',
+        label: 'Overlanders Bridge',
         taken: 'May 18, 2025',
       },
       {
