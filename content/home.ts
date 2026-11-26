@@ -86,11 +86,27 @@ export const home = homeSchema.parse({
       questions: {
         heading: 'Could you answer these?',
         lede: 'We think every student should graduate able to answer questions like these. Have a guess before you look.',
-        count: 5,
+        anchor: 'questions',
+        copyLink: 'Share',
+        copied: 'Link copied',
+        count: 10,
         windowTitle: '~/questions',
+        found: 'answers found',
+        complete: 'all answers found',
+        timer: {
+          seconds: 20,
+          label: 'answer in',
+          pause: 'pause',
+          resume: 'resume',
+          timeUp: 'Time’s up. Here’s the answer.',
+        },
+        finale: {
+          tag: 'questions complete',
+        },
         prompt: 'have a guess first. then:',
         reveal: 'show the answer',
         hide: 'hide the answer',
+        answerLabel: 'answer',
         next: 'next question',
       },
       closing: {
