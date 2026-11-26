@@ -32,7 +32,7 @@ export const team = teamSchema.parse([
     work: [
       {
         title: 'Photographer and owner',
-        organization: { name: '[TK: photography business name]', logo },
+        organization: { name: 'Everyday Archive Co.', logo },
       },
     ],
     education: [
@@ -64,9 +64,9 @@ He left software to do more of that mix. He started a photography business and d
       src: '/team/keaton-allan.webp',
       alt: 'Keaton Allan smiling in a suit and tie, in front of a grey backdrop.',
     },
-    // [TK: confirm role and home city with Keaton]
+    // [TK: confirm role with Keaton]
     role: 'Board Member',
-    place: 'Victoria',
+    place: 'Kamloops',
     focus: '[TK: one-sentence focus for Keaton]',
     work: [
       {
@@ -92,10 +92,25 @@ In his career, Keaton has blended environmental services, operational excellence
       src: '/team/carolyn-dahl.webp',
       alt: 'Carolyn Dahl smiling in a graduation gown, with the water in the background.',
     },
-    // [TK: confirm role and home city with Carolyn]
+    // [TK: confirm role with Carolyn]
     role: 'Board Member',
-    place: 'Victoria',
-    focus: '[TK: one-sentence focus for Carolyn]',
+    place: 'Vancouver',
+    // Draft copy from Reed's notes, Nov 26, 2026: needs Carolyn's approval.
+    focus:
+      'Brings the view of a primary teacher, from kindergarten to Grade 3.',
+    work: [
+      {
+        title: 'Teacher on call',
+        organization: { name: 'Vancouver School District', logo },
+      },
+    ],
+    education: [
+      {
+        program: 'Bachelor of Education',
+        school: { name: 'Vancouver Island University', logo },
+      },
+    ],
+    bio: `Carolyn is a primary teacher who focuses on kindergarten to Grade 3. She earned her Bachelor of Education at Vancouver Island University and lived in Nanaimo for several years. She now lives in Vancouver, where she is a teacher on call in the Vancouver School District.`,
   },
   {
     name: 'Nicole Peverley',
@@ -103,10 +118,27 @@ In his career, Keaton has blended environmental services, operational excellence
       src: '/team/nicole-peverley.webp',
       alt: 'Nicole Peverley smiling in front of a red brick wall.',
     },
-    // [TK: confirm role and home city with Nicole]
+    // [TK: confirm role with Nicole]
     role: 'Board Member',
-    place: 'Kamloops',
-    focus: '[TK: one-sentence focus for Nicole]',
+    place: 'Victoria',
+    // Draft copy from Reed's notes, Nov 26, 2026: needs Nicole's approval.
+    focus:
+      'Brings her love of building software and of teaching to our work with kids.',
+    work: [
+      {
+        title: '[TK: job title at Shift]',
+        organization: { name: 'Shift', logo },
+      },
+    ],
+    education: [
+      {
+        program: 'Software Engineering',
+        school: { name: 'University of Victoria', logo },
+      },
+    ],
+    bio: `Nicole lives in Victoria and works at Shift, a software company in the city. She studied software engineering at the University of Victoria.
+
+She has always been drawn to teaching as well as software development. She is excited to build software, and to teach it, in ways that help kids.`,
   },
 ]);
 
