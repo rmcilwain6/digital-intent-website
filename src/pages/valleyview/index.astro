@@ -2,6 +2,7 @@
 // Valleyview grant home (SPEC 7.4, decision record 0006). Reads top to
 // bottom: the bigger picture (pillar 4), past recipients, then this year's
 // grant and how to apply. The apply link is added when applications open.
+import { Picture } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import { valleyview } from '../../../content/valleyview';
 import { brand } from '../../brand/brand.config';
@@ -70,11 +71,25 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
         </h2>
         {recipients.map((recipient) => (
           <div class="teaser">
-            <ImagePlaceholder
-              ratio={recipient.data.hero.ratio}
-              label={recipient.data.hero.label}
-              note={recipient.data.hero.note}
-            />
+            <div class="portrait">
+              {'src' in recipient.data.portrait ? (
+                <Picture
+                  class="photo"
+                  src={recipient.data.portrait.src}
+                  alt={recipient.data.portrait.alt}
+                  formats={['avif', 'webp']}
+                  quality={50}
+                  widths={[320, 480, 640, 960]}
+                  sizes="(min-width: 48rem) 22rem, calc(100vw - 2.5rem)"
+                />
+              ) : (
+                <ImagePlaceholder
+                  ratio="4 / 5"
+                  label={recipient.data.portrait.label}
+                  note={recipient.data.portrait.note}
+                />
+              )}
+            </div>
             <div class="teaser-text">
               <p class="label">{recipient.data.cohort}</p>
               <h3>Meet {recipient.data.name}</h3>
@@ -86,13 +101,13 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
                   </blockquote>
                   <p>
                     <a class="more" href={`/valleyview/${recipient.id}/`}>
-                      Read {recipient.data.name}'s story
+                      Read {recipient.data.name}’s story
                     </a>
                   </p>
                 </>
               ) : (
                 <p class="soon">
-                  {recipient.data.name}'s story is coming soon.
+                  {recipient.data.name}’s story is coming soon.
                 </p>
               )}
             </div>
@@ -196,7 +211,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
 
       <div class="split">
         <div>
-          <h3>Who's behind it</h3>
+          <h3>Who’s behind it</h3>
           <p>
             {current.founders.text.replace('{organization}', brand.name)}{' '}
             <a href={current.founders.link.href}>
@@ -342,6 +357,20 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     align-items: center;
   }
 
+  /* The portrait is always 4:5, whatever the photo's own shape. */
+  .portrait {
+    inline-size: min(100%, 22rem);
+  }
+
+  .portrait :global(.photo) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+  }
+
   .teaser h3 {
     margin-block: var(--space-2);
     font-size: var(--text-2xl);
@@ -369,7 +398,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
 
   @media (width >= 48rem) {
     .teaser {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 22rem minmax(0, 1fr);
       gap: var(--space-7);
     }
   }
