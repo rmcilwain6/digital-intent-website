@@ -1,15 +1,13 @@
 ---
 // Privacy (SPEC 7.7), from the "Privacy A: the full page" design. Analog
 // world. The lede says it in one line, then a numbered list of what the site
-// does not do, a table of the services that run it, and an index card for
-// each service we link to. An "At a glance" card sits beside the text on wide
+// does not do, a table of the services that run it, what happens to email
+// sent to us, and an index card for each service we link to. An "At a glance" card sits beside the text on wide
 // screens and after the lede on phones. A real page, not a dialog, so it
 // needs no JavaScript. Copy is in content/ and is a draft until a person
-// approves it (SPEC 12.5). Anything waiting on an open decision is a [TK]
-// note in content/. Other facts not yet confirmed are left out: the date,
-// where services are based, and the extras on the linked-service cards each
-// appear once they are set in content/. A notice link that is still a [TK]
-// note shows as text, so there is no broken link.
+// approves it (SPEC 12.5). Every fact not yet confirmed is a visible [TK]
+// note in content/, never hidden, so gaps are obvious before launch. A notice
+// link that is still a [TK] note shows as text, so there is no broken link.
 import { render } from 'astro:content';
 import { privacy } from '../../content/privacy';
 import EmailLink from '../components/EmailLink.astro';
@@ -20,11 +18,9 @@ import { isPlaceholder } from '../lib/placeholder';
 const page = await getPage('privacy');
 const { Content } = await render(page);
 
-const { collects, doesNot, services, linked, glance, questions } = privacy;
+const { collects, doesNot, services, email, linked, glance, questions } =
+  privacy;
 const number = (i: number) => String(i + 1).padStart(2, '0');
-// Show the "where it is based" column once any service has it.
-const showBased = services.items.some((item) => item.based);
-const columns = showBased ? services.columns : services.columns.slice(0, 2);
 ---
 
 <BaseLayout title={page.data.title} description={page.data.description}>
@@ -34,14 +30,11 @@ const columns = showBased ? services.columns : services.columns.slice(0, 2);
       <div class="lede">
         <Content />
       </div>
-      {privacy.lastUpdated && (
-        <p class="updated">Last updated {privacy.lastUpdated}</p>
-      )}
+      <p class="updated">Last updated {privacy.lastUpdated}</p>
     </div>
 
     <aside class="glance" aria-labelledby="glance-heading">
       <div class="card">
-        <span class="rule" aria-hidden="true"></span>
         <h2 id="glance-heading" class="card-label">
           {glance.heading}
         </h2>
@@ -66,7 +59,8 @@ const columns = showBased ? services.columns : services.columns.slice(0, 2);
 
       <section aria-labelledby="does-not-heading">
         <h2 id="does-not-heading">{doesNot.heading}</h2>
-        <ol class="does-not">
+        {/* role="list": with list-style none, VoiceOver drops list semantics. */}
+        <ol class="does-not" role="list">
           {doesNot.items.map((item, i) => (
             <li>
               <span class="num" aria-hidden="true">
@@ -84,7 +78,7 @@ const columns = showBased ? services.columns : services.columns.slice(0, 2);
         <table>
           <thead>
             <tr>
-              {columns.map((col) => (
+              {services.columns.map((col) => (
                 <th scope="col">{col}</th>
               ))}
             </tr>
@@ -94,33 +88,47 @@ const columns = showBased ? services.columns : services.columns.slice(0, 2);
               <tr>
                 <th scope="row">{item.name}</th>
                 <td>{item.role}</td>
-                {showBased && <td>{item.based}</td>}
+                <td>{item.based}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        {services.notes?.map((text) => (
+          <p class="note">{text}</p>
+        ))}
+      </section>
+
+      <section aria-labelledby="email-heading">
+        <h2 id="email-heading">{email.heading}</h2>
+        <p>{email.intro}</p>
+        <dl class="email">
+          {email.items.map((item) => (
+            <div>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <section aria-labelledby="linked-heading">
         <h2 id="linked-heading">{linked.heading}</h2>
         <p>{linked.intro}</p>
-        <ul class="linked">
+        <ul class="linked" role="list">
           {linked.items.map((item) => (
             <li class="card">
-              <span class="rule" aria-hidden="true"></span>
               <span class="card-label">{item.when}</span>
               <h3>{item.name}</h3>
               <p>{item.description}</p>
-              {item.stored && <p>Stored: {item.stored}</p>}
-              {item.notice &&
-                (isPlaceholder(item.notice.href) ? (
-                  <p class="notice">{item.notice.href}</p>
-                ) : (
-                  <a class="notice" href={item.notice.href}>
-                    {item.notice.label}
-                    <span class="visually-hidden">: {item.name}</span>
-                  </a>
-                ))}
+              <p>Stored: {item.stored}</p>
+              {isPlaceholder(item.notice.href) ? (
+                <p class="notice">{item.notice.href}</p>
+              ) : (
+                <a class="notice" href={item.notice.href}>
+                  {item.notice.label}
+                  <span class="visually-hidden">: {item.name}</span>
+                </a>
+              )}
             </li>
           ))}
         </ul>
@@ -256,21 +264,51 @@ const columns = showBased ? services.columns : services.columns.slice(0, 2);
     background-position: 0 2.75rem;
   }
 
-  .rule {
-    position: absolute;
-    inset-inline: 0;
-    inset-block-start: 2.5rem;
-    block-size: 2px;
-    background: var(--color-marker);
-  }
-
+  /* The label grows if it wraps or is zoomed, and the red rule sits under
+     it whatever its height, spanning the card's full width. */
   .card-label {
-    block-size: 1.625rem;
+    position: relative;
+    min-block-size: 1.625rem;
     margin: 0;
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     font-weight: var(--font-weight-regular);
     line-height: var(--leading-normal);
+  }
+
+  .card-label::after {
+    position: absolute;
+    inset-inline: calc(-1 * var(--space-5));
+    inset-block-start: 100%;
+    block-size: 2px;
+    background: var(--color-marker);
+    content: '';
+  }
+
+  .note {
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .email {
+    margin: var(--space-4) 0 0;
+  }
+
+  .email div {
+    display: grid;
+    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .email dt {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .email dd {
+    margin: 0;
   }
 
   .linked {
@@ -351,6 +389,11 @@ const columns = showBased ? services.columns : services.columns.slice(0, 2);
   @media (width < 48rem) {
     .privacy {
       padding-block-start: var(--space-6);
+    }
+
+    .email div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-1);
     }
 
     .lede {
