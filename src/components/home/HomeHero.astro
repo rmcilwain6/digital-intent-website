@@ -41,8 +41,9 @@ const printSizes = [
     {/*
       The prints: each photo fills its paper, held up by a magnet. Clicking
       one turns it over to the back, where the place and date are written in
-      pencil. The button's name carries the same details for screen readers,
-      and aria-pressed says whether it is turned over. Without JavaScript the
+      pencil. The button's name starts with those pencilled words, in the same
+      order (WCAG 2.5.3, label in name), then the photo's description;
+      aria-pressed says whether it is turned over. Without JavaScript the
       prints stay face up.
     */}
     <div class="board">
@@ -57,7 +58,7 @@ const printSizes = [
               type="button"
               class="turn"
               aria-pressed="false"
-              aria-label={`${image.alt} Photo of the ${image.label}, ${image.place}, taken ${image.taken}.${image.aside ? ` ${image.aside}` : ''} Turn it over`}
+              aria-label={`${image.label}, ${image.place}.${image.aside ? ` ${image.aside}` : ''} ${image.taken}. ${image.alt} Turn it over`}
               data-print
             >
               <span class="card" aria-hidden="true">
@@ -74,14 +75,19 @@ const printSizes = [
                     fetchpriority={index === 0 ? 'high' : 'auto'}
                   />
                 </span>
+                {/*
+                  Real spaces between the pencilled lines, so the text reads
+                  as words ("SkyBridge New Westminster"), not run together.
+                */}
                 <span class="face back">
                   <span class="pencil">
-                    {image.label}
-                    <br />
+                    {image.label} <br />
                     {image.place}
-                  </span>
+                  </span>{' '}
                   {image.aside && (
-                    <span class="pencil aside">{image.aside}</span>
+                    <>
+                      <span class="pencil aside">{image.aside}</span>{' '}
+                    </>
                   )}
                   <span class="pencil date">{image.taken}</span>
                 </span>
