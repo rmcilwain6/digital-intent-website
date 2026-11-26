@@ -113,8 +113,8 @@ export const home = homeSchema.parse({
     },
 
     // The mission and the pillars are in content/organization.ts, shared with
-    // About. `focus` follows the pillars' order. Its items are stand-ins
-    // built from pages we have; Reed will choose the real ones (Nov 24).
+    // About. `focus` follows the pillars' order. Items approved by Reed,
+    // Nov 26; each "In the works" item says "Coming soon" until it has more.
     mission: {
       heading: 'What we do',
       focusHeading: 'What we focus on',
@@ -124,12 +124,15 @@ export const home = homeSchema.parse({
           highlight: 'independent',
           now: {
             title: 'This website',
-            text: 'Built the way we think technology should be: fast, accessible and private, with no tracking and no cookies.',
-            cta: { label: 'How we handle privacy', href: '/privacy/' },
+            text: 'Built the way we think technology should be: open source, transparent and accessible. Anyone can read the code that runs it.',
+            cta: {
+              label: 'See the code',
+              href: 'https://github.com/rmcilwain6/digital-intent-website',
+            },
           },
           next: {
             title: 'Our positions, published in the open',
-            text: '[TK: our first published position, once the board signs off]',
+            text: 'Coming soon.',
           },
         },
         {
@@ -140,8 +143,8 @@ export const home = homeSchema.parse({
             cta: { label: 'Get in touch', href: '/contact/' },
           },
           next: {
-            title: 'Book a call with us',
-            text: '[TK: when teachers can book a call]',
+            title: 'Book a call or a classroom visit',
+            text: 'Coming soon.',
           },
         },
         {
@@ -152,8 +155,8 @@ export const home = homeSchema.parse({
             cta: { label: 'What we offer teachers', href: '/teachers/' },
           },
           next: {
-            title: 'Technology camps, with the Big Little Science Centre',
-            text: '[TK: what the camps are, who they are for, and when they run]',
+            title: 'Technology camps with the Big Little Science Centre',
+            text: 'Coming soon.',
           },
         },
         {
@@ -164,7 +167,8 @@ export const home = homeSchema.parse({
             cta: { label: 'Read about the grant', href: '/valleyview/' },
           },
           next: {
-            title: '[TK: what comes next for this pillar]',
+            title: 'More grants for students',
+            text: 'Coming soon.',
           },
         },
       ],
@@ -174,7 +178,7 @@ export const home = homeSchema.parse({
         next: 'Next focus',
       },
       cta: { label: 'More about our mission', href: '/about/' },
-      draft: true,
+      draft: false,
     },
 
     map: {
