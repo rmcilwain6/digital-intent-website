@@ -2,8 +2,10 @@
 // Privacy (SPEC 7.7), from the "Privacy A: the full page" design. Analog
 // world. The lede says it in one line, then a numbered list of what the site
 // does not do, a table of the services that run it, what happens to email
-// sent to us, and an index card for each service we link to. An "At a glance" card sits beside the text on wide
-// screens and after the lede on phones. A real page, not a dialog, so it
+// sent to us, and an index card for each service we link to. On wide screens
+// the "At a glance" card sits beside the intro, and everything below uses the
+// full page width: short sections in pairs, the table and email in full, with
+// running text kept to reading width. On phones the card follows the lede. A real page, not a dialog, so it
 // needs no JavaScript. Copy is in content/ and is a draft until a person
 // approves it (SPEC 12.5). Every fact not yet confirmed is a visible [TK]
 // note in content/, never hidden, so gaps are obvious before launch. A notice
@@ -50,14 +52,14 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
     </aside>
 
     <div class="body">
-      <section aria-labelledby="collects-heading">
+      <section class="pair" aria-labelledby="collects-heading">
         <h2 id="collects-heading">{collects.heading}</h2>
         {collects.paragraphs.map((text) => (
           <p>{text}</p>
         ))}
       </section>
 
-      <section aria-labelledby="does-not-heading">
+      <section class="pair" aria-labelledby="does-not-heading">
         <h2 id="does-not-heading">{doesNot.heading}</h2>
         {/* role="list": with list-style none, VoiceOver drops list semantics. */}
         <ol class="does-not" role="list">
@@ -72,7 +74,7 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
         </ol>
       </section>
 
-      <section aria-labelledby="services-heading">
+      <section class="full" aria-labelledby="services-heading">
         <h2 id="services-heading">{services.heading}</h2>
         <p>{services.intro}</p>
         <table>
@@ -109,7 +111,7 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
         ))}
       </section>
 
-      <section aria-labelledby="email-heading">
+      <section class="full" aria-labelledby="email-heading">
         <h2 id="email-heading">{email.heading}</h2>
         <p>{email.intro}</p>
         <dl class="email">
@@ -122,7 +124,7 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
         </dl>
       </section>
 
-      <section aria-labelledby="linked-heading">
+      <section class="pair" aria-labelledby="linked-heading">
         <h2 id="linked-heading">{linked.heading}</h2>
         <p>{linked.intro}</p>
         <ul class="linked" role="list">
@@ -145,7 +147,7 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
         </ul>
       </section>
 
-      <section aria-labelledby="questions-heading">
+      <section class="pair" aria-labelledby="questions-heading">
         <h2 id="questions-heading">{questions.heading}</h2>
         <p>
           {questions.lead} <EmailLink />.
@@ -159,13 +161,14 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
 </BaseLayout>
 
 <style>
-  /* Two columns on wide screens: the text, and the glance card beside it. */
+  /* Wide screens: the intro with the glance card beside it, then the body
+     across the full width. */
   .privacy {
     display: grid;
-    grid-template-columns: minmax(0, var(--width-prose)) minmax(0, 20rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
     grid-template-areas:
       'intro glance'
-      'body glance';
+      'body body';
     gap: 0 var(--space-8);
     align-items: start;
     padding-block-start: var(--space-7);
@@ -173,14 +176,28 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
 
   .intro {
     grid-area: intro;
+    max-inline-size: var(--width-prose);
   }
 
   .glance {
     grid-area: glance;
   }
 
+  /* Short sections sit in pairs; the table and email take the full width. */
   .body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--space-8);
     grid-area: body;
+  }
+
+  .full {
+    grid-column: 1 / -1;
+  }
+
+  /* Running text stays at reading width, however wide its section. */
+  section > p {
+    max-inline-size: var(--width-prose);
   }
 
   h1 {
@@ -305,14 +322,18 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
     font-size: var(--text-sm);
   }
 
+  /* Two columns of label-over-answer pairs on wide screens. */
   .email {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--space-8);
     margin: var(--space-4) 0 0;
   }
 
   .email div {
     display: grid;
-    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
-    gap: var(--space-3);
+    gap: var(--space-1);
+    align-content: start;
     padding-block: var(--space-3);
     border-block-start: var(--border-width) solid var(--color-border);
   }
@@ -394,6 +415,10 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
       grid-template-areas: 'intro' 'glance' 'body';
     }
 
+    .body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
     .glance {
       max-inline-size: 24rem;
       margin-block-start: var(--space-6);
@@ -405,9 +430,8 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
       padding-block-start: var(--space-6);
     }
 
-    .email div {
+    .email {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-1);
     }
 
     .lede {

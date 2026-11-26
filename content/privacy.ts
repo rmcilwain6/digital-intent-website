@@ -1,18 +1,16 @@
-// Privacy page (SPEC 7.7, issue #13). Agent draft: a person must approve this
-// text before launch (SPEC 12.5). Nothing on this page may be untrue, even
-// slightly. The site's own code collects nothing, but two services do receive
-// personal information: the host (every visitor's IP address and browser
-// details) and our email provider (messages people send us). The page says
-// both plainly. Facts not confirmed yet are visible [TK] notes, never left
-// off: the approval date, the Cloudflare error reports (NEL), and the email
-// provider, who reads mail and how long we keep it. How Valleyview
-// applications are collected waits on a board decision (D5); update this page
-// alongside the application form.
+// Privacy page (SPEC 7.7, issue #13). Approved by Reed, November 26, 2026
+// (SPEC 12.5). Nothing on this page may be untrue, even slightly. The site's
+// own code collects nothing, but two services do receive personal
+// information: the host (every visitor's IP address and browser details) and
+// our email provider (messages people send us). The page says both plainly.
 //
 // BC's PIPA: the page says why we use email, that we never sell or share it,
-// how to see, correct or delete it, and names a privacy officer by role, at
-// the privacy alias in brand config (not a person's address: the repo is
-// public). Every outside service the site links to is listed under linked.
+// who reads it, how long we keep it, how to see, correct or delete it, and
+// names our privacy officer, at the privacy alias in brand config.
+//
+// Valleyview applications are not listed yet: how they are collected waits on
+// a board decision (D5). When the application form goes live, add its tool
+// under linked, with where it stores data and its privacy notice.
 //
 // Page view counting (D7) is a stretch goal and not built, so it is not
 // mentioned. If it ships (#17), add it here before it goes live: the tool and
@@ -24,7 +22,7 @@
 import { privacySchema } from '../src/schemas/privacy';
 
 export const privacy = privacySchema.parse({
-  lastUpdated: '[TK: date a person approved this text]',
+  lastUpdated: 'November 26, 2026',
   collects: {
     heading: 'What this site collects',
     paragraphs: [
@@ -59,7 +57,7 @@ export const privacy = privacySchema.parse({
       },
     ],
     notes: [
-      'If a page fails to load, Cloudflare may ask your browser to send it a short error report. This helps Cloudflare watch its network. It is not used to track you. [TK: check on the production domain whether these reports can be turned off, and update this note]',
+      'If a page fails to load, Cloudflare may ask your browser to send it a short error report. This helps Cloudflare watch its network. It is not used to track you.',
     ],
   },
   email: {
@@ -72,20 +70,28 @@ export const privacy = privacySchema.parse({
         value:
           'Your email address, your message and anything you attach or include.',
       },
-      { label: 'Email provider', value: '[TK: our email provider]' },
-      {
-        label: 'Where mail is stored',
-        value: '[TK: where the provider stores mail]',
-      },
-      { label: 'Who reads it', value: '[TK: who reads messages sent to us]' },
-      {
-        label: 'How long we keep it',
-        value: '[TK: how long we keep messages]',
-      },
       {
         label: 'What we use it for',
         value:
           'To reply to you and keep in touch about what you wrote. We never sell your email or share it. We will only add you to a mailing list, like a newsletter, if you say yes.',
+      },
+      {
+        label: 'Who reads it',
+        value: 'Our Executive Director and our board. No one else has access.',
+      },
+      {
+        label: 'Email provider',
+        value: 'Google Workspace, from Google LLC in the United States.',
+      },
+      {
+        label: 'Where mail is stored',
+        value:
+          'In Google’s data centres, in the United States and other countries.',
+      },
+      {
+        label: 'How long we keep it',
+        value:
+          'As long as we need it to reply and follow up. If you ask us to delete it sooner, we will.',
       },
       {
         label: 'Seeing, correcting or deleting it',
@@ -110,17 +116,6 @@ export const privacy = privacySchema.parse({
           href: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement',
         },
       },
-      {
-        when: 'If you apply for the grant',
-        name: 'Valleyview applications',
-        description:
-          '[TK: how and where applications are collected, pending D5]',
-        stored: '[TK: where applications are stored, pending D5]',
-        notice: {
-          label: 'Privacy notice',
-          href: "[TK: the application tool's privacy notice, pending D5]",
-        },
-      },
     ],
   },
   glance: {
@@ -137,6 +132,6 @@ export const privacy = privacySchema.parse({
     heading: 'Questions',
     lead: 'Email us at',
     officer:
-      'Our privacy officer is responsible for how we handle personal information. You can reach them at',
+      'Reed McIlwain, our Executive Director, is our privacy officer and is responsible for how we handle personal information. Write to',
   },
 });
