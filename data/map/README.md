@@ -1,6 +1,6 @@
 # BC map data
 
-Open data for a map of British Columbia, projected to BC Albers (EPSG:3005) and simplified for the web. The site header draws the elevation profile, the footer draws a small outline of the province, and Home draws the province and the starting regions (`src/components/BcMap.astro`); how prominent the map becomes is still open (SPEC D25). Any map built from it is drawn at build time, with no map tiles and no map service, so showing it sends no requests to anyone.
+Open data for a map of British Columbia, projected to BC Albers (EPSG:3005) and simplified for the web. The site header draws the elevation profile, the footer draws a small outline of the province, and Home draws the province, its school districts and the starting regions (`src/components/BcMap.astro`); how prominent the map becomes is still open (SPEC D25). Any map built from it is drawn at build time, with no map tiles and no map service, so showing it sends no requests to anyone.
 
 Rebuild everything with `bash tools/map/build-map.sh`; it runs `tools/map/build-detail.sh` for the close-up layers. To rebuild only `bc-map.json` from the files here, run `node tools/map/build-svg.mjs`.
 
@@ -35,5 +35,5 @@ These need credit wherever the map appears. The site footer carries the credit (
 
 ## Not included
 
-- **First Nations schools** are not in the DataBC schools layer, and they are not added here on purpose. Any map of First Nations schools or communities comes out of guidance from and partnership with First Nations education partners (SPEC R6), not out of a dataset.
+- **First Nations schools** are not in the DataBC schools layer, and they are not added here on purpose. Any map of First Nations schools or communities comes out of guidance from and partnership with First Nations education partners (SPEC R6), not out of a dataset. The Indigenous outreach page map starts empty and gains a point for each school, Nation or band we have worked with, with their agreement. Those points are content, in `content/outreach.ts`, not map data.
 - **Board member locations** are not stored here. They are content, added only with each member's agreement.

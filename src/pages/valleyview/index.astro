@@ -1,11 +1,13 @@
 ---
 // Valleyview grant home (SPEC 7.4, decision record 0006). Reads top to
 // bottom: the bigger picture (pillar 4), past recipients, then this year's
-// grant and how to apply. No apply button until the board decides D5.
+// grant and how to apply. The apply link is added when applications open.
+import { Picture } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import { valleyview } from '../../../content/valleyview';
 import { brand } from '../../brand/brand.config';
 import EmailLink from '../../components/EmailLink.astro';
+import RichText, { type Segment } from '../../components/RichText.astro';
 import ImagePlaceholder from '../../components/ImagePlaceholder.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPage } from '../../lib/pages';
@@ -18,41 +20,35 @@ const recipients = (await getCollection('recipients')).sort(
   (a, b) => b.data.year - a.data.year,
 );
 
+// A recipient's dek, with its highlighted phrase (if any) marked.
+function dekSegments(dek: string, highlight?: string): Segment[] {
+  if (!highlight) return [{ text: dek }];
+  const [before, ...rest] = dek.split(highlight);
+  return [
+    { text: before },
+    { text: highlight, mark: true },
+    { text: rest.join(highlight) },
+  ];
+}
+
 const dateFormat = new Intl.DateTimeFormat('en-CA', {
   dateStyle: 'long',
   timeZone: 'UTC',
 });
 ---
 
-<BaseLayout title={page.data.title} description={page.data.description}>
+<BaseLayout
+  title={page.data.title}
+  description={page.data.description}
+  socialImage="valleyview"
+>
   <article class="valleyview">
     <header class="hero">
-      <p class="label">/valleyview</p>
       <h1>{page.data.heading ?? page.data.title}</h1>
       <p class="headline">{hero.headline}</p>
       <div class="intro">
         <Content />
       </div>
-      <ul class="facts">
-        {hero.facts.map((fact) => (
-          <li>{fact}</li>
-        ))}
-      </ul>
-      <nav class="jump" aria-label="On this page">
-        <ul>
-          <li>
-            <a href="#why">Why we do this</a>
-          </li>
-          {recipients.length > 0 && (
-            <li>
-              <a href="#past">Past recipients</a>
-            </li>
-          )}
-          <li>
-            <a href="#apply">{current.label}: apply</a>
-          </li>
-        </ul>
-      </nav>
     </header>
 
     <section
@@ -77,7 +73,6 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
             <li>{goal}</li>
           ))}
         </ol>
-        {pillar.goalsNote && <p class="muted">{pillar.goalsNote}</p>}
       </div>
     </section>
 
@@ -88,23 +83,52 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
         </h2>
         {recipients.map((recipient) => (
           <div class="teaser">
-            <ImagePlaceholder
-              ratio={recipient.data.hero.ratio}
-              label={recipient.data.hero.label}
-              note={recipient.data.hero.note}
-            />
+            <div class="portrait">
+              {'src' in recipient.data.portrait ? (
+                <Picture
+                  class="photo"
+                  src={recipient.data.portrait.src}
+                  alt={recipient.data.portrait.alt}
+                  formats={['avif', 'webp']}
+                  quality={50}
+                  widths={[320, 480, 640, 960]}
+                  sizes="(min-width: 48rem) 22rem, calc(100vw - 2.5rem)"
+                />
+              ) : (
+                <ImagePlaceholder
+                  ratio="4 / 5"
+                  label={recipient.data.portrait.label}
+                  note={recipient.data.portrait.note}
+                />
+              )}
+            </div>
             <div class="teaser-text">
               <p class="label">{recipient.data.cohort}</p>
               <h3>Meet {recipient.data.name}</h3>
-              <p>{recipient.data.dek}</p>
-              <blockquote>
-                <p>{recipient.data.quote}</p>
-              </blockquote>
               <p>
-                <a class="more" href={`/valleyview/${recipient.id}/`}>
-                  Read {recipient.data.name}'s story
-                </a>
+                <RichText
+                  segments={dekSegments(
+                    recipient.data.dek,
+                    recipient.data.dekHighlight,
+                  )}
+                />
               </p>
+              {recipient.data.published ? (
+                <>
+                  <blockquote>
+                    <p>{recipient.data.quote}</p>
+                  </blockquote>
+                  <p>
+                    <a class="more" href={`/valleyview/${recipient.id}/`}>
+                      Read {recipient.data.name}’s story
+                    </a>
+                  </p>
+                </>
+              ) : (
+                <p class="soon">
+                  {recipient.data.name}’s story is coming soon.
+                </p>
+              )}
             </div>
           </div>
         ))}
@@ -170,24 +194,30 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
               </li>
             ))}
           </ol>
-          {current.timelineNote && <p class="muted">{current.timelineNote}</p>}
         </div>
       </div>
 
-      <h3>The three questions</h3>
-      <ol class="questions">
-        {current.questions.map((question) => (
-          <li>{question}</li>
-        ))}
-      </ol>
-      <p class="muted">{current.tipsIntro}</p>
-      <ul class="tips">
-        {current.tips.map((tip) => (
-          <li>
-            <strong>{tip.title}</strong> {tip.text}
-          </li>
-        ))}
-      </ul>
+      {/* What a good application looks like: the questions, then our advice. */}
+      <div class="split">
+        <div>
+          <h3>A good application answers three questions</h3>
+          <ol class="questions">
+            {current.questions.map((question) => (
+              <li>{question}</li>
+            ))}
+          </ol>
+        </div>
+        <div>
+          <h3>Our advice</h3>
+          <ul class="tips">
+            {current.tips.map((tip) => (
+              <li>
+                <strong>{tip.title}</strong> {tip.text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
       <div class="band apply" data-theme="digital">
         <h3>{current.apply.heading}</h3>
@@ -195,32 +225,28 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
         <p class="apply-slot">{current.apply.pending}</p>
       </div>
 
-      <h3>Questions</h3>
-      <div class="faq">
-        {current.faq.map((item) => (
-          <details>
-            <summary>{item.question}</summary>
-            <p>{item.answer}</p>
-          </details>
-        ))}
-      </div>
-
+      {/* Questions on the left; who runs it and how to reach us on the right. */}
       <div class="split">
         <div>
-          <h3>Who's behind it</h3>
-          <p>
-            {current.team.intro} It is now a program of the {brand.name}.
-          </p>
-          <dl class="team">
-            {current.team.people.map((person) => (
-              <>
-                <dt>{person.name}</dt>
-                <dd>{person.bio}</dd>
-              </>
+          <h3>Questions</h3>
+          <div class="faq">
+            {current.faq.map((item) => (
+              <details>
+                <summary>{item.question}</summary>
+                <p>{item.answer}</p>
+              </details>
             ))}
-          </dl>
+          </div>
         </div>
         <div>
+          <h3>Who’s behind it</h3>
+          <p>
+            {current.founders.text.replace('{organization}', brand.name)}{' '}
+            <a href={current.founders.link.href}>
+              {current.founders.link.label}
+            </a>
+            .
+          </p>
           <h3>Contact and privacy</h3>
           <p>
             Questions? Email us at <EmailLink />.
@@ -259,8 +285,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
   }
 
   p,
-  li,
-  dd {
+  li {
     max-inline-size: var(--width-prose);
   }
 
@@ -270,7 +295,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
   }
 
   .hero h1 {
-    margin-block: var(--space-2) 0;
+    margin: 0;
     font-size: var(--text-xl);
   }
 
@@ -285,37 +310,6 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
 
   .intro {
     font-size: var(--text-lg);
-  }
-
-  .facts,
-  .jump ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-5);
-    padding: 0;
-    list-style: none;
-  }
-
-  .facts {
-    margin-block: var(--space-5);
-    font-weight: var(--font-weight-bold);
-  }
-
-  .facts li + li::before {
-    content: '·';
-    margin-inline-end: var(--space-5);
-    color: var(--color-label);
-  }
-
-  .jump {
-    padding-block-start: var(--space-4);
-    border-block-start: var(--border-width) solid var(--color-border);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-
-  .jump ul {
-    margin: 0;
   }
 
   /* Full-width bands in the Digital world, without page overflow. */
@@ -389,6 +383,25 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     align-items: center;
   }
 
+  /* The text first and the portrait on the right, on wider screens. */
+  .teaser-text {
+    grid-row: 1;
+  }
+
+  /* The portrait is always 4:5, whatever the photo's own shape. */
+  .portrait {
+    inline-size: min(100%, 22rem);
+  }
+
+  .portrait :global(.photo) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+  }
+
   .teaser h3 {
     margin-block: var(--space-2);
     font-size: var(--text-2xl);
@@ -401,6 +414,11 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     font-size: var(--text-lg);
   }
 
+  .soon {
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
   .more {
     font-weight: var(--font-weight-bold);
   }
@@ -410,9 +428,14 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
   }
 
   @media (width >= 48rem) {
+    /* Two equal columns, the portrait centred in the right one. */
     .teaser {
       grid-template-columns: 1fr 1fr;
       gap: var(--space-7);
+    }
+
+    .portrait {
+      justify-self: center;
     }
   }
 
@@ -465,8 +488,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     }
   }
 
-  .steps,
-  .questions {
+  .steps {
     display: grid;
     gap: var(--space-4);
     padding: 0;
@@ -474,15 +496,13 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     counter-reset: step;
   }
 
-  .steps li,
-  .questions li {
+  .steps li {
     position: relative;
     padding-inline-start: var(--space-7);
     counter-increment: step;
   }
 
-  .steps li::before,
-  .questions li::before {
+  .steps li::before {
     content: counter(step, decimal-leading-zero);
     position: absolute;
     inset-inline-start: 0;
@@ -490,15 +510,31 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     color: var(--color-label);
   }
 
+  /* The three questions: large, regular weight, each in its own band
+     between rules like the timeline, numbered above in mono. */
+  .questions {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: question;
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
   .questions li {
+    padding-block: var(--space-5);
+    border-block-end: var(--border-width) solid var(--color-border);
     font-size: var(--text-xl);
-    font-weight: var(--font-weight-bold);
     line-height: var(--leading-tight);
+    counter-increment: question;
   }
 
   .questions li::before {
-    font-size: var(--text-base);
-    line-height: inherit;
+    content: counter(question, decimal-leading-zero);
+    display: block;
+    margin-block-end: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-label);
   }
 
   .timeline {
@@ -566,15 +602,6 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
 
   details p {
     margin-block: 0 var(--space-4);
-  }
-
-  .team dt {
-    margin-block-start: var(--space-4);
-    font-weight: var(--font-weight-bold);
-  }
-
-  .team dd {
-    margin: 0;
   }
 
   @media (width < 30rem) {

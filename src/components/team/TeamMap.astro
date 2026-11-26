@@ -35,8 +35,8 @@ export interface MapDistrict {
 export interface MapView {
   /** The member this view belongs to. */
   member: string;
-  /** The town the view is about. */
-  place: string;
+  /** The towns the view is about: the member's home city first. */
+  places: string[];
   /** What the view shows, in map units. */
   box: Box;
   /** School districts around the member's city, outlined in pen red. */

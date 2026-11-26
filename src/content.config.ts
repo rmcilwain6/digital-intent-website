@@ -24,21 +24,41 @@ const pages = defineCollection({
  */
 const recipients = defineCollection({
   loader: glob({ pattern: '*.md', base: './content/valleyview-recipients' }),
-  schema: z.strictObject({
-    title: z.string().min(1),
-    description: z.string().min(1),
-    /** First name only, unless the recipient agrees to more. */
-    name: z.string().min(1),
-    year: z.number().int(),
-    /** Label such as "Year 1 · 2026". */
-    cohort: z.string().min(1),
-    headline: z.string().min(1),
-    /** One or two sentences under the headline; also the teaser on /valleyview/. */
-    dek: z.string().min(1),
-    quote: z.string().min(1),
-    hero: imageSlotSchema,
-    gallery: z.array(imageSlotSchema).min(1),
-  }),
+  schema: ({ image }) =>
+    z
+      .strictObject({
+        title: z.string().min(1),
+        description: z.string().min(1),
+        /** First name only, unless the recipient agrees to more. */
+        name: z.string().min(1),
+        year: z.number().int(),
+        /** Label such as "Year 1 · 2025/26", the school year of the grant. */
+        cohort: z.string().min(1),
+        /**
+         * False until the story is written and the recipient has approved it: no
+         * page is built, and /valleyview/ shows a "coming soon" teaser instead.
+         */
+        published: z.boolean(),
+        headline: z.string().min(1),
+        /** One or two sentences under the headline; also the teaser on /valleyview/. */
+        dek: z.string().min(1),
+        /** A phrase in the dek to mark with the lime highlighter, e.g. a project's name. */
+        dekHighlight: z.string().min(1).optional(),
+        quote: z.string().min(1),
+        /**
+         * The teaser photo on /valleyview/, shown at 4:5: a labelled slot until
+         * the photo exists, then `src` (a path to src/assets/photos/) and `alt`.
+         */
+        portrait: z.union([
+          imageSlotSchema,
+          z.strictObject({ src: image(), alt: z.string().min(1) }),
+        ]),
+        hero: imageSlotSchema,
+        gallery: z.array(imageSlotSchema).min(1),
+      })
+      .refine((r) => !r.dekHighlight || r.dek.includes(r.dekHighlight), {
+        message: 'dekHighlight must be a phrase that appears in dek',
+      }),
 });
 
 export const collections = { pages, recipients };

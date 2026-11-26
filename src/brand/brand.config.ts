@@ -8,6 +8,14 @@ export interface SocialLink {
   href: string;
 }
 
+export interface SocialImage {
+  /** Path under `public/`, 1200 × 630. */
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
 export interface Brand {
   /** True until the final brand lands. Layouts show a "Placeholder brand" label while it is set. */
   placeholder: boolean;
@@ -36,12 +44,10 @@ export interface Brand {
     alt: string;
   };
   favicon: string;
-  socialImage: {
-    src: string;
-    alt: string;
-    width: number;
-    height: number;
-  };
+  /** The sharing image for every page that doesn't name its own. */
+  socialImage: SocialImage;
+  /** Sharing images for particular pages, picked with BaseLayout's `socialImage` prop. */
+  pageSocialImages: Readonly<Record<string, SocialImage>>;
 }
 
 const name = 'Digital Intent Learning Society';
@@ -68,8 +74,16 @@ export const brand = {
   favicon: '/brand/favicon.svg',
   socialImage: {
     src: '/brand/og-default.png',
-    alt: 'Placeholder brand',
+    alt: 'Every student learns how the natural world works. What about the digital one? Digital Intent, digitalintent.ca.',
     width: 1200,
     height: 630,
+  },
+  pageSocialImages: {
+    valleyview: {
+      src: '/brand/og-valleyview.png',
+      alt: "Valleyview Social Innovation Grant. Pick a hard problem. We'll put $2,000 behind it. $2,000 plus mentorship, for Valleyview Grade 12s. A rough idea is enough. Digital Intent.",
+      width: 1200,
+      height: 630,
+    },
   },
 } as const satisfies Brand;

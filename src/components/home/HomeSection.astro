@@ -3,6 +3,8 @@
 // background tones so each section reads as its own step. Heading, body and
 // call to action come from content/home.ts; the slot holds anything extra
 // (pillars, the map, a list), placed between the body and the call to action.
+// Anything in the `aside` slot (the BC map) sits beside the text on wide
+// screens and below it on phones.
 import type { CallToAction as Cta } from '../../schemas/home';
 import CallToAction from '../CallToAction.astro';
 import DraftMarker from './DraftMarker.astro';
@@ -19,19 +21,33 @@ interface Props {
 
 const { id, heading, lead, body, cta, draft, tone } = Astro.props;
 const headingId = `${id}-heading`;
+// Render the aside rather than trusting Astro.slots.has: Home passes the map
+// as `{key === 'map' && <BcMap slot="aside" />}`, and Astro registers that
+// slot on every section in the loop, even where it renders nothing.
+const aside = await Astro.slots.render('aside');
+const hasAside = aside.trim() !== '';
 ---
 
 <section class:list={['band', tone]} aria-labelledby={headingId}>
   <div class="container">
     {draft && <DraftMarker />}
-    <div class="prose">
-      <h2 id={headingId}>{heading}</h2>
-      {lead && <p class="lead">{lead}</p>}
-      {body.map((paragraph) => (
-        <p>{paragraph}</p>
-      ))}
+    <div class:list={[{ split: hasAside }]}>
+      <div class="main">
+        <div class="prose">
+          <h2 id={headingId}>{heading}</h2>
+          {lead && <p class="lead">{lead}</p>}
+          {body.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+        <slot />
+      </div>
+      {hasAside && (
+        <div class="aside">
+          <Fragment set:html={aside} />
+        </div>
+      )}
     </div>
-    <slot />
     {cta && (
       <p class="cta-row">
         <CallToAction cta={cta} variant="secondary" />
@@ -62,6 +78,42 @@ const headingId = `${id}-heading`;
     font-size: var(--text-xl);
     font-weight: var(--font-weight-bold);
     line-height: var(--leading-tight);
+  }
+
+  .split {
+    container-type: inline-size;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-7) var(--space-8);
+    align-items: start;
+  }
+
+  .split .main {
+    flex: 1 1 20rem;
+    max-width: 32rem;
+    min-width: 0;
+  }
+
+  .split .aside {
+    flex: 999 1 35rem;
+    min-width: 0;
+  }
+
+  /*
+   * Side by side (main 20rem + gap 4rem + aside 35rem): the aside starts just
+   * above the heading, so the top of the map sits a touch higher than it.
+   */
+  @container (min-width: 59rem) {
+    .split .aside {
+      margin-block-start: calc(-1 * var(--space-4));
+    }
+  }
+
+  /* Stacked below the text: keep the aside modest instead of filling the band. */
+  @container (max-width: 58.99rem) {
+    .split .aside {
+      max-inline-size: 28rem;
+    }
   }
 
   .cta-row {

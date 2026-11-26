@@ -1,8 +1,12 @@
 // Home page sections (SPEC 7.1, record 0004). Copy marked `draft: true` is an
 // agent draft built only from ideas in the spec. It shows a visible [TK]
 // marker until a human approves it and sets `draft: false`.
+import johnsonStreetBridge from '../src/assets/photos/johnson-street-bridge-victoria.jpg';
+import kamloopsBridge from '../src/assets/photos/overlanders-bridge-kamloops.jpg';
+import skyBridge from '../src/assets/photos/skybridge-new-westminster.jpg';
 import { brand } from '../src/brand/brand.config';
 import { homeSchema } from '../src/schemas/home';
+import { valleyview } from './valleyview';
 
 export const home = homeSchema.parse({
   hero: {
@@ -26,25 +30,31 @@ export const home = homeSchema.parse({
       detailLabels: { who: 'who', what: 'what', asks: 'asks', when: 'when' },
     },
     // Original photography (SPEC 8.2): a bridge from each starting region,
-    // as prints on the whiteboard. Kamloops first, where we started.
+    // as prints on the whiteboard. Victoria is featured: the largest print.
     images: [
       {
-        place: 'Kamloops',
-        label: 'Overlanders Bridge',
-        note: '3:2. Over the Thompson River, under a storm sky.',
-        taken: '[TK: date taken]',
-      },
-      {
+        src: johnsonStreetBridge,
+        alt: 'The white Johnson Street Bridge in Victoria, lit by low sun under heavy cloud, with people crossing on foot.',
         place: 'Victoria',
         label: 'Johnson Street Bridge',
-        note: '4:5. From the harbour.',
-        taken: '[TK: date taken]',
+        taken: 'February 6, 2026',
       },
       {
-        place: 'Vancouver',
-        label: 'Burrard or Lions Gate Bridge',
-        note: '3:2. Deck across the frame, at dusk.',
-        taken: '[TK: date taken]',
+        src: kamloopsBridge,
+        alt: 'The Overlanders Bridge over the Thompson River in Kamloops, under a storm sky, with sun breaking through the trees.',
+        place: 'Kamloops',
+        label: 'Overlanders Bridge',
+        taken: 'May 18, 2025',
+      },
+      {
+        src: skyBridge,
+        alt: 'A SkyTrain crosses the SkyBridge over the Fraser River, with the old Pattullo Bridge, the stal̕əw̓asəm Bridge under construction and snowy North Shore mountains behind.',
+        place: 'New Westminster',
+        label: 'SkyBridge',
+        taken: 'March 17, 2023',
+        // The Pattullo's replacement, named by Kwantlen First Nation and
+        // Musqueam Indian Band; fully open February 14, 2026.
+        aside: 'The stal̕əw̓asəm Bridge was still being built.',
       },
     ],
   },
@@ -61,38 +71,50 @@ export const home = homeSchema.parse({
       lede: 'We see a set of challenges around technology in schools right now. None of them has a simple answer, and we think each one needs careful, intentional work.',
       challenges: [
         {
-          title: 'More devices haven’t meant better learning',
-          text: 'Schools had good reasons to bring devices in. But most software is built to make things easier and to hold our attention, and learning happens in the hard part: the wrong answer, the second try, working it out with the people in the room.',
+          title: 'More device use hasn’t meant better learning',
+          text: 'Schools had good reasons to bring devices in. But most software is built to make things easier and to hold our attention. Learning happens in the hard part: the right amount of friction, with scaffolding and support in place so students can work through it.',
         },
         {
           title: 'Using technology isn’t the same as understanding it',
-          text: 'Students spend hours a day on screens, and many are fluent users. That isn’t the same as knowing how any of it works: the hardware, the networks, where data goes, or who pays for the free apps.',
+          text: 'Students spend hours a day on screens, and many are fluent users. That isn’t the same as knowing how any of it works.',
         },
         {
           title: 'AI changes the ground under all of it',
-          text: 'It arrived in classrooms almost overnight, and it touches how students learn, how we know what they’ve learned, how anyone finds information, and what work students are preparing for.',
+          text: 'It arrived in classrooms almost overnight and shifted the landscape. It affects how students learn, how we assess them, how we all find information, and what work students are preparing for.',
         },
       ],
       questions: {
         heading: 'Could you answer these?',
-        lede: 'We think every student should graduate able to answer questions like these. Have a guess before you look.',
-        count: 5,
+        lede: 'We think every student should graduate able to answer questions like these.',
+        anchor: 'questions',
+        copyLink: 'Share',
+        copied: 'Link copied',
+        count: 10,
         windowTitle: '~/questions',
+        found: 'answers found',
+        complete: 'all answers found',
+        timer: {
+          seconds: 20,
+          label: 'answer in',
+          pause: 'pause',
+          resume: 'resume',
+          timeUp: 'Time’s up. Here’s the answer.',
+        },
+        finale: {
+          tag: 'questions complete',
+        },
         prompt: 'have a guess first. then:',
         reveal: 'show the answer',
         hide: 'hide the answer',
+        answerLabel: 'answer',
         next: 'next question',
-      },
-      closing: {
-        heading: 'Why this is hard',
-        body: 'None of this has an easy fix, partly because the people who build technology and the people who teach often see it differently. They want different things from it, for different reasons. Finding what’s best for students means bringing those views together. That’s the bridge we’re trying to build.',
       },
       draft: false,
     },
 
     // The mission and the pillars are in content/organization.ts, shared with
-    // About. `focus` follows the pillars' order. Its items are stand-ins
-    // built from pages we have; Reed will choose the real ones (Nov 24).
+    // About. `focus` follows the pillars' order. Items approved by Reed,
+    // Nov 26; each "In the works" item says "Coming soon" until it has more.
     mission: {
       heading: 'What we do',
       focusHeading: 'What we focus on',
@@ -102,12 +124,15 @@ export const home = homeSchema.parse({
           highlight: 'independent',
           now: {
             title: 'This website',
-            text: 'Built the way we think technology should be: fast, accessible and private, with no tracking and no cookies.',
-            cta: { label: 'How we handle privacy', href: '/privacy/' },
+            text: 'Built the way we think technology should be: open source, transparent and accessible. Anyone can read the code that runs it.',
+            cta: {
+              label: 'See the code',
+              href: 'https://github.com/rmcilwain6/digital-intent-website',
+            },
           },
           next: {
             title: 'Our positions, published in the open',
-            text: '[TK: our first published position, once the board signs off]',
+            text: 'Coming soon.',
           },
         },
         {
@@ -118,8 +143,8 @@ export const home = homeSchema.parse({
             cta: { label: 'Get in touch', href: '/contact/' },
           },
           next: {
-            title: 'Book a call with us',
-            text: '[TK: when teachers can book a call]',
+            title: 'Book a call or a classroom visit',
+            text: 'Coming soon.',
           },
         },
         {
@@ -130,8 +155,8 @@ export const home = homeSchema.parse({
             cta: { label: 'What we offer teachers', href: '/teachers/' },
           },
           next: {
-            title: 'Technology camps, with the Big Little Science Centre',
-            text: '[TK: what the camps are, who they are for, and when they run]',
+            title: 'Technology camps with the Big Little Science Centre',
+            text: 'Coming soon.',
           },
         },
         {
@@ -142,7 +167,8 @@ export const home = homeSchema.parse({
             cta: { label: 'Read about the grant', href: '/valleyview/' },
           },
           next: {
-            title: '[TK: what comes next for this pillar]',
+            title: 'More grants for students',
+            text: 'Coming soon.',
           },
         },
       ],
@@ -152,19 +178,21 @@ export const home = homeSchema.parse({
         next: 'Next focus',
       },
       cta: { label: 'More about our mission', href: '/about/' },
-      approach:
-        'There is no single fix for any of this. We expect to try many things at once: workshops for teachers, school visits, grants for students, and partnerships across the province. Then we keep what works.',
-      draft: true,
+      draft: false,
     },
 
     map: {
       heading: 'BC is our mandate',
       body: [
-        'We are a BC organization working on a BC problem. Our work is for teachers, students and communities across the province: in the North, the Rockies, rural towns and Indigenous schools.',
-        'We are starting where we already have people, and growing from there.',
+        'We’re a BC organization working on a BC problem. Our work is for teachers, students and communities across the province: in the North, the Rockies, rural towns and Indigenous schools.',
+        'We’re starting in the districts around Kamloops, Victoria and Vancouver, where our team already lives, and growing from there.',
       ],
-      regionsHeading: 'Where we are starting',
-      cta: { label: 'Get in touch from anywhere in BC', href: '/contact/' },
+      regionsHeading: 'Where we’re starting',
+      // The house map on paper (design system: MapAnalog). No call to action
+      // until an interactive map page exists (post-MVP).
+      mapCaption:
+        'Dotted lines are BC’s school districts. Red marks where we’re starting.',
+      insetLabel: 'close-up: southwest',
       draft: false,
     },
 
@@ -191,32 +219,77 @@ export const home = homeSchema.parse({
       draft: false,
     },
 
+    // The Valleyview band (#66): Digital, for students. Information only (D5):
+    // it links to the grant page and never to an application.
     valleyview: {
-      heading: 'The Valleyview Social Innovation Grant',
+      year: 'year 2',
+      yearNote: '2026/27',
+      heading: 'Valleyview Grade 12s: bet on yourself',
       body: [
-        'A grant for Grade 12 students at Valleyview who have an idea and want to build it now. Recipients get funding and mentorship, and they agree to follow-up that shows how the grant helped them learn.',
+        'The Valleyview Social Innovation Grant gives one graduating student $2,000 and mentorship to take on a hard problem that makes life better for other people.',
+        'You don’t need top grades, a long list of accomplishments or a finished plan. Applying starts with a problem you care about solving.',
       ],
-      questionsHeading: 'What we ask you',
-      cta: { label: 'Read about the grant', href: '/valleyview/' },
+      details: [
+        {
+          term: 'who',
+          // Kamloops: confirmed by Reed, November 25, 2026.
+          value:
+            'Grade 12s at Valleyview Secondary in Kamloops, graduating in June 2027.',
+        },
+        {
+          term: 'why',
+          value:
+            'To learn, to invest in your community and to make the world a better place.',
+        },
+        { term: 'when', value: valleyview.current.apply.heading },
+      ],
+      cta: { label: 'read about the grant', href: '/valleyview/' },
+      school: {
+        label: 'Want this at your school? Let us know',
+        href: '/contact/',
+      },
       draft: false,
     },
 
+    // Kept plain on purpose: the last band on Home, after Partnerships.
+    // Copy follows the outreach page
+    // (content/outreach.ts) and needs the same approval (SPEC 12.5).
     outreach: {
       heading: 'Indigenous outreach',
       body: [
-        '[TK: commitment to Indigenous outreach, copy from the team member leading this work]',
+        'Our outreach with Indigenous schools and communities starts with face-to-face relationships, built in good faith, beginning where we live.',
+        'Read our land acknowledgement, what we are committing to, and how we will report on it.',
       ],
-      // No link until the outreach page exists (#36).
+      cta: { label: 'Our commitments', href: '/indigenous-outreach/' },
       draft: false,
     },
 
+    // Partnerships (D27 leans to a section with an email). Headline and first
+    // sentence are Reed's (Nov 24); the second sentence is an agent draft.
     partnerships: {
-      heading: 'Partnerships',
+      heading:
+        'If you care about how young people grow up with technology, let’s work together.',
+      highlight: 'let’s work together.',
       body: [
-        'We work alongside organizations, businesses and groups that want better outcomes for students, teachers and parents. We see ourselves as one part of a network, not a competitor.',
-        'If that sounds like you, write to us.',
+        'We’re one node in a bigger network of people who care about kids and technology. We want to help ideas and opportunities move between everyone in it, and build connections that last.',
       ],
-      cta: { label: 'Write to us', href: '/contact/' },
+      email: { label: 'Email us', subject: 'Partnership' },
+      network: {
+        label: 'A hand-drawn web of the groups we work among',
+        groups: [
+          ['Schools and districts'],
+          ['Tech companies'],
+          ['Colleges and', 'universities'],
+          ['Families and', 'parent groups'],
+          ['Science centres', 'and makerspaces'],
+          ['Nonprofits and', 'local groups'],
+        ],
+      },
+      partners: {
+        heading: 'organizations we’ve worked with',
+        // Empty until a partner says yes to being listed.
+        items: [],
+      },
       draft: false,
     },
   },
@@ -228,7 +301,7 @@ export const home = homeSchema.parse({
     'map',
     'library',
     'valleyview',
-    'outreach',
     'partnerships',
+    'outreach',
   ],
 });

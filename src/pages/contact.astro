@@ -1,11 +1,12 @@
 ---
-// Contact (SPEC 7.6). No form (rule 1): the organization email as a mailto:
-// link, then the topics we hear about, each a mailto: link with its subject
+// Contact (SPEC 7.6). No form (rule 1): the organization email in a shared
+// panel, then the topics we hear about, each a mailto: link with its subject
 // filled in. If the address in brand config is ever a [TK] note, it shows as
 // text and the topics are plain text, so there are no broken links. Copy is in content/.
 import { render } from 'astro:content';
 import { contact } from '../../content/contact';
 import { brand } from '../brand/brand.config';
+import EmailPanel from '../components/EmailPanel.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
 import { isPlaceholder } from '../lib/placeholder';
@@ -27,16 +28,7 @@ const mailto = (subject?: string) =>
       </div>
     </div>
 
-    <p class="email">
-      <span class="label">{contact.emailLabel}</span>
-      {pending ? (
-        <span class="address">{brand.email}</span>
-      ) : (
-        <a class="address" href={mailto()}>
-          {brand.email}
-        </a>
-      )}
-    </p>
+    <EmailPanel label={contact.emailLabel} />
 
     <section class="topics" aria-labelledby="topics-heading">
       <h2 id="topics-heading">{contact.topics.heading}</h2>
@@ -84,39 +76,6 @@ const mailto = (subject?: string) =>
 
   .lede :global(p) {
     margin: 0;
-  }
-
-  /* The address, large and typed, on a surface panel. */
-  .email {
-    display: grid;
-    gap: var(--space-1);
-    justify-items: start;
-    inline-size: fit-content;
-    min-inline-size: min(100%, 28rem);
-    max-inline-size: 100%;
-    margin: 0;
-    padding: var(--space-5) var(--space-6);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
-  }
-
-  .label {
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-  }
-
-  .address {
-    font-family: var(--font-mono);
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-bold);
-    overflow-wrap: anywhere;
-  }
-
-  span.address {
-    color: var(--color-text-muted);
-    font-size: var(--text-lg);
   }
 
   .topics {
@@ -179,10 +138,6 @@ const mailto = (subject?: string) =>
 
     .lede {
       font-size: var(--text-lg);
-    }
-
-    .email {
-      padding: var(--space-4);
     }
   }
 </style>

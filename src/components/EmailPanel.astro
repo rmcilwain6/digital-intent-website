@@ -1,0 +1,73 @@
+---
+// The organization email, large and typed, on a surface panel: how visitors
+// reach us without a form (rule 1). Used on Contact and Teachers. The address
+// comes from brand config; while it is a [TK] note it shows as plain text, so
+// there is no broken mailto: link (D21). An optional subject is filled in for
+// the visitor's email app.
+import { brand } from '../brand/brand.config';
+import { isPlaceholder } from '../lib/placeholder';
+
+interface Props {
+  /** Small label above the address, e.g. "Email". */
+  label: string;
+  /** Subject line to fill in, e.g. "Teacher inquiry". */
+  subject?: string;
+}
+
+const { label, subject } = Astro.props;
+
+const mailto = isPlaceholder(brand.email)
+  ? undefined
+  : `mailto:${brand.email}${subject ? `?subject=${encodeURIComponent(subject)}` : ''}`;
+---
+
+<p class="email">
+  <span class="label">{label}</span>
+  {mailto ? (
+    <a class="address" href={mailto}>
+      {brand.email}
+    </a>
+  ) : (
+    <span class="address">{brand.email}</span>
+  )}
+</p>
+
+<style>
+  .email {
+    display: grid;
+    gap: var(--space-1);
+    justify-items: start;
+    inline-size: fit-content;
+    min-inline-size: min(100%, 28rem);
+    max-inline-size: 100%;
+    margin: 0;
+    padding: var(--space-5) var(--space-6);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .label {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .address {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    overflow-wrap: anywhere;
+  }
+
+  span.address {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+  }
+
+  @media (width < 48rem) {
+    .email {
+      padding: var(--space-4);
+    }
+  }
+</style>

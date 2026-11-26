@@ -1,18 +1,27 @@
 ---
-// "Could you answer these?": a terminal window of questions from the bank
-// (content/questions.ts), the one Digital object on a paper band. Each
-// answer stays hidden until the visitor asks for it, so they have a guess
-// first.
+// "Could you answer these?": questions from the bank (content/questions.ts)
+// set out like a game, the one Digital object on a paper band. Each answer
+// stays hidden until the visitor asks for it, so they have a guess first.
 //
-// Without JavaScript every question shows, one after another, each with its
-// answer behind a native disclosure. With it, the window becomes two panes on
-// wide screens: the questions listed on the left as tabs (up and down arrows
-// move between them), one question open on the right, and a "next question"
-// key after each answer. On phones the list becomes a row of numbered tabs
-// across the top (left and right arrows), so only the open question takes
-// up room; each tab still carries its full question for screen readers.
+// Without JavaScript every question shows, one after another, each in its
+// own dialogue box with its answer behind a native disclosure. With it, the
+// game shows one question at a time: a status bar counts the answers found,
+// a row of numbered level keys works as tabs (left and right arrows, Home
+// and End), and a "next question" key follows each answer. Each level key
+// still carries its full question for screen readers.
+//
+// Game-show timer, with JavaScript only: each unanswered question counts
+// down, a row of blocks emptying one a second, then shows its answer. It runs
+// only while the question is on screen and the tab is visible, it has a
+// pause key (WCAG 2.2.2), and "show the answer" still works at any time.
+// The blocks step, they don't slide, so there is nothing to reduce.
+//
+// Motion: the "your turn" arrow bobs a few times then stops, the answer box
+// rises into place, and a level key pops when its answer is found. All of it
+// is transform only, and none of it under reduced motion.
 import type { Question } from '../../schemas/questions';
 import type { WhyWeExist } from '../../schemas/home';
+import ShareButton from './ShareButton.astro';
 
 interface Props {
   questions: readonly Question[];
@@ -21,102 +30,298 @@ interface Props {
 
 const { questions, copy } = Astro.props;
 const number = (index: number) => String(index + 1).padStart(2, '0');
+const cells = Array.from({ length: copy.timer.seconds });
+
+// Pixel confetti for the finale: squares spread evenly around a circle, at
+// set distances so every build looks the same. Distances are in rem.
+const bits = Array.from({ length: 24 }, (_, i) => {
+  const angle = (i / 24) * 2 * Math.PI;
+  const distance = 3 + (i % 3) * 1.5;
+  const round = (n: number) => Math.round(n * 100) / 100;
+  return {
+    x: round(Math.cos(angle) * distance),
+    y: round(Math.sin(angle) * distance * 0.5),
+    r: (i % 4) * 90 + 45,
+    d: i % 4,
+  };
+});
 ---
 
-<div class="window" data-theme="digital" data-questions>
-  <div class="bar">
-    <span class="dots" aria-hidden="true">
-      <span></span>
-      <span></span>
-      <span></span>
+<div
+  class="game"
+  data-theme="digital"
+  data-questions
+  data-complete={copy.complete}
+  data-seconds={copy.timer.seconds}
+  data-pause={copy.timer.pause}
+  data-resume={copy.timer.resume}
+  data-time-up={copy.timer.timeUp}
+>
+  <p class="visually-hidden" aria-live="polite" data-announce></p>
+  <div class="hud mono" data-hud hidden>
+    <span class="hud-title">{copy.windowTitle}</span>
+    <span class="hud-found" aria-live="polite" data-found-text>
+      <span data-found-count>0</span>/{questions.length} {copy.found}
     </span>
-    <span class="window-title">{copy.windowTitle}</span>
   </div>
 
-  <div class="panes">
-    <div class="list" data-list hidden>
-      <p class="mono command ls">$ ls</p>
-      <div
-        role="tablist"
-        aria-label="Questions"
-        aria-orientation="vertical"
-        data-tablist
-      >
-        {questions.map((q, index) => (
-          <button
-            type="button"
-            role="tab"
-            class="tab"
-            id={`q-${q.slug}-tab`}
-            aria-controls={`q-${q.slug}`}
-            aria-selected={index === 0 ? 'true' : 'false'}
-            tabindex={index === 0 ? 0 : -1}
-          >
-            <span class="mono number">{number(index)}</span>
-            <span class="tab-question">{q.question}</span>
-            <span class="mono done" aria-hidden="true">
-              ✓
-            </span>
-          </button>
-        ))}
-      </div>
+  <div class="levels" data-list hidden>
+    <div
+      role="tablist"
+      aria-label="Questions"
+      aria-orientation="horizontal"
+      style={`--count: ${questions.length}`}
+    >
+      {questions.map((q, index) => (
+        <button
+          type="button"
+          role="tab"
+          class="level"
+          id={`q-${q.slug}-tab`}
+          aria-controls={`q-${q.slug}`}
+          aria-selected={index === 0 ? 'true' : 'false'}
+          tabindex={index === 0 ? 0 : -1}
+          style={`--i: ${index}`}
+        >
+          <span class="mono">{number(index)}</span>
+          <span class="visually-hidden">{q.question}</span>
+          <span class="mono done" aria-hidden="true">
+            ✓
+          </span>
+        </button>
+      ))}
     </div>
 
-    <div class="panels">
-      {questions.map((q, index) => (
-        <div class="panel" id={`q-${q.slug}`} data-panel>
-          <p class="mono command">
-            $ cat questions/{number(index)}-{q.slug}
+    <div class="finale" data-finale hidden>
+      <span class="confetti" aria-hidden="true">
+        {bits.map((bit) => (
+          <span
+            class="bit"
+            style={`--x: ${bit.x}rem; --y: ${bit.y}rem; --r: ${bit.r}deg; --d: ${bit.d}`}
+          />
+        ))}
+      </span>
+      <p class="mono finale-tag">
+        <span aria-hidden="true">★ </span>
+        {copy.finale.tag}
+      </p>
+      <ShareButton
+        anchor={copy.anchor}
+        label={copy.copyLink}
+        copied={copy.copied}
+      />
+    </div>
+  </div>
+
+  <div class="panels">
+    {questions.map((q, index) => (
+      <div class="panel" id={`q-${q.slug}`} data-panel>
+        <div class="box">
+          <p class="mono stage">
+            <span class="stage-number">{number(index)}</span>
+            {q.category}
           </p>
           <h4 class="question">{q.question}</h4>
-          <p class="mono command">&gt; {copy.prompt}</p>
-          <details>
-            <summary class="key">
+          <div class="controls" data-controls hidden>
+            <div class="timer" data-timer hidden>
+              <span class="cells" aria-hidden="true">
+                {cells.map(() => (
+                  <span class="cell" />
+                ))}
+              </span>
+              <span class="mono timer-count">
+                <span class="timer-label">{copy.timer.label}</span>{' '}
+                <span data-timer-count>{copy.timer.seconds}</span>s
+              </span>
+              <button
+                type="button"
+                class="key"
+                aria-label={copy.timer.pause}
+                data-timer-pause
+              >
+                <svg
+                  class="icon icon-pause"
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <rect x="3" y="2" width="3.5" height="12" />
+                  <rect x="9.5" y="2" width="3.5" height="12" />
+                </svg>
+                <svg
+                  class="icon icon-resume"
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M4 2l10 6-10 6z" />
+                </svg>
+              </button>
+            </div>
+            <button
+              type="button"
+              class="key"
+              aria-expanded="false"
+              aria-controls={`a-${q.slug}`}
+              data-reveal
+            >
               <span class="cap" aria-hidden="true">
                 ↵
               </span>
               <span class="when-closed">{copy.reveal}</span>
               <span class="when-open">{copy.hide}</span>
-            </summary>
-            <p class="mono command">
-              $ cat answers/{number(index)}-{q.slug}
-            </p>
-            <p class="answer">{q.answer}</p>
-            <p class="mono concept">concept: {q.concept}</p>
+            </button>
             <button type="button" class="key" data-next hidden>
               {copy.next}{' '}
               <span class="cap" aria-hidden="true">
                 →
               </span>
             </button>
-          </details>
+          </div>
+          <p class="mono prompt">
+            {copy.prompt}
+            {' '}
+            <span class="turn" aria-hidden="true">
+              ▼
+            </span>
+          </p>
         </div>
-      ))}
-    </div>
+        <details id={`a-${q.slug}`}>
+          <summary class="key">
+            <span class="cap" aria-hidden="true">
+              ↵
+            </span>
+            <span class="when-closed">{copy.reveal}</span>
+            <span class="when-open">{copy.hide}</span>
+          </summary>
+          <div class="box answer-box">
+            <p class="mono tag">{copy.answerLabel}</p>
+            <p class="answer">{q.answer}</p>
+          </div>
+        </details>
+      </div>
+    ))}
   </div>
 </div>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-questions]').forEach((win) => {
-    const list = win.querySelector<HTMLElement>('[data-list]');
-    const tabs = [...win.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-    const panels = [...win.querySelectorAll<HTMLElement>('[data-panel]')];
-    if (!list || tabs.length !== panels.length || tabs.length === 0) return;
+  document.querySelectorAll<HTMLElement>('[data-questions]').forEach((game) => {
+    const hud = game.querySelector<HTMLElement>('[data-hud]');
+    const list = game.querySelector<HTMLElement>('[data-list]');
+    const tabs = [...game.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...game.querySelectorAll<HTMLElement>('[data-panel]')];
+    if (!hud || !list || tabs.length !== panels.length || tabs.length === 0) {
+      return;
+    }
 
+    hud.hidden = false;
     list.hidden = false;
-    win.classList.add('is-enhanced');
+    game.classList.add('is-enhanced');
 
-    // Phones show a row of numbered tabs; wider screens a column. Must match
-    // the CSS breakpoint.
-    const tablist = win.querySelector<HTMLElement>('[data-tablist]');
-    const wide = window.matchMedia('(min-width: 56rem)');
-    const orient = () =>
-      tablist?.setAttribute(
-        'aria-orientation',
-        wide.matches ? 'vertical' : 'horizontal',
-      );
-    orient();
-    wide.addEventListener('change', orient);
+    const count = tabs.length;
+    const foundText = game.querySelector<HTMLElement>('[data-found-text]');
+    const foundCount = game.querySelector<HTMLElement>('[data-found-count]');
+    const complete = game.dataset.complete ?? '';
+    const found = new Set<number>();
+
+    // The timer. One runs at a time, for the open question.
+    const seconds = Number(game.dataset.seconds) || 0;
+    const announce = game.querySelector<HTMLElement>('[data-announce]');
+    const timers = panels.map((p) =>
+      p.querySelector<HTMLElement>('[data-timer]'),
+    );
+    const onScreen = new Set<Element>();
+    let current = 0;
+    let remaining = 0;
+    let ticker: number | undefined;
+    let userPaused = false;
+
+    const render = () => {
+      const timer = timers[current];
+      if (!timer) return;
+      const label = timer.querySelector('[data-timer-count]');
+      if (label) label.textContent = String(remaining);
+      timer.querySelectorAll('.cell').forEach((cell, k) => {
+        cell.toggleAttribute('data-spent', k >= remaining);
+      });
+      const pause = timer.querySelector<HTMLElement>('[data-timer-pause]');
+      if (pause) {
+        pause.toggleAttribute('data-paused', userPaused);
+        pause.setAttribute(
+          'aria-label',
+          (userPaused ? game.dataset.resume : game.dataset.pause) ?? '',
+        );
+      }
+    };
+
+    const box = (i: number) => panels[i]?.querySelector('.box') ?? null;
+    const running = () =>
+      remaining > 0 &&
+      !userPaused &&
+      !document.hidden &&
+      !found.has(current) &&
+      onScreen.has(box(current) as Element);
+
+    const sync = () => {
+      window.clearInterval(ticker);
+      ticker = undefined;
+      if (running()) ticker = window.setInterval(tick, 1000);
+    };
+
+    const tick = () => {
+      remaining -= 1;
+      render();
+      if (remaining > 0) return;
+      sync();
+      const details = panels[current]?.querySelector('details');
+      if (details && !details.open) {
+        if (announce) announce.textContent = game.dataset.timeUp ?? '';
+        details.open = true;
+      }
+    };
+
+    const startTimer = (index: number) => {
+      current = index;
+      const timer = timers[index];
+      if (!timer || seconds === 0 || found.has(index)) {
+        if (timer) timer.hidden = true;
+        remaining = 0;
+        sync();
+        return;
+      }
+      timer.hidden = false;
+      remaining = seconds;
+      userPaused = false;
+      render();
+      sync();
+    };
+
+    timers.forEach((timer) => {
+      timer
+        ?.querySelector('[data-timer-pause]')
+        ?.addEventListener('click', () => {
+          userPaused = !userPaused;
+          render();
+          sync();
+        });
+    });
+
+    // Count down only while the question is fully in view and the tab shows.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) onScreen.add(entry.target);
+          else onScreen.delete(entry.target);
+        });
+        sync();
+      },
+      { threshold: 0.9 },
+    );
+    panels.forEach((_, i) => {
+      const b = box(i);
+      if (b) observer.observe(b);
+    });
+    document.addEventListener('visibilitychange', sync);
 
     const select = (index: number, focus = false) => {
       tabs.forEach((tab, i) => {
@@ -126,18 +331,17 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
       panels.forEach((panel, i) => {
         panel.hidden = i !== index;
       });
+      if (announce) announce.textContent = '';
+      startTimer(index);
       if (focus) tabs[index]?.focus();
     };
 
-    const count = tabs.length;
     tabs.forEach((tab, i) => {
       tab.addEventListener('click', () => select(i));
       tab.addEventListener('keydown', (event) => {
-        const forward = wide.matches ? 'ArrowDown' : 'ArrowRight';
-        const back = wide.matches ? 'ArrowUp' : 'ArrowLeft';
         const to: Record<string, number> = {
-          [forward]: (i + 1) % count,
-          [back]: (i - 1 + count) % count,
+          ArrowRight: (i + 1) % count,
+          ArrowLeft: (i - 1 + count) % count,
           Home: 0,
           End: count - 1,
         };
@@ -152,16 +356,51 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
       const tab = tabs[i];
       panel.setAttribute('role', 'tabpanel');
       if (tab) panel.setAttribute('aria-labelledby', tab.id);
-      panel.querySelector('details')?.addEventListener('toggle', (event) => {
-        if ((event.target as HTMLDetailsElement).open && tab) {
-          tab.dataset.answered = '';
+      // With JavaScript the reveal key sits in the question box, beside the
+      // timer, and opens the answer's disclosure; its own summary is hidden.
+      const details = panel.querySelector('details');
+      const controls = panel.querySelector<HTMLElement>('[data-controls]');
+      const reveal = panel.querySelector<HTMLButtonElement>('[data-reveal]');
+      const next = panel.querySelector<HTMLButtonElement>('[data-next]');
+      if (controls) controls.hidden = false;
+      reveal?.addEventListener('click', () => {
+        if (details) details.open = !details.open;
+      });
+      next?.addEventListener('click', () => select((i + 1) % count, true));
+
+      details?.addEventListener('toggle', () => {
+        reveal?.setAttribute('aria-expanded', String(details.open));
+        if (!details.open || !tab) return;
+        if (next) next.hidden = false;
+        // On phones the reveal key hides once the answer shows; keep focus
+        // on the next thing to do instead of losing it.
+        if (
+          document.activeElement === reveal &&
+          reveal?.offsetParent === null
+        ) {
+          next?.focus();
+        }
+        tab.dataset.answered = '';
+        found.add(i);
+        const timer = timers[i];
+        if (timer) timer.hidden = true;
+        if (i === current) sync();
+        // If the answer opened below the bottom of the screen, bring it up
+        // just far enough to read. Already in view, nothing moves.
+        const answer = panel.querySelector('.answer-box');
+        const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        answer?.scrollIntoView({
+          block: 'nearest',
+          behavior: still ? 'auto' : 'smooth',
+        });
+        if (foundCount) foundCount.textContent = String(found.size);
+        if (found.size === count && foundText && complete) {
+          foundText.textContent = complete;
+          game.dataset.allFound = '';
+          const finale = game.querySelector<HTMLElement>('[data-finale]');
+          if (finale) finale.hidden = false;
         }
       });
-      const next = panel.querySelector<HTMLButtonElement>('[data-next]');
-      if (next) {
-        next.hidden = false;
-        next.addEventListener('click', () => select((i + 1) % count, true));
-      }
     });
 
     select(0);
@@ -169,125 +408,310 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
 </script>
 
 <style>
-  .window {
-    overflow: hidden;
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-lg);
-  }
-
-  .bar {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-2) var(--space-4);
-    border-block-end: var(--border-width) solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-
-  .dots {
-    display: flex;
-    gap: 0.375rem;
-  }
-
-  .dots span {
-    inline-size: 0.6875rem;
-    block-size: 0.6875rem;
-    border: var(--border-width) solid var(--color-border);
-    border-radius: 50%;
-  }
-
-  .window-title {
-    flex: 1;
-    text-align: center;
+  /*
+   * The game: a double frame like an old console's dialogue box. Square
+   * edges throughout; pixels have no curves.
+   */
+  .game {
+    padding: var(--space-2);
+    border: 3px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    box-shadow:
+      inset 0 0 0 3px var(--color-bg),
+      inset 0 0 0 4px var(--color-border);
   }
 
   .mono {
     font-family: var(--font-mono);
   }
 
-  .command {
-    margin: 0;
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
-  .list[hidden] {
+  /* Status bar: the title on the left, answers found on the right. */
+  .hud[hidden],
+  .levels[hidden] {
     display: none;
   }
 
-  .list {
-    padding-block: var(--space-3);
+  .hud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) var(--space-4) var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  .list .command {
+  .hud-found {
+    color: var(--color-signal);
+  }
+
+  /* Level select: the keys, then the finale badge once every answer is
+     found, in the same row when there's room. */
+  .levels {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
     padding: var(--space-2) var(--space-4) var(--space-3);
   }
 
-  .tab {
+  /*
+   * One numbered key per question. Phones: rows of five across the game.
+   * Tablets: rows of five at key size. Wide screens: one row, once there is
+   * room for every key inside the game.
+   */
+  [role='tablist'] {
     display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr) 1rem;
+    flex: 1 1 100%;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: var(--space-2);
-    inline-size: 100%;
-    padding: var(--space-3) var(--space-4);
-    border: 0;
-    border-inline-start: 2px solid transparent;
-    background: transparent;
+  }
+
+  @media (min-width: 48rem) {
+    [role='tablist'] {
+      flex: none;
+      grid-template-columns: repeat(5, 4rem);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    [role='tablist'] {
+      grid-template-columns: repeat(var(--count), 4rem);
+    }
+  }
+
+  .level {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 2.75rem;
+    padding: 0;
+    border: 2px solid var(--color-border);
+    border-block-end-width: 4px;
+    border-block-end-color: var(--color-key-lip);
+    background: var(--color-surface);
     color: var(--color-text-muted);
     font: inherit;
-    font-size: 1.0625rem;
-    line-height: 1.5rem;
-    text-align: start;
+    font-size: var(--text-sm);
     cursor: pointer;
   }
 
-  .tab:hover,
-  .tab[aria-selected='true'] {
-    background: var(--color-surface);
+  .level:hover {
     color: var(--color-text);
   }
 
-  .tab[aria-selected='true'] {
-    border-inline-start-color: var(--color-signal);
+  .level[aria-selected='true'] {
+    border-color: var(--color-signal);
+    border-block-end-color: var(--color-signal);
+    color: var(--color-text);
+    transform: translateY(-2px);
   }
 
-  .tab:focus-visible {
-    outline-offset: calc(-1 * var(--focus-width));
+  .level[data-answered] {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
   }
 
-  .number,
+  .level[data-answered]:not([aria-selected='true']) {
+    border-color: var(--color-accent);
+    border-block-end-color: var(--color-key-lip);
+  }
+
   .done {
-    color: var(--color-label);
+    display: none;
+    margin-inline-start: var(--space-1);
   }
 
-  .done {
-    visibility: hidden;
+  .level[data-answered] .done {
+    display: inline;
   }
 
-  .tab[data-answered] .done {
-    visibility: visible;
+  .level:focus-visible {
+    outline-offset: var(--focus-offset);
   }
 
+  /*
+   * One question. Sized so the question and its answer fit on screen
+   * together, under the sticky header, from small phones up.
+   */
   .panel {
-    padding: var(--space-6) var(--space-6) var(--space-7);
+    padding: var(--space-4) var(--space-3) var(--space-5);
   }
 
   /* Without JavaScript the questions run one after another. */
   .panel + .panel {
-    border-block-start: var(--border-width) solid var(--color-border);
+    border-block-start: 3px solid var(--color-border);
+  }
+
+  /* The question's number and its category, a quiet line above it. */
+  .stage {
+    display: flex;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .stage-number {
+    color: var(--color-label);
+  }
+
+  .box {
+    padding: var(--space-3);
+    border: 2px solid var(--color-text);
+    background: var(--color-surface);
+    box-shadow:
+      inset 0 0 0 3px var(--color-surface),
+      inset 0 0 0 4px var(--color-border);
   }
 
   .question {
-    margin: var(--space-3) 0 var(--space-5);
-    font-size: var(--text-2xl);
+    max-inline-size: 32em;
+    margin: 0;
+    font-size: var(--text-lg);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tight);
   }
 
-  details {
+  .prompt {
+    margin: var(--space-4) 0 0;
+    text-align: end;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .is-enhanced .prompt {
+    display: none;
+  }
+
+  .turn {
+    display: inline-block;
+    color: var(--color-signal);
+  }
+
+  /* Timer: blocks that empty one a second, the seconds left, and pause. */
+  /*
+   * With JavaScript, one row of controls inside the question box: the timer,
+   * the reveal key and, once answered, "next question". The answer box then
+   * sits straight under the question. Without JavaScript the row stays
+   * hidden and the answer's own disclosure key shows instead.
+   */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
     margin-block-start: var(--space-4);
+  }
+
+  .controls[hidden],
+  .is-enhanced summary {
+    display: none;
+  }
+
+  .timer {
+    display: flex;
+    flex: 1 1 14rem;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  [data-reveal][aria-expanded='true'] .when-closed,
+  [data-reveal][aria-expanded='false'] .when-open {
+    display: none;
+  }
+
+  [data-reveal][aria-expanded='true'] .when-open {
+    display: inline;
+  }
+
+  /* Phones: once the answer shows, "next question" takes the hide key's
+     place, so the answer stays right under the question. */
+  @media (max-width: 47.99rem) {
+    [data-reveal][aria-expanded='true'] {
+      display: none;
+    }
+  }
+
+  .timer[hidden] {
+    display: none;
+  }
+
+  .cells {
+    display: flex;
+    flex: 1;
+    gap: 2px;
+  }
+
+  .cell {
+    flex: 1;
+    block-size: 0.75rem;
+    background: var(--color-signal);
+  }
+
+  .cell[data-spent] {
+    background: transparent;
+    box-shadow: inset 0 0 0 var(--border-width) var(--color-border);
+  }
+
+  .timer-count {
+    flex: none;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Phones keep just the seconds; the words stay for screen readers. */
+  @media (max-width: 47.99rem) {
+    .timer-label {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  /* Pause and resume symbols; the key's label says which, for screen
+     readers. */
+  .timer .key {
+    flex: none;
+    inline-size: 2.75rem;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: var(--color-signal);
+  }
+
+  .icon-resume,
+  .key[data-paused] .icon-pause {
+    display: none;
+  }
+
+  .key[data-paused] .icon-resume {
+    display: block;
+  }
+
+  details {
+    margin-block-start: var(--space-2);
   }
 
   summary {
@@ -317,9 +741,10 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
     transition: transform var(--duration-press) var(--ease-standard);
   }
 
+  /* Pressed, the key sinks onto its lip. Its height is fixed, so only the
+     transform moves it and nothing around it shifts. */
   .key:active {
     border-block-end-width: var(--border-width);
-    margin-block-end: 2px;
     transform: translateY(2px);
   }
 
@@ -337,102 +762,311 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
   }
 
   details[open] > summary {
-    margin-block-end: var(--space-5);
+    margin-block-end: var(--space-2);
+  }
+
+  .tag {
+    margin: 0;
+    color: var(--color-label);
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .answer {
     max-inline-size: 40em;
-    margin: var(--space-3) 0 0;
-    font-size: var(--text-lg);
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-base);
     line-height: var(--leading-normal);
   }
 
-  .concept {
-    margin: var(--space-4) 0 var(--space-5);
-    color: var(--color-label);
-    font-size: var(--text-sm);
+  .is-enhanced details {
+    margin-block-start: 0;
+  }
+
+  .is-enhanced details[open] {
+    margin-block-start: var(--space-3);
   }
 
   .key[hidden] {
     display: none;
   }
 
-  /* With JavaScript, on wide screens: questions on the left, one open on the
-     right, tall enough that switching questions doesn't move the page. */
-  @media (min-width: 56rem) {
-    .is-enhanced .panes {
-      display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      min-block-size: 30rem;
-    }
-
-    .is-enhanced .list {
-      border-inline-end: var(--border-width) solid var(--color-border);
-    }
-
-    .is-enhanced .panel {
-      padding: var(--space-6) var(--space-7) var(--space-7);
-    }
+  .is-enhanced .panel {
+    padding-block-start: var(--space-2);
+    border-block-start: 0;
   }
 
   /*
-   * Phones and narrow screens, with JavaScript: the list becomes a row of
-   * numbered tabs, like terminal tabs, and only the open question shows
-   * below. The question text stays in each tab for screen readers.
+   * Wider screens have the room for larger type and more air. The space
+   * between the question, the answer key, the answer and "next question"
+   * grows with the window's height: a short laptop screen gets enough to
+   * breathe, a tall one more, and the answer still fits under the question.
    */
-  @media (max-width: 55.99rem) {
-    .is-enhanced .list {
-      padding: var(--space-2) var(--space-2) 0;
-      border-block-end: var(--border-width) solid var(--color-border);
-      background: var(--color-surface);
+  @media (min-width: 48rem) {
+    .game {
+      --air: clamp(var(--space-4), 3vh, var(--space-6));
     }
 
-    .is-enhanced .ls {
+    .panel {
+      padding: var(--air) var(--space-5) var(--air);
+    }
+
+    .is-enhanced .panel {
+      padding-block-start: var(--space-3);
+    }
+
+    .box {
+      padding: var(--space-5);
+    }
+
+    .controls {
+      margin-block-start: var(--space-5);
+    }
+
+    /* The status bar moves up beside the keys, saving a row. */
+    .game.is-enhanced {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    .is-enhanced .levels {
+      grid-row: 1;
+      grid-column: 1;
+    }
+
+    .is-enhanced .hud {
+      grid-row: 1;
+      grid-column: 2;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--space-1);
+      padding-block: var(--space-3);
+    }
+
+    .is-enhanced .panels {
+      grid-column: 1 / -1;
+    }
+
+    /* Beside the keys, the count is enough; the title would add a line. */
+    .is-enhanced .hud-title {
       display: none;
     }
 
-    .is-enhanced [role='tablist'] {
-      display: flex;
-      gap: var(--space-1);
-    }
-
-    .is-enhanced .tab {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-1);
-      min-block-size: 2.75rem;
-      padding: 0 var(--space-2);
-      border-inline-start: 0;
-      border-block-end: 2px solid transparent;
-      border-radius: var(--radius-md) var(--radius-md) 0 0;
-    }
-
-    .is-enhanced .tab:hover {
-      background: var(--color-bg);
-    }
-
-    .is-enhanced .tab[aria-selected='true'] {
-      background: var(--color-bg);
-      border-block-end-color: var(--color-signal);
-    }
-
-    .is-enhanced .tab-question {
+    /* Once every answer is found, the badge takes the count's place. The
+       count stays in the page, hidden, so its announcement still reads. */
+    .game[data-all-found] .hud {
       position: absolute;
       inline-size: 1px;
       block-size: 1px;
+      padding: 0;
       overflow: hidden;
       clip-path: inset(50%);
       white-space: nowrap;
     }
 
-    .is-enhanced .done {
-      display: none;
+    .answer {
+      max-inline-size: 48em;
     }
 
-    .is-enhanced .tab[data-answered] .done {
-      display: inline;
+    details {
+      margin-block-start: var(--air);
+    }
+
+    details[open] > summary {
+      margin-block-end: var(--air);
+    }
+
+    .is-enhanced details[open] {
+      margin-block-start: var(--air);
+    }
+
+    .question {
+      font-size: var(--text-2xl);
+    }
+
+    .answer {
+      margin-block-start: var(--space-3);
+      font-size: var(--text-lg);
+    }
+  }
+
+  @media (min-width: 56rem) {
+    .hud,
+    .levels {
+      padding-inline: var(--space-6);
+    }
+
+    .panel {
+      padding-inline: var(--space-6);
+    }
+  }
+
+  /*
+   * Short wide screens, like most laptops: slightly smaller type and less
+   * padding, so the heading, the keys, the question and its answer all fit
+   * on screen together.
+   */
+  @media (min-width: 48rem) and (max-height: 56rem) {
+    .game {
+      --air: clamp(var(--space-3), 2.5vh, var(--space-5));
+    }
+
+    .box {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .question {
+      max-inline-size: none;
+      font-size: var(--text-xl);
+    }
+
+    .answer {
+      font-size: var(--text-base);
+    }
+
+    .levels {
+      padding-block: var(--space-2);
+    }
+  }
+
+  /* Motion, all transform only, and none under reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .level {
+      transition: transform var(--duration-fast) var(--ease-standard);
+    }
+
+    .turn {
+      animation: bob var(--duration-blink) var(--ease-standard) 4;
+    }
+
+    details[open] .answer-box {
+      animation: rise var(--duration-base) var(--ease-enter);
+    }
+
+    .level[data-answered] .done {
+      display: inline-block;
+      animation: pop var(--duration-slow) var(--ease-enter);
+    }
+  }
+
+  @keyframes bob {
+    50% {
+      transform: translateY(calc(var(--motion-distance-sm) / 2));
+    }
+  }
+
+  @keyframes rise {
+    from {
+      transform: translateY(var(--motion-distance-sm));
+    }
+  }
+
+  @keyframes pop {
+    from {
+      transform: scale(0.4);
+    }
+    60% {
+      transform: scale(1.3);
+    }
+  }
+
+  /*
+   * Finale, once every answer is found: a small badge beside the keys with
+   * a Share button. It sits in the keys row, so the answer below doesn't
+   * move. With motion, the keys hop in a wave, the badge rises and pixel
+   * confetti bursts out of it and fades. Without motion, just the badge.
+   */
+  .finale {
+    position: relative;
+    display: flex;
+    flex: 1 1 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+    border: 2px solid var(--color-signal);
+    background: var(--color-surface);
+  }
+
+  @media (min-width: 48rem) {
+    .finale {
+      flex: none;
+    }
+  }
+
+  .finale[hidden] {
+    display: none;
+  }
+
+  .finale-tag {
+    position: relative;
+    margin: 0;
+    color: var(--color-label);
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .confetti {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    pointer-events: none;
+  }
+
+  .bit {
+    position: absolute;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    background: var(--color-signal);
+    opacity: 0;
+  }
+
+  .bit:nth-child(3n) {
+    background: var(--color-text);
+  }
+
+  .bit:nth-child(3n + 1) {
+    background: var(--color-border);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .game[data-all-found] .level {
+      animation: hop var(--duration-slow) var(--ease-standard);
+      animation-delay: calc(var(--i) * var(--duration-fast) / 2);
+    }
+
+    .finale:not([hidden]) {
+      animation: rise var(--duration-slow) var(--ease-enter);
+    }
+
+    .finale:not([hidden]) .bit {
+      animation: burst calc(var(--duration-slower) * 1.6) var(--ease-exit);
+      animation-delay: calc(var(--d) * var(--duration-fast) / 2);
+    }
+  }
+
+  @keyframes hop {
+    40% {
+      transform: translateY(calc(-1 * var(--motion-distance-sm)));
+    }
+  }
+
+  @keyframes burst {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(0) scale(1);
+    }
+    70% {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+        rotate(var(--r)) scale(0.5);
     }
   }
 </style>

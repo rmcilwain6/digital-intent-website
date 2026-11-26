@@ -1,0 +1,136 @@
+---
+// Share: copies a link to a part of the page (#anchor) to the clipboard. The
+// label turns to "Link copied" for a few seconds and is announced to screen
+// readers. Nothing is sent anywhere: the address is built from the current
+// page. Copying needs JavaScript, so without it the button stays hidden.
+interface Props {
+  anchor: string;
+  label: string;
+  copied: string;
+}
+
+const { anchor, label, copied } = Astro.props;
+---
+
+<span class="share">
+  <button
+    type="button"
+    class="share-button"
+    data-copy-link={anchor}
+    data-copied={copied}
+    hidden
+  >
+    <svg
+      class="icon icon-link"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"></path>
+      <path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"></path>
+    </svg>
+    <svg
+      class="icon icon-done"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M5 12.5l4.5 4.5L19 7.5"></path>
+    </svg>
+    <span data-copy-label>{label}</span>
+  </button>
+  <span class="visually-hidden" aria-live="polite" data-copy-status></span>
+</span>
+
+<script>
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-copy-link]')
+    .forEach((button) => {
+      if (!navigator.clipboard) return;
+      const label = button.querySelector<HTMLElement>('[data-copy-label]');
+      const status =
+        button.parentElement?.querySelector<HTMLElement>('[data-copy-status]');
+      const idle = label?.textContent ?? '';
+      const copied = button.dataset.copied ?? '';
+      let reset: number | undefined;
+      button.hidden = false;
+      button.addEventListener('click', async () => {
+        const url = `${location.origin}${location.pathname}#${button.dataset.copyLink}`;
+        try {
+          await navigator.clipboard.writeText(url);
+        } catch {
+          return;
+        }
+        if (label) label.textContent = copied;
+        if (status) status.textContent = copied;
+        button.dataset.done = '';
+        window.clearTimeout(reset);
+        reset = window.setTimeout(() => {
+          if (label) label.textContent = idle;
+          if (status) status.textContent = '';
+          delete button.dataset.done;
+        }, 3000);
+      });
+    });
+</script>
+
+<style>
+  /* Positioned, so decoration placed around it can't paint over it. */
+  .share {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .share-button {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: 2.75rem;
+    padding: 0 var(--space-3);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+  }
+
+  .share-button:hover {
+    border-color: var(--color-text);
+  }
+
+  .share-button[hidden] {
+    display: none;
+  }
+
+  .icon {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .icon-done,
+  .share-button[data-done] .icon-link {
+    display: none;
+  }
+
+  .share-button[data-done] .icon-done {
+    display: block;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>

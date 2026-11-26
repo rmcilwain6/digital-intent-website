@@ -1,17 +1,14 @@
 // Valleyview grant home page (SPEC 7.4, decision record 0006). Copy comes
 // from the "Year 2 master copy" doc (Nov 21, 2026) and the pillar 4 draft
-// goals (Oct 18, 2026). The pillar section states the organization's position,
+// goals (Oct 18, 2026). The pillar section states the organization’s position,
 // so a person must approve it before merge (AGENTS.md).
 import { valleyviewSchema } from '../src/schemas/valleyview';
 
 export const valleyview = valleyviewSchema.parse({
   hero: {
-    headline: "Pick a hard problem. We'll put $2,000 behind it.",
-    facts: [
-      '$2,000 plus mentorship',
-      'For Valleyview Grade 12s graduating in 2027',
-      'A rough idea is enough to apply',
-    ],
+    headline: 'Pick a hard problem. We’ll put $2,000 behind it.',
+    // Short form for Home’s Valleyview window; not shown on this page.
+    award: '$2,000 plus mentorship',
   },
 
   pillar: {
@@ -20,24 +17,22 @@ export const valleyview = valleyviewSchema.parse({
     paragraphs: [
       'Nobody can say for sure what work will look like in ten years. AI, the job market and the paths after high school are all shifting, and a lot of the usual advice is getting harder to trust.',
       'We think the best preparation is pretty old-fashioned. Pick a hard problem and work on it. Building something teaches you to learn fast, get stuck and get unstuck, talk to people you have never met, and keep going when nobody hands you the next step.',
-      "So we don't ask young people to wait until they graduate. We back them now, with money, mentors and people who want their idea to work. The Valleyview grant is how we do that today.",
+      'So we don’t ask young people to wait until they graduate. We back them now, with money, mentors and people who want their idea to work. The Valleyview grant is how we do that today.',
     ],
-    goalsHeading: "What we're working toward",
+    goalsHeading: 'What we’re working toward',
     goals: [
       'Every year, more young people bring us ideas they want to build.',
       'Students we back put the support to work and take their ideas as far as they can.',
       'Young people we mentor stay connected to us after high school, and our network opens doors for them as their ideas grow.',
       'Some of the ideas we back grow into lasting ventures.',
     ],
-    goalsNote:
-      '[TK: confirm the pillar 4 goals, drafts pending board approval]',
   },
 
   current: {
-    label: 'Year 2 · 2027',
+    label: 'Year 2 · 2026/27',
     heading: 'Apply for the 2027 grant',
     intro:
-      "$2,000 and mentorship for one graduating Valleyview student to take on a hard problem that makes life better for other people. You don't need top grades, a long list of accomplishments or a finished plan.",
+      'You don’t need top grades, a long list of accomplishments or a finished plan.',
     award: [
       {
         title: '$2,000',
@@ -45,15 +40,15 @@ export const valleyview = valleyviewSchema.parse({
       },
       {
         title: 'Mentorship, if you want it',
-        text: "Two mentors help with next steps, introduce you to people who can help, or just act as a sounding board. You decide what's useful and when.",
+        text: 'Two mentors help with next steps, introduce you to people who can help, or just act as a sounding board. You decide what’s useful and when.',
       },
       {
         title: 'Check-ins',
-        text: "In return, the recipient checks in with us [TK: how often, placeholder says twice] over the following year: how the money was used and how the project is going, including what didn't work.",
+        text: 'In return, the recipient checks in with us a few times over the following year: how the money was used and how the project is going, including what didn’t work.',
       },
     ],
     eligibility:
-      "Any Grade 12 student at Valleyview Secondary who is on track to graduate in June 2027. You don't need to be going to post-secondary, and there's no grade requirement.",
+      'Any Grade 12 student at Valleyview Secondary in Kamloops who is on track to graduate in June 2027. You don’t need to be going to post-secondary, and there’s no grade requirement.',
     socialInnovation: [
       'An idea that makes things better for other people, or takes on a problem worth solving. It could be a business, a nonprofit, an app, an event, a program, a campaign or a creative project.',
       'A business is welcome. Just show us who it helps and why that problem matters.',
@@ -61,37 +56,39 @@ export const valleyview = valleyviewSchema.parse({
     steps: [
       {
         title: 'Apply online',
-        text: 'Answer the three questions below and attach anything that helps us see your idea: sketches, screenshots, writing, a prototype, a letter from someone who knows you. No transcript needed.',
+        text: 'Fill out the online application and attach anything that helps us see your idea: sketches, screenshots, writing, a prototype, a letter from someone who knows you. No transcript needed.',
       },
       {
         title: 'Hear back',
-        text: 'We read every application and invite a shortlist to the next step.',
+        text: 'We read every application, get back to every applicant with some feedback, and invite a shortlist to the next step.',
       },
       {
         title: 'Have a conversation with us',
-        text: "Shortlisted students meet with us at Valleyview. Take about [TK: length, placeholder says 10] minutes to walk us through your answers, then we'll ask questions. We send a template beforehand. Slides are optional.",
+        text: 'Shortlisted students meet with us at Valleyview. It’s a conversation, not a formal pitch: we want to understand who you are, why this problem matters to you and what made you apply. Come ready to talk about your idea. We’ll tell you what to expect ahead of time, and we’re there to help you do well.',
       },
       {
         title: 'The award',
         text: 'We tell the recipient in May and present the grant at the Valleyview Awards Banquet in June.',
       },
+      {
+        // Reed, November 26, 2026: what we offer through the year.
+        title: 'We get to work',
+        text: 'Through the following year, we introduce you to people in our network, connect you with mentors and help where we can with the problems you run into.',
+      },
     ],
     timeline: [
       { when: 'December 1, 2026', what: 'Applications open' },
-      { when: 'Late February or early March', what: 'Applications close' },
+      { when: 'Early March', what: 'Applications close' },
       { when: 'Late March', what: 'Shortlist notified' },
       { when: 'Last week of April', what: 'Conversations at Valleyview' },
       { when: 'May', what: 'Recipient notified' },
       { when: 'June', what: 'Valleyview Awards Banquet' },
     ],
-    timelineNote: '[TK: exact dates for the deadline, shortlist and recipient]',
     questions: [
       'What problem do you want to take on, and why does it matter?',
       'Why are you the right person to work on it?',
       'How would the grant help you make progress?',
     ],
-    tipsIntro:
-      "These aren't requirements. They're what we look for when we read.",
     tips: [
       {
         title: 'Start with why it matters to you.',
@@ -99,7 +96,7 @@ export const valleyview = valleyviewSchema.parse({
       },
       {
         title: 'Explain the problem before the solution.',
-        text: "We might not know this area well. Tell us who it affects and what's at stake.",
+        text: 'We might not know this area well. Tell us who it affects and what’s at stake.',
       },
       {
         title: 'Think big, then show the first steps.',
@@ -115,30 +112,29 @@ export const valleyview = valleyviewSchema.parse({
       },
     ],
     apply: {
-      heading: 'Applications open December 1, 2026',
-      text: 'Apply online from December 1 until late February or early March. A rough idea is enough to start.',
-      pending:
-        '[TK: apply button, once the board picks the application form (D5)]',
+      heading: 'Applications open December 1',
+      text: 'Applications are open from December 1, 2026 to early March. We read them as they come in and get back to each applicant with feedback, so applying early means hearing from us sooner, with time to make your application stronger. A rough idea is enough to start.',
+      pending: 'The link to the application will be here when it opens.',
     },
     faq: [
       {
-        question: "What if my idea isn't fully formed yet?",
+        question: 'What if my idea isn’t fully formed yet?',
         answer:
-          "Apply anyway. A rough idea and a clear sense of why it matters is enough to start. Ideas usually get sharper between the application and the conversation, and that's a good sign.",
+          'Apply anyway. A rough idea and a clear sense of why it matters is enough to start. Ideas usually get sharper between the application and the conversation, and that’s a good sign.',
       },
       {
         question: 'Do I have to give a pitch?',
         answer:
-          "Not a formal one. If you're shortlisted, you'll walk us through your answers to the three questions and then we'll talk. We'll send a template ahead of time so you know what to prepare.",
+          'Not a formal one. If you’re shortlisted, we’ll have a conversation about you, your idea and why it matters to you. We’ll tell you what to expect ahead of time so you can prepare.',
       },
       {
         question: 'Do I need my transcript?',
-        answer: "No. This year we're only looking at you and your idea.",
+        answer: 'No. This year we’re only looking at you and your idea.',
       },
       {
         question: 'Does it have to be a business?',
         answer:
-          "No. It can be, but there's no requirement to make money. It should help other people or take on a problem that matters.",
+          'No. It can be, but there’s no requirement to make money. It should help other people or take on a problem that matters.',
       },
       {
         question: 'Can I apply with a friend or a group?',
@@ -146,9 +142,9 @@ export const valleyview = valleyviewSchema.parse({
           'Yes, but the money goes to one person, the one who applies. Tell us how you work together: who does what, how you make decisions and how you handle disagreements.',
       },
       {
-        question: "Can I apply with something I've already started?",
+        question: 'Can I apply with something I’ve already started?',
         answer:
-          "Yes. Something already in progress shows initiative. Include whatever helps us see what you've done so far.",
+          'Yes. Something already in progress shows initiative. Include whatever helps us see what you’ve done so far.',
       },
       {
         question: 'Do I need reference letters?',
@@ -160,21 +156,12 @@ export const valleyview = valleyviewSchema.parse({
         answer: 'No. It can be the first steps of something much bigger.',
       },
     ],
-    team: {
-      intro:
-        'The grant was started in 2025 by two Valleyview grads who wanted to give back to the school.',
-      people: [
-        {
-          name: 'Reed McIlwain',
-          bio: 'Valleyview class of 2016 and UVic Software Engineering. Founding executive director of Digital Intent.',
-        },
-        {
-          name: '[TK: second founder, with their agreement]',
-          bio: '[TK: bio, pending their check]',
-        },
-      ],
+    // Founders confirmed by Reed, November 26, 2026.
+    founders: {
+      text: 'The Valleyview Social Innovation Grant was founded in 2025 by Reed McIlwain and Keaton Allan. It is now a program of the {organization}.',
+      link: { label: 'Read more about them on our team page', href: '/team/' },
     },
     privacy:
-      'We only ask for what we need to understand you and your idea. Applications are read only by the grant team. [TK: where application data is stored, once the form provider is chosen]',
+      'We only ask for what we need to understand you and your idea. Applications are read only by the grant team.',
   },
 });
