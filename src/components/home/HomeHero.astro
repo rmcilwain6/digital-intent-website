@@ -46,51 +46,55 @@ const printSizes = [
       prints stay face up.
     */}
     <div class="board">
-      {hero.images.map((image, index) => (
-        <div class={`print print-${index + 1}`}>
-          <span
-            class={`magnet ${['magnet-red', 'magnet-navy', 'magnet-lime'][index]}`}
-            aria-hidden="true"
-          />
-          <button
-            type="button"
-            class="turn"
-            aria-pressed="false"
-            aria-label={`${image.alt} Photo of the ${image.label}, ${image.place}, taken ${image.taken}.${image.aside ? ` ${image.aside}` : ''} Turn it over`}
-            data-print
-          >
-            <span class="card" aria-hidden="true">
-              <span class="face front">
-                <Picture
-                  class="photo"
-                  src={image.src}
-                  alt=""
-                  formats={['avif', 'webp']}
-                  quality={50}
-                  widths={[400, 640, 960, 1280]}
-                  sizes={printSizes[index]}
-                  loading="eager"
-                  fetchpriority={index === 0 ? 'high' : 'auto'}
-                />
-              </span>
-              <span class="face back">
-                <span class="pencil">
-                  {image.label}
-                  <br />
-                  {image.place}
+      <div class="pins">
+        {hero.images.map((image, index) => (
+          <div class={`print print-${index + 1}`}>
+            <span
+              class={`magnet ${['magnet-red', 'magnet-navy', 'magnet-lime'][index]}`}
+              aria-hidden="true"
+            />
+            <button
+              type="button"
+              class="turn"
+              aria-pressed="false"
+              aria-label={`${image.alt} Photo of the ${image.label}, ${image.place}, taken ${image.taken}.${image.aside ? ` ${image.aside}` : ''} Turn it over`}
+              data-print
+            >
+              <span class="card" aria-hidden="true">
+                <span class="face front">
+                  <Picture
+                    class="photo"
+                    src={image.src}
+                    alt=""
+                    formats={['avif', 'webp']}
+                    quality={50}
+                    widths={[400, 640, 960, 1280]}
+                    sizes={printSizes[index]}
+                    loading="eager"
+                    fetchpriority={index === 0 ? 'high' : 'auto'}
+                  />
                 </span>
-                {image.aside && <span class="pencil aside">{image.aside}</span>}
-                <span class="pencil date">{image.taken}</span>
+                <span class="face back">
+                  <span class="pencil">
+                    {image.label}
+                    <br />
+                    {image.place}
+                  </span>
+                  {image.aside && (
+                    <span class="pencil aside">{image.aside}</span>
+                  )}
+                  <span class="pencil date">{image.taken}</span>
+                </span>
               </span>
-            </span>
-          </button>
-        </div>
-      ))}
-      <span class="spare spare-1 magnet-red" aria-hidden="true" />
-      <span class="spare spare-2 magnet-navy" aria-hidden="true" />
-      <span class="spare spare-3 magnet-white" aria-hidden="true" />
-      <span class="spare spare-4 magnet-lime" aria-hidden="true" />
-      <span class="spare spare-5 magnet-navy" aria-hidden="true" />
+            </button>
+          </div>
+        ))}
+        <span class="spare spare-1 magnet-red" aria-hidden="true" />
+        <span class="spare spare-2 magnet-navy" aria-hidden="true" />
+        <span class="spare spare-3 magnet-white" aria-hidden="true" />
+        <span class="spare spare-4 magnet-lime" aria-hidden="true" />
+        <span class="spare spare-5 magnet-navy" aria-hidden="true" />
+      </div>
     </div>
   </div>
 </section>
@@ -163,13 +167,19 @@ const printSizes = [
 
   /*
    * The board: a near-white whiteboard in a grey frame, with faint ghosts of
-   * old marker. Below wide screens it runs full width, nearly square like
-   * the wide-screen board, so the prints sit the same way at every size. On
-   * wide screens it fills the right column and bleeds off the right edge.
+   * old marker. Below wide screens it runs full width, at most a set height.
+   * On wide screens it is exactly as tall as the text beside it, from the top
+   * of the headline to the bottom of the Valleyview window, and bleeds off
+   * the right edge. Either way it grows and shrinks with the text, zoom
+   * included.
    */
   .board {
+    /* The shape the prints are laid out in; the pins keep it at any size. */
+    --pins-w: 16;
+    --pins-h: 15;
     position: relative;
-    aspect-ratio: 16 / 15;
+    container-type: size;
+    block-size: min(100vw * var(--pins-h) / var(--pins-w), 34rem);
     margin-inline: calc(-1 * var(--space-gutter));
     border-block: 0.5rem solid var(--color-border);
     background:
@@ -190,6 +200,18 @@ const printSizes = [
       );
     box-shadow: inset 0 0 0 1px
       color-mix(in srgb, var(--color-text) 8%, transparent);
+  }
+
+  /* Everything pinned to the board, in a box of a fixed shape that fits the
+     board's height (or width, if that is smaller). Centred below wide
+     screens. */
+  .pins {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: min(100cqw, 100cqh * var(--pins-w) / var(--pins-h));
+    aspect-ratio: var(--pins-w) / var(--pins-h);
+    translate: -50% -50%;
   }
 
   /* Prints: the photo fills the paper; a slight tilt and a soft shadow. */
@@ -255,8 +277,12 @@ const printSizes = [
   }
 
   /* Back: plain photo paper, written on in pencil. */
+  /* The place top left, the date top right, any note at the foot. */
   .back {
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr;
+    gap: var(--space-2);
     padding: var(--space-4);
     background: var(--color-card);
     transform: rotateY(180deg);
@@ -272,12 +298,15 @@ const printSizes = [
   }
 
   .aside {
+    grid-area: 2 / 1 / 3 / 3;
+    align-self: end;
     font-size: 0.875rem;
     rotate: -1deg;
   }
 
   .date {
-    align-self: flex-end;
+    grid-area: 1 / 2;
+    text-align: end;
     rotate: 1deg;
   }
 
@@ -386,15 +415,37 @@ const printSizes = [
       gap: var(--space-4);
     }
 
-    /* Less paper around the pencil, so the small prints keep their shape. */
+    /* Less paper around the pencil, so the small prints keep their shape;
+       the date takes its own line, still top right. */
     .back {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr;
+      gap: var(--space-1);
       padding: var(--space-3);
+    }
+
+    .date {
+      grid-area: 1 / 1;
+    }
+
+    .aside {
+      grid-area: 3 / 1;
+    }
+
+    .pencil {
+      font-size: 0.875rem;
+    }
+
+    .aside {
+      font-size: 0.8125rem;
     }
 
     /* A taller board and bigger prints, so the photos read on a small
        screen. */
     .board {
-      aspect-ratio: 8 / 9;
+      --pins-w: 8;
+      --pins-h: 9;
+      block-size: min(100vw * var(--pins-h) / var(--pins-w), 30rem);
     }
 
     .print-1 {
@@ -426,6 +477,9 @@ const printSizes = [
 
     .inner {
       grid-template-columns: minmax(27.5rem, 1fr) minmax(0, 1fr);
+      /* One row as tall as the text, centred in the screen; the board
+         stretches to match it. */
+      align-content: center;
       align-items: center;
     }
 
@@ -450,14 +504,18 @@ const printSizes = [
 
     .board {
       align-self: stretch;
-      aspect-ratio: auto;
-      min-block-size: 30rem;
+      block-size: auto;
       margin-inline: 0
         calc(-1 * max(var(--space-gutter), (100vw - var(--width-page)) / 2));
       border: 0.625rem solid var(--color-border);
       border-inline-end: 0;
       border-start-start-radius: var(--radius-md);
       border-end-start-radius: var(--radius-md);
+    }
+
+    .pins {
+      inset-inline-start: 0;
+      translate: 0 -50%;
     }
   }
 

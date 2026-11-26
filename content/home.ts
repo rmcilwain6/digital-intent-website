@@ -48,11 +48,13 @@ export const home = homeSchema.parse({
       },
       {
         src: skyBridge,
-        alt: 'A SkyTrain crosses the SkyBridge over the Fraser River, with the Pattullo Bridge and snowy North Shore mountains behind.',
+        alt: 'A SkyTrain crosses the SkyBridge over the Fraser River, with the old Pattullo Bridge, the stal̕əw̓asəm Bridge under construction and snowy North Shore mountains behind.',
         place: 'New Westminster',
         label: 'SkyBridge',
         taken: 'March 17, 2023',
-        aside: 'The new bridge behind it was still being built then.',
+        // The Pattullo's replacement, named by Kwantlen First Nation and
+        // Musqueam Indian Band; fully open February 14, 2026.
+        aside: 'The stal̕əw̓asəm Bridge was still being built.',
       },
     ],
   },
