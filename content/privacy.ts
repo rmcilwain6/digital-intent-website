@@ -23,7 +23,7 @@ export const privacy = privacySchema.parse({
   collects: {
     heading: 'What this site collects',
     paragraphs: [
-      'This site does not collect personal information. There are no accounts, no forms and no sign-ups. Anything that asks for your details, like an application, is on a separate site we link to.',
+      'We do not ask for, store or look at personal information through this site. There are no accounts, no forms and no sign-ups. Anything that asks for your details, like an application, is on a separate site we link to.',
       'Two services do receive some information about you. Our hosting service receives your IP address and browser details when it sends you a page. Our email provider holds any email you send us. Both are explained below.',
     ],
   },
@@ -72,6 +72,11 @@ export const privacy = privacySchema.parse({
         label: 'How long we keep it',
         value: '[TK: how long we keep messages]',
       },
+      {
+        label: 'Seeing or correcting it',
+        value:
+          'You can ask to see the personal information we hold from your emails, or ask us to correct it. Email us to ask.',
+      },
     ],
   },
   linked: {
@@ -95,7 +100,7 @@ export const privacy = privacySchema.parse({
   glance: {
     heading: 'At a glance',
     items: [
-      { label: 'Personal information collected by this site', value: 'none' },
+      { label: 'Personal information we store from this site', value: 'none' },
       { label: 'Cookies', value: '0' },
       { label: 'Trackers', value: '0' },
       { label: 'Forms', value: '0' },
