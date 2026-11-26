@@ -1,8 +1,441 @@
 ---
-import PageLayout from '../layouts/PageLayout.astro';
+// Privacy (SPEC 7.7), from the "Privacy A: the full page" design. Analog
+// world. The lede says it in one line, then a numbered list of what the site
+// does not do, a table of the services that run it, what happens to email
+// sent to us, and an index card for each service we link to. On wide screens
+// the "At a glance" card sits beside the intro, and everything below uses the
+// full page width: short sections in pairs, the table and email in full, with
+// running text kept to reading width. On phones the card follows the lede. A real page, not a dialog, so it
+// needs no JavaScript. Copy is in content/ and is a draft until a person
+// approves it (SPEC 12.5). Every fact not yet confirmed is a visible [TK]
+// note in content/, never hidden, so gaps are obvious before launch. A notice
+// link that is still a [TK] note shows as text, so there is no broken link.
+import { render } from 'astro:content';
+import { privacy } from '../../content/privacy';
+import EmailLink from '../components/EmailLink.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPage } from '../lib/pages';
+import { isPlaceholder } from '../lib/placeholder';
 
 const page = await getPage('privacy');
+const { Content } = await render(page);
+
+const { collects, doesNot, services, email, linked, glance, questions } =
+  privacy;
+const number = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
-<PageLayout page={page} />
+<BaseLayout title={page.data.title} description={page.data.description}>
+  <article class="privacy">
+    <div class="intro">
+      <h1>{page.data.heading ?? page.data.title}</h1>
+      <div class="lede">
+        <Content />
+      </div>
+      <p class="updated">Last updated {privacy.lastUpdated}</p>
+    </div>
+
+    <aside class="glance" aria-labelledby="glance-heading">
+      <div class="card">
+        <h2 id="glance-heading" class="card-label">
+          {glance.heading}
+        </h2>
+        <dl>
+          {glance.items.map((item) => (
+            <div>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </aside>
+
+    <div class="body">
+      <section class="pair" aria-labelledby="collects-heading">
+        <h2 id="collects-heading">{collects.heading}</h2>
+        {collects.paragraphs.map((text) => (
+          <p>{text}</p>
+        ))}
+      </section>
+
+      <section class="pair" aria-labelledby="does-not-heading">
+        <h2 id="does-not-heading">{doesNot.heading}</h2>
+        {/* role="list": with list-style none, VoiceOver drops list semantics. */}
+        <ol class="does-not" role="list">
+          {doesNot.items.map((item, i) => (
+            <li>
+              <span class="num" aria-hidden="true">
+                {number(i)}
+              </span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="full" aria-labelledby="services-heading">
+        <h2 id="services-heading">{services.heading}</h2>
+        <p>{services.intro}</p>
+        <table>
+          <thead>
+            <tr>
+              {services.columns.map((col) => (
+                <th scope="col">{col}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {services.items.map((item) => (
+              <tr>
+                <th scope="row">{item.name}</th>
+                <td>
+                  {item.role}
+                  {item.notice && (
+                    <>
+                      {' '}
+                      <a href={item.notice.href}>
+                        {item.notice.label}
+                        <span class="visually-hidden">: {item.name}</span>
+                      </a>
+                    </>
+                  )}
+                </td>
+                <td>{item.based}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {services.notes?.map((text) => (
+          <p class="note">{text}</p>
+        ))}
+      </section>
+
+      <section class="full" aria-labelledby="email-heading">
+        <h2 id="email-heading">{email.heading}</h2>
+        <p>{email.intro}</p>
+        <dl class="email">
+          {email.items.map((item) => (
+            <div>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section class="pair" aria-labelledby="linked-heading">
+        <h2 id="linked-heading">{linked.heading}</h2>
+        <p>{linked.intro}</p>
+        <ul class="linked" role="list">
+          {linked.items.map((item) => (
+            <li class="card">
+              <span class="card-label">{item.when}</span>
+              <h3>{item.name}</h3>
+              <p>{item.description}</p>
+              <p>Stored: {item.stored}</p>
+              {isPlaceholder(item.notice.href) ? (
+                <p class="notice">{item.notice.href}</p>
+              ) : (
+                <a class="notice" href={item.notice.href}>
+                  {item.notice.label}
+                  <span class="visually-hidden">: {item.name}</span>
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="pair" aria-labelledby="questions-heading">
+        <h2 id="questions-heading">{questions.heading}</h2>
+        <p>
+          {questions.lead} <EmailLink />.
+        </p>
+        <p>
+          {questions.officer} <EmailLink address="privacyEmail" />.
+        </p>
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  /* Wide screens: the intro with the glance card beside it, then the body
+     across the full width. */
+  .privacy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+    grid-template-areas:
+      'intro glance'
+      'body body';
+    gap: 0 var(--space-8);
+    align-items: start;
+    padding-block-start: var(--space-7);
+  }
+
+  .intro {
+    grid-area: intro;
+    max-inline-size: var(--width-prose);
+  }
+
+  .glance {
+    grid-area: glance;
+  }
+
+  /* Short sections sit in pairs; the table and email take the full width. */
+  .body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--space-8);
+    grid-area: body;
+  }
+
+  .full {
+    grid-column: 1 / -1;
+  }
+
+  /* Running text stays at reading width, however wide its section. */
+  section > p {
+    max-inline-size: var(--width-prose);
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  .lede {
+    margin-block-start: var(--space-5);
+    font-size: var(--text-xl);
+    line-height: var(--leading-normal);
+  }
+
+  .lede :global(p) {
+    margin: 0;
+  }
+
+  .updated {
+    margin: var(--space-4) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  section {
+    margin-block-start: var(--space-7);
+  }
+
+  section h2 {
+    margin: 0 0 var(--space-3);
+  }
+
+  section p {
+    margin: 0 0 var(--space-3);
+  }
+
+  /* Numbered rules, numbers typed in mono. The list keeps its own numbering
+     for screen readers; the visible numbers are decoration. */
+  .does-not {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .does-not li {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .num {
+    color: var(--color-label);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    font-weight: var(--font-weight-bold);
+  }
+
+  table {
+    inline-size: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-3) var(--space-3) 0;
+    border-block-end: var(--border-width) solid var(--color-border);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  thead th {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-regular);
+  }
+
+  /* Index card: lighter paper, ruled lines and a pen-red header rule. */
+  .card {
+    --row: 1.75rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0.875rem var(--space-5) var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-card);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--row) - 1px),
+      var(--color-card-rule) calc(var(--row) - 1px),
+      var(--color-card-rule) var(--row)
+    );
+    background-position: 0 2.75rem;
+  }
+
+  /* The label grows if it wraps or is zoomed, and the red rule sits under
+     it whatever its height, spanning the card's full width. */
+  .card-label {
+    position: relative;
+    min-block-size: 1.625rem;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--leading-normal);
+  }
+
+  .card-label::after {
+    position: absolute;
+    inset-inline: calc(-1 * var(--space-5));
+    inset-block-start: 100%;
+    block-size: 2px;
+    background: var(--color-marker);
+    content: '';
+  }
+
+  .note {
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* Two columns of label-over-answer pairs on wide screens. */
+  .email {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--space-8);
+    margin: var(--space-4) 0 0;
+  }
+
+  .email div {
+    display: grid;
+    gap: var(--space-1);
+    align-content: start;
+    padding-block: var(--space-3);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .email dt {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .email dd {
+    margin: 0;
+  }
+
+  .linked {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: var(--space-5);
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .linked h3 {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-lg);
+    line-height: var(--row);
+  }
+
+  .linked p {
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: var(--row);
+  }
+
+  .notice {
+    margin-block-start: auto;
+    padding-block-start: var(--space-2);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--row);
+  }
+
+  .glance dl {
+    margin: 0;
+  }
+
+  .glance dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    line-height: var(--row);
+  }
+
+  .glance dt {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .glance dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    text-align: end;
+  }
+
+  p.notice {
+    font-weight: var(--font-weight-regular);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* One column: the glance card follows the lede. */
+  @media (width < 64rem) {
+    .privacy {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'intro' 'glance' 'body';
+    }
+
+    .body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .glance {
+      max-inline-size: 24rem;
+      margin-block-start: var(--space-6);
+    }
+  }
+
+  @media (width < 48rem) {
+    .privacy {
+      padding-block-start: var(--space-6);
+    }
+
+    .email {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .lede {
+      font-size: var(--text-lg);
+    }
+  }
+</style>

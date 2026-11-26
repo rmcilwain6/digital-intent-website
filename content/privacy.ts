@@ -1,0 +1,137 @@
+// Privacy page (SPEC 7.7, issue #13). Approved by Reed, November 26, 2026
+// (SPEC 12.5). Nothing on this page may be untrue, even slightly. The site's
+// own code collects nothing, but two services do receive personal
+// information: the host (every visitor's IP address and browser details) and
+// our email provider (messages people send us). The page says both plainly.
+//
+// BC's PIPA: the page says why we use email, that we never sell or share it,
+// who reads it, how long we keep it, how to see, correct or delete it, and
+// names our privacy officer, at the privacy alias in brand config.
+//
+// Valleyview applications are not listed yet: how they are collected waits on
+// a board decision (D5). When the application form goes live, add its tool
+// under linked, with where it stores data and its privacy notice.
+//
+// Page view counting (D7) is a stretch goal and not built, so it is not
+// mentioned. If it ships (#17), add it here before it goes live: the tool and
+// where it is based under services, what it counts under collects, and a
+// "Page views" line at a glance (SPEC 10: the Privacy page names the tool).
+//
+// The site stores nothing in the visitor's browser, not even a theme
+// preference: there is no theme toggle (decision record 0005).
+import { privacySchema } from '../src/schemas/privacy';
+
+export const privacy = privacySchema.parse({
+  lastUpdated: 'November 26, 2026',
+  collects: {
+    heading: 'What this site collects',
+    paragraphs: [
+      'We do not ask for, store or look at personal information through this site. There are no accounts, no forms and no sign-ups. Anything that asks for your details, like an application, is on a separate site we link to.',
+      'Two services do receive some information about you. Our hosting service receives your IP address and browser details when it sends you a page. Our email provider holds any email you send us. Both are explained below.',
+    ],
+  },
+  doesNot: {
+    heading: 'What this site does not do',
+    items: [
+      'Set cookies, or store anything in your browser. Not even a setting.',
+      'Send what you type anywhere. There is nothing to type into.',
+      'Run ads, trackers or fingerprinting, or share data with ad networks.',
+      'Load fonts, images or scripts from other companies. Everything comes from our own site.',
+    ],
+  },
+  services: {
+    heading: 'Services that run this site',
+    intro:
+      'These services put the site online. We do not send them anything about you, but your browser connects to them directly.',
+    columns: ['Service', 'What it does', 'Where it is based'],
+    items: [
+      {
+        name: 'Cloudflare Workers',
+        role: 'Hosts the site and sends pages to your browser. To send you pages, Cloudflare receives your IP address and basic details about your browser. Cloudflare keeps some of this to protect and run its network, as its own privacy policy explains.',
+        based:
+          'Cloudflare, Inc., in the United States. Pages are sent from Cloudflare data centres around the world, usually the one nearest you.',
+        notice: {
+          label: 'Cloudflare privacy policy',
+          href: 'https://www.cloudflare.com/privacypolicy/',
+        },
+      },
+    ],
+    notes: [
+      'If a page fails to load, Cloudflare may ask your browser to send it a short error report. This helps Cloudflare watch its network. It is not used to track you.',
+    ],
+  },
+  email: {
+    heading: 'If you email us',
+    intro:
+      'Our email address opens your own email app. Your message goes from there to our inbox, not through this site. Email is the one place we hold personal information.',
+    items: [
+      {
+        label: 'What we receive',
+        value:
+          'Your email address, your message and anything you attach or include.',
+      },
+      {
+        label: 'What we use it for',
+        value:
+          'To reply to you and keep in touch about what you wrote. We never sell your email or share it. We will only add you to a mailing list, like a newsletter, if you say yes.',
+      },
+      {
+        label: 'Who reads it',
+        value: 'Our Executive Director and our board. No one else has access.',
+      },
+      {
+        label: 'Email provider',
+        value: 'Google Workspace, from Google LLC in the United States.',
+      },
+      {
+        label: 'Where mail is stored',
+        value:
+          'In Google’s data centres, in the United States and other countries.',
+      },
+      {
+        label: 'How long we keep it',
+        value:
+          'As long as we need it to reply and follow up. If you ask us to delete it sooner, we will.',
+      },
+      {
+        label: 'Seeing, correcting or deleting it',
+        value:
+          'You can ask to see the personal information we hold from your emails, ask us to correct it, or ask us to delete it from our records. Email us to ask.',
+      },
+    ],
+  },
+  linked: {
+    heading: 'Services we link to',
+    intro:
+      'Some links take you to other services. Once you are there, their privacy notice applies, not this one. Each one stores your information in its own place.',
+    items: [
+      {
+        when: 'If you open our code',
+        name: 'GitHub',
+        description:
+          'Our “See the code” link goes to the code for this site on GitHub, which is owned by Microsoft. You do not need an account to read it.',
+        stored: 'GitHub, Inc., in the United States.',
+        notice: {
+          label: 'Privacy notice',
+          href: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement',
+        },
+      },
+    ],
+  },
+  glance: {
+    heading: 'At a glance',
+    items: [
+      { label: 'Personal information we store from this site', value: 'none' },
+      { label: 'Cookies', value: '0' },
+      { label: 'Trackers', value: '0' },
+      { label: 'Forms', value: '0' },
+      { label: 'Outside requests made by our code', value: '0' },
+    ],
+  },
+  questions: {
+    heading: 'Questions',
+    lead: 'Email us at',
+    officer:
+      'Reed McIlwain, our Executive Director, is our privacy officer and is responsible for how we handle personal information. Write to',
+  },
+});

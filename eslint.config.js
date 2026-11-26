@@ -17,4 +17,14 @@ export default defineConfig(
       globals: { ...globals.browser, ...globals.node },
     },
   },
+  {
+    rules: {
+      // Lists styled with list-style: none lose their list role in Safari
+      // and VoiceOver, so role="list" on them is deliberate, not redundant.
+      'astro/jsx-a11y/no-redundant-roles': [
+        'error',
+        { ul: ['list'], ol: ['list'] },
+      ],
+    },
+  },
 );

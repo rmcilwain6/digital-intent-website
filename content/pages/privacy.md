@@ -1,6 +1,6 @@
 ---
 title: Privacy
-description: '[TK: one-sentence summary of what this site collects]'
+description: We do not ask for, store or look at personal information through this site. It sets no cookies and runs no trackers.
 ---
 
-[TK: privacy text, pending human approval: what the site does and does not collect, every service involved and where it is based, and linked third-party services and their own notices]
+We do not ask for, store or look at <mark>personal information</mark> through this site. To send you pages, our hosting service, Cloudflare, receives your IP address and basic details about your browser. The site sets no cookies and runs no trackers.

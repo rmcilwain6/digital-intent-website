@@ -1,12 +1,20 @@
 ---
-// The organization email from brand config. Shows the placeholder as plain
-// text until the address exists (D21), so there is no broken mailto: link.
+// An email address from brand config, the organization's by default. Shows a
+// placeholder as plain text until the address exists (D21), so there is no
+// broken mailto: link.
 import { brand } from '../brand/brand.config';
 import { isPlaceholder } from '../lib/placeholder';
+
+interface Props {
+  /** Which brand address to show. */
+  address?: 'email' | 'privacyEmail';
+}
+
+const email = brand[Astro.props.address ?? 'email'];
 ---
 
-{isPlaceholder(brand.email) ? (
-  <span>{brand.email}</span>
+{isPlaceholder(email) ? (
+  <span>{email}</span>
 ) : (
-  <a href={`mailto:${brand.email}`}>{brand.email}</a>
+  <a href={`mailto:${email}`}>{email}</a>
 )}
