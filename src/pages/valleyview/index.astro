@@ -429,11 +429,14 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
   }
 
   @media (width >= 48rem) {
-    /* The text at reading width, with the portrait right beside it. */
+    /* Two equal columns, the portrait centred in the right one. */
     .teaser {
-      grid-template-columns: minmax(0, var(--width-prose)) 22rem;
-      justify-content: start;
+      grid-template-columns: 1fr 1fr;
       gap: var(--space-7);
+    }
+
+    .portrait {
+      justify-self: center;
     }
   }
 
@@ -486,8 +489,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     }
   }
 
-  .steps,
-  .questions {
+  .steps {
     display: grid;
     gap: var(--space-4);
     padding: 0;
@@ -495,15 +497,13 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     counter-reset: step;
   }
 
-  .steps li,
-  .questions li {
+  .steps li {
     position: relative;
     padding-inline-start: var(--space-7);
     counter-increment: step;
   }
 
-  .steps li::before,
-  .questions li::before {
+  .steps li::before {
     content: counter(step, decimal-leading-zero);
     position: absolute;
     inset-inline-start: 0;
@@ -511,15 +511,31 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     color: var(--color-label);
   }
 
+  /* The three questions: large, regular weight, each in its own band
+     between rules like the timeline, numbered above in mono. */
+  .questions {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: question;
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
   .questions li {
+    padding-block: var(--space-5);
+    border-block-end: var(--border-width) solid var(--color-border);
     font-size: var(--text-xl);
-    font-weight: var(--font-weight-bold);
     line-height: var(--leading-tight);
+    counter-increment: question;
   }
 
   .questions li::before {
-    font-size: var(--text-base);
-    line-height: inherit;
+    content: counter(question, decimal-leading-zero);
+    display: block;
+    margin-block-end: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-label);
   }
 
   .timeline {
