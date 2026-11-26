@@ -72,7 +72,7 @@ export const home = homeSchema.parse({
       challenges: [
         {
           title: 'More device use hasn’t meant better learning',
-          text: 'Schools had good reasons to bring devices in. But most software is built to make things easier and to hold our attention, and learning happens in the hard part: the wrong answer, the second try, working it out with the people in the room.',
+          text: 'Schools had good reasons to bring devices in. But most software is built to make things easier and to hold our attention. Learning happens in the hard part: the right amount of friction, with scaffolding and support in place so students can work through it.',
         },
         {
           title: 'Using technology isn’t the same as understanding it',
@@ -80,7 +80,7 @@ export const home = homeSchema.parse({
         },
         {
           title: 'AI changes the ground under all of it',
-          text: 'It arrived in classrooms almost overnight, and it touches how students learn, how we know what they’ve learned, how anyone finds information, and what work students are preparing for.',
+          text: 'It arrived in classrooms almost overnight and shifted the landscape. It affects how students learn, how we assess them, how we all find information, and what work students are preparing for.',
         },
       ],
       questions: {
