@@ -19,6 +19,8 @@ interface Props {
   fullWidth?: boolean;
   /** Put the whole main area in one world, e.g. the Digital 404 page (record 0005). */
   theme?: 'analog' | 'digital';
+  /** A page's own sharing image from brand config; the default otherwise. */
+  socialImage?: keyof typeof brand.pageSocialImages;
 }
 
 const {
@@ -27,6 +29,7 @@ const {
   noindex = false,
   fullWidth = false,
   theme,
+  socialImage: socialImageKey,
 } = Astro.props;
 const documentTitle = title ? `${title} | ${brand.name}` : brand.name;
 const lang = Astro.currentLocale ?? 'en';
@@ -36,7 +39,10 @@ const lang = Astro.currentLocale ?? 'en';
 const canonical = noindex
   ? undefined
   : new URL(Astro.url.pathname, Astro.site).href;
-const socialImage = new URL(brand.socialImage.src, Astro.site).href;
+const share = socialImageKey
+  ? brand.pageSocialImages[socialImageKey]
+  : brand.socialImage;
+const socialImage = new URL(share.src, Astro.site).href;
 ---
 
 <!doctype html>
@@ -60,12 +66,9 @@ const socialImage = new URL(brand.socialImage.src, Astro.site).href;
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={socialImage} />
-    <meta property="og:image:width" content={String(brand.socialImage.width)} />
-    <meta
-      property="og:image:height"
-      content={String(brand.socialImage.height)}
-    />
-    <meta property="og:image:alt" content={brand.socialImage.alt} />
+    <meta property="og:image:width" content={String(share.width)} />
+    <meta property="og:image:height" content={String(share.height)} />
+    <meta property="og:image:alt" content={share.alt} />
     <meta name="twitter:card" content="summary_large_image" />
     <!--
       Marks the page as able to run scripts, before first paint, so styles for

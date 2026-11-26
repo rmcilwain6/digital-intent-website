@@ -26,7 +26,11 @@ const { data } = entry;
 const { Content } = await render(entry);
 ---
 
-<BaseLayout title={data.title} description={data.description}>
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  socialImage="valleyview"
+>
   <article class="feature">
     <header class="feature-head">
       <p class="label">

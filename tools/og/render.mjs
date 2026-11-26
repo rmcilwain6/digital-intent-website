@@ -8,7 +8,10 @@ const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 
 // Source page → output file, both relative to the repo root.
-const images = [['tools/og/default.html', 'public/brand/og-default.png']];
+const images = [
+  ['tools/og/default.html', 'public/brand/og-default.png'],
+  ['tools/og/valleyview.html', 'public/brand/og-valleyview.png'],
+];
 
 const root = new URL('../../', import.meta.url);
 const browser = await chromium.launch();
