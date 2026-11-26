@@ -51,6 +51,8 @@ export const aboutSchema = z.strictObject({
       file: z.string().regex(/^[a-z0-9-]+\.(jpg|jpeg|png|webp)$/),
       /** Size of the original file, shown in the caption, e.g. "859 kb". Update it if the photo changes. */
       size: z.string().regex(/^\d+ kb$/),
+      /** Where it was taken, shown first in the caption. */
+      place: z.string().min(1),
       /** When it was taken, shown in the caption, e.g. "fall 2026". */
       taken: z.string().min(1),
     })

@@ -33,8 +33,8 @@ const section = z.strictObject({
 
 /**
  * "Why we exist": a short intro, three challenges side by side, the
- * "Could you answer this?" window with a question from content/questions.ts,
- * then a closing note on why this is hard, which hands off to What we do.
+ * "Could you answer these?" game with questions from content/questions.ts,
+ * which hands off to What we do.
  */
 const whyWeExist = z.strictObject({
   heading: z.string().min(1),
@@ -50,20 +50,45 @@ const whyWeExist = z.strictObject({
   questions: z.strictObject({
     heading: z.string().min(1),
     lede: z.string().min(1),
+    /** Link target for this part of Home, as in /#questions. Share copies it. */
+    anchor: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
+    /** The key beside the heading that copies a link to the anchor. */
+    copyLink: z.string().min(1),
+    /** Shown on that key, and announced, once the link is copied. */
+    copied: z.string().min(1),
     /** How many questions from the bank the window shows. */
-    count: z.int().min(1).max(8),
-    /** Lowercase mono label in the window's title bar. */
+    count: z.int().min(1).max(10),
+    /** Lowercase mono label at the left of the game's status bar. */
     windowTitle: z.string().min(1),
+    /** After the count in the status bar, as in "2/10 answers found". */
+    found: z.string().min(1),
+    /** Replaces the count once every answer has been opened. */
+    complete: z.string().min(1),
+    /**
+     * Game-show timer: seconds before an unanswered question shows its
+     * answer by itself, and the words around it.
+     */
+    timer: z.strictObject({
+      seconds: z.int().min(5).max(60),
+      /** Before the seconds left, as in "answer in 12s". */
+      label: z.string().min(1),
+      pause: z.string().min(1),
+      resume: z.string().min(1),
+      /** Announced to screen readers when the time runs out. */
+      timeUp: z.string().min(1),
+    }),
+    /** The badge beside the keys once every answer has been found. */
+    finale: z.strictObject({
+      /** Short lowercase mono label, as in "questions complete". */
+      tag: z.string().min(1),
+    }),
     /** Lowercase mono line before the reveal key. */
     prompt: z.string().min(1),
     reveal: z.string().min(1),
     hide: z.string().min(1),
+    /** Label at the top of the answer box. */
+    answerLabel: z.string().min(1),
     next: z.string().min(1),
-  }),
-  /** Why this is hard: a quiet, left-aligned note after the window. */
-  closing: z.strictObject({
-    heading: z.string().min(1),
-    body: z.string().min(1),
   }),
   draft: z.boolean(),
 });
@@ -115,7 +140,7 @@ const focusItem = z.strictObject({
 /**
  * "What we do": the mission (from content/organization.ts), then the four
  * pillars as "what we focus on", each with one thing live now and one in the
- * works, then a line on taking many approaches at once.
+ * works.
  */
 const whatWeDo = z.strictObject({
   heading: z.string().min(1),
@@ -148,8 +173,6 @@ const whatWeDo = z.strictObject({
   }),
   /** Under the pillars: the mission and pillars in full, on About. */
   cta: callToAction,
-  /** Closes the section: there is no single fix, so we try many things. */
-  approach: z.string().min(1),
   draft: z.boolean(),
 });
 
