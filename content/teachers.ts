@@ -14,7 +14,7 @@ export const teachers = teachersSchema.parse({
       },
       {
         title: 'It fits what you already teach.',
-        text: 'We are not asking you to teach a new subject. We show where digital literacy already fits in the courses you teach, and share lessons that slot into them.',
+        text: 'We show where digital literacy already fits in the courses you teach, and share lessons that slot into them.',
       },
       {
         title: 'We help protect your classroom.',

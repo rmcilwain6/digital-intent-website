@@ -71,21 +71,21 @@ export const home = homeSchema.parse({
       lede: 'We see a set of challenges around technology in schools right now. None of them has a simple answer, and we think each one needs careful, intentional work.',
       challenges: [
         {
-          title: 'More devices haven’t meant better learning',
-          text: 'Schools had good reasons to bring devices in. But most software is built to make things easier and to hold our attention, and learning happens in the hard part: the wrong answer, the second try, working it out with the people in the room.',
+          title: 'More device use hasn’t meant better learning',
+          text: 'Schools had good reasons to bring devices in. But most software is built to make things easier and to hold our attention. Learning happens in the hard part: the right amount of friction, with scaffolding and support in place so students can work through it.',
         },
         {
           title: 'Using technology isn’t the same as understanding it',
-          text: 'Students spend hours a day on screens, and many are fluent users. That isn’t the same as knowing how any of it works: the hardware, the networks, where data goes, or who pays for the free apps.',
+          text: 'Students spend hours a day on screens, and many are fluent users. That isn’t the same as knowing how any of it works.',
         },
         {
           title: 'AI changes the ground under all of it',
-          text: 'It arrived in classrooms almost overnight, and it touches how students learn, how we know what they’ve learned, how anyone finds information, and what work students are preparing for.',
+          text: 'It arrived in classrooms almost overnight and shifted the landscape. It affects how students learn, how we assess them, how we all find information, and what work students are preparing for.',
         },
       ],
       questions: {
         heading: 'Could you answer these?',
-        lede: 'We think every student should graduate able to answer questions like these. Have a guess before you look.',
+        lede: 'We think every student should graduate able to answer questions like these.',
         anchor: 'questions',
         copyLink: 'Share',
         copied: 'Link copied',
@@ -109,16 +109,12 @@ export const home = homeSchema.parse({
         answerLabel: 'answer',
         next: 'next question',
       },
-      closing: {
-        heading: 'Why this is hard',
-        body: 'None of this has an easy fix, partly because the people who build technology and the people who teach often see it differently. They want different things from it, for different reasons. Finding what’s best for students means bringing those views together. That’s the bridge we’re trying to build.',
-      },
       draft: false,
     },
 
     // The mission and the pillars are in content/organization.ts, shared with
-    // About. `focus` follows the pillars' order. Its items are stand-ins
-    // built from pages we have; Reed will choose the real ones (Nov 24).
+    // About. `focus` follows the pillars' order. Items approved by Reed,
+    // Nov 26; each "In the works" item says "Coming soon" until it has more.
     mission: {
       heading: 'What we do',
       focusHeading: 'What we focus on',
@@ -128,12 +124,15 @@ export const home = homeSchema.parse({
           highlight: 'independent',
           now: {
             title: 'This website',
-            text: 'Built the way we think technology should be: fast, accessible and private, with no tracking and no cookies.',
-            cta: { label: 'How we handle privacy', href: '/privacy/' },
+            text: 'Built the way we think technology should be: open source, transparent and accessible. Anyone can read the code that runs it.',
+            cta: {
+              label: 'See the code',
+              href: 'https://github.com/rmcilwain6/digital-intent-website',
+            },
           },
           next: {
             title: 'Our positions, published in the open',
-            text: '[TK: our first published position, once the board signs off]',
+            text: 'Coming soon.',
           },
         },
         {
@@ -144,8 +143,8 @@ export const home = homeSchema.parse({
             cta: { label: 'Get in touch', href: '/contact/' },
           },
           next: {
-            title: 'Book a call with us',
-            text: '[TK: when teachers can book a call]',
+            title: 'Book a call or a classroom visit',
+            text: 'Coming soon.',
           },
         },
         {
@@ -156,8 +155,8 @@ export const home = homeSchema.parse({
             cta: { label: 'What we offer teachers', href: '/teachers/' },
           },
           next: {
-            title: 'Technology camps, with the Big Little Science Centre',
-            text: '[TK: what the camps are, who they are for, and when they run]',
+            title: 'Technology camps with the Big Little Science Centre',
+            text: 'Coming soon.',
           },
         },
         {
@@ -168,7 +167,8 @@ export const home = homeSchema.parse({
             cta: { label: 'Read about the grant', href: '/valleyview/' },
           },
           next: {
-            title: '[TK: what comes next for this pillar]',
+            title: 'More grants for students',
+            text: 'Coming soon.',
           },
         },
       ],
@@ -178,9 +178,7 @@ export const home = homeSchema.parse({
         next: 'Next focus',
       },
       cta: { label: 'More about our mission', href: '/about/' },
-      approach:
-        'There is no single fix for any of this. We expect to try many things at once: workshops for teachers, school visits, grants for students, and partnerships across the province. Then we keep what works.',
-      draft: true,
+      draft: false,
     },
 
     map: {

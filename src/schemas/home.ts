@@ -34,7 +34,7 @@ const section = z.strictObject({
 /**
  * "Why we exist": a short intro, three challenges side by side, the
  * "Could you answer these?" game with questions from content/questions.ts,
- * then a closing note on why this is hard, which hands off to What we do.
+ * which hands off to What we do.
  */
 const whyWeExist = z.strictObject({
   heading: z.string().min(1),
@@ -90,11 +90,6 @@ const whyWeExist = z.strictObject({
     answerLabel: z.string().min(1),
     next: z.string().min(1),
   }),
-  /** Why this is hard: a quiet, left-aligned note after the window. */
-  closing: z.strictObject({
-    heading: z.string().min(1),
-    body: z.string().min(1),
-  }),
   draft: z.boolean(),
 });
 
@@ -145,7 +140,7 @@ const focusItem = z.strictObject({
 /**
  * "What we do": the mission (from content/organization.ts), then the four
  * pillars as "what we focus on", each with one thing live now and one in the
- * works, then a line on taking many approaches at once.
+ * works.
  */
 const whatWeDo = z.strictObject({
   heading: z.string().min(1),
@@ -178,8 +173,6 @@ const whatWeDo = z.strictObject({
   }),
   /** Under the pillars: the mission and pillars in full, on About. */
   cta: callToAction,
-  /** Closes the section: there is no single fix, so we try many things. */
-  approach: z.string().min(1),
   draft: z.boolean(),
 });
 

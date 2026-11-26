@@ -4,10 +4,10 @@ import { siteSchema } from '../src/schemas/site';
 export const site = siteSchema.parse({
   home: { label: 'Home', href: '/' },
   primaryNav: [
-    { label: 'For teachers', href: '/teachers/' },
+    { label: 'For Teachers', href: '/teachers/' },
+    { label: 'Valleyview Grant', href: '/valleyview/' },
+    { label: 'Our Team', href: '/team/' },
     { label: 'About', href: '/about/' },
-    { label: 'Our team', href: '/team/' },
-    { label: 'Valleyview Grant', href: '/valleyview/', featured: true },
     {
       label: 'Indigenous outreach',
       href: '/indigenous-outreach/',
@@ -15,10 +15,21 @@ export const site = siteSchema.parse({
     },
     { label: 'Contact', href: '/contact/' },
   ],
+  // Phone menu: Home and About side by side, then full rows for Teachers,
+  // Valleyview and Indigenous outreach, then Our Team and Contact.
+  phoneMenu: [
+    { href: '/' },
+    { href: '/about/' },
+    { href: '/teachers/', wide: true },
+    { href: '/valleyview/', wide: true },
+    { href: '/indigenous-outreach/', wide: true },
+    { href: '/team/' },
+    { href: '/contact/' },
+  ],
   footerNav: [
-    { label: 'For teachers', href: '/teachers/' },
+    { label: 'For Teachers', href: '/teachers/' },
     { label: 'About', href: '/about/' },
-    { label: 'Our team', href: '/team/' },
+    { label: 'Our Team', href: '/team/' },
     { label: 'Valleyview Grant', href: '/valleyview/' },
     { label: 'Indigenous outreach', href: '/indigenous-outreach/' },
     { label: 'Contact', href: '/contact/' },
