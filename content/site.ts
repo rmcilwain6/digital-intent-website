@@ -24,6 +24,8 @@ export const site = siteSchema.parse({
     { label: 'Contact', href: '/contact/' },
     { label: 'Privacy', href: '/privacy/' },
   ],
+  // The footer's "Next path": the first two that aren't the current page,
+  // so order matters.
   nextStops: [
     {
       label: 'Who we are',

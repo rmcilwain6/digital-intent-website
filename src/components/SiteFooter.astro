@@ -1,6 +1,6 @@
 ---
 // Site footer, Digital world (design system: website frame). Layout B from
-// the footer review (Reed, November 26, 2026): on the left, "Next stops"
+// the footer review (Reed, November 26, 2026): on the left, "Next path"
 // continue the reader's path, with a short land acknowledgement below them
 // that links to the Indigenous outreach page (decision record 0007). On the
 // right, the organization, its starting regions, contact and links. A slim
@@ -14,7 +14,10 @@ import EmailLink from './EmailLink.astro';
 
 const trim = (path: string) => path.replace(/\/+$/, '') || '/';
 const currentPath = trim(Astro.url.pathname);
-const stops = site.nextStops.filter((stop) => trim(stop.href) !== currentPath);
+// At most two, leaving out the page the reader is on.
+const stops = site.nextStops
+  .filter((stop) => trim(stop.href) !== currentPath)
+  .slice(0, 2);
 const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
   brand.regions,
 );
@@ -26,7 +29,7 @@ const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
       <div class="journey">
         {stops.length > 0 && (
           <section class="next-stops" aria-labelledby="next-stops-heading">
-            <h2 id="next-stops-heading">Next stops</h2>
+            <h2 id="next-stops-heading">Next path</h2>
             <ul>
               {stops.map((stop) => (
                 <li>
