@@ -14,9 +14,15 @@ interface Props {
   lessons: Lesson[];
   /** Accessible name for the row of tabs. */
   label: string;
+  /**
+   * Label for a quiet tab after the lessons saying more are on the way. It
+   * is plain text, not a tab: there is nothing to open, so it stays out of
+   * the tab list and the keyboard order.
+   */
+  soon?: string;
 }
 
-const { lessons, label } = Astro.props;
+const { lessons, label, soon } = Astro.props;
 ---
 
 <div class="folder" data-folder>
@@ -35,6 +41,7 @@ const { lessons, label } = Astro.props;
         </li>
       ))}
     </ul>
+    {soon && <span class="tab tab-soon">{soon}</span>}
   </nav>
 
   <div class="body">
@@ -133,15 +140,22 @@ const { lessons, label } = Astro.props;
   /* The row of tabs. Its bottom line is the folder's top edge; the chosen tab
      covers it, so the tab and the folder read as one piece of card. On
      narrow screens the row scrolls sideways on its own. */
+  .tabs {
+    display: flex;
+    gap: var(--space-1);
+    align-items: end;
+    overflow-x: auto;
+    box-shadow: inset 0 calc(-1 * var(--border-width)) 0 var(--color-border);
+    scrollbar-width: thin;
+  }
+
   .tabs ul {
     display: flex;
+    flex: none;
     gap: var(--space-1);
     margin: 0;
     padding: var(--space-1) 0 0;
-    overflow-x: auto;
     list-style: none;
-    box-shadow: inset 0 calc(-1 * var(--border-width)) 0 var(--color-border);
-    scrollbar-width: thin;
   }
 
   li {
@@ -181,6 +195,16 @@ const { lessons, label } = Astro.props;
     background: var(--color-surface);
   }
 
+  /* More on the way: a dashed outline of a tab, nothing to open yet. */
+  .tab-soon {
+    flex: none;
+    min-inline-size: 0;
+    border-style: dashed;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-regular);
+  }
+
   .body {
     display: grid;
     gap: var(--space-7);
@@ -212,6 +236,12 @@ const { lessons, label } = Astro.props;
       min-inline-size: 0;
       padding: var(--space-2) var(--space-5) var(--space-2) var(--space-4);
       font-size: var(--text-base);
+    }
+
+    /* Smaller than a lesson tab, so it fits beside one on a phone. */
+    .tab-soon {
+      padding-inline: var(--space-3);
+      font-size: var(--text-sm);
     }
   }
 </style>

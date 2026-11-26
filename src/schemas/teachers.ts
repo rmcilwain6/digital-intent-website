@@ -119,6 +119,11 @@ export const teachersSchema = z.strictObject({
       intro: z.string().min(1),
       /** A line under the folder saying more lessons are on the way. */
       comingSoon: z.string().min(1).optional(),
+      /**
+       * Label for a quiet, unclickable tab at the end of the folder's tab
+       * row, so it is obvious at a glance that more lessons are on the way.
+       */
+      comingSoonTab: z.string().min(1).optional(),
       items: z.array(lessonSchema).min(1),
     })
     .refine(
@@ -131,6 +136,7 @@ export const teachersSchema = z.strictObject({
    */
   contact: z.strictObject({
     heading: z.string().min(1),
+    /** One or more paragraphs, with a blank line between them. */
     intro: z.string().min(1),
     emailLabel: z.string().min(1),
     subject: z.string().min(1),
