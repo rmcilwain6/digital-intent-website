@@ -10,10 +10,11 @@ import { aboutSchema } from '../src/schemas/about';
 export const about = aboutSchema.parse({
   photo: {
     src: campusAvenue,
-    alt: 'A student reads at a table under a long avenue of trees in autumn.',
+    alt: 'A student reads at a table under a long avenue of trees in autumn, on the quad at the University of Victoria.',
+    place: 'The quad at the University of Victoria',
     file: 'campus-avenue-autumn.jpg',
     size: '859 kb',
-    taken: 'fall 2026',
+    taken: 'fall 2025',
   },
   // The pillars themselves live in content/organization.ts, shared with Home.
   pillars: {

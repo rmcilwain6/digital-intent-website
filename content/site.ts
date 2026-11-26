@@ -4,10 +4,10 @@ import { siteSchema } from '../src/schemas/site';
 export const site = siteSchema.parse({
   home: { label: 'Home', href: '/' },
   primaryNav: [
-    { label: 'For teachers', href: '/teachers/' },
-    { label: 'About', href: '/about/' },
-    { label: 'Our team', href: '/team/' },
+    { label: 'For Teachers', href: '/teachers/' },
     { label: 'Valleyview Grant', href: '/valleyview/', featured: true },
+    { label: 'Our Team', href: '/team/' },
+    { label: 'About', href: '/about/' },
     {
       label: 'Indigenous outreach',
       href: '/indigenous-outreach/',
@@ -16,9 +16,9 @@ export const site = siteSchema.parse({
     { label: 'Contact', href: '/contact/' },
   ],
   footerNav: [
-    { label: 'For teachers', href: '/teachers/' },
+    { label: 'For Teachers', href: '/teachers/' },
     { label: 'About', href: '/about/' },
-    { label: 'Our team', href: '/team/' },
+    { label: 'Our Team', href: '/team/' },
     { label: 'Valleyview Grant', href: '/valleyview/' },
     { label: 'Indigenous outreach', href: '/indigenous-outreach/' },
     { label: 'Contact', href: '/contact/' },

@@ -1,5 +1,5 @@
 ---
-title: For teachers
+title: For Teachers
 description: Free lessons to download, and a call with our team. We help teachers build their own digital skills and bring them into the subjects they already teach.
 ---
 

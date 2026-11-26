@@ -71,12 +71,12 @@ export const home = homeSchema.parse({
       lede: 'We see a set of challenges around technology in schools right now. None of them has a simple answer, and we think each one needs careful, intentional work.',
       challenges: [
         {
-          title: 'More devices haven’t meant better learning',
+          title: 'More device use hasn’t meant better learning',
           text: 'Schools had good reasons to bring devices in. But most software is built to make things easier and to hold our attention, and learning happens in the hard part: the wrong answer, the second try, working it out with the people in the room.',
         },
         {
           title: 'Using technology isn’t the same as understanding it',
-          text: 'Students spend hours a day on screens, and many are fluent users. That isn’t the same as knowing how any of it works: the hardware, the networks, where data goes, or who pays for the free apps.',
+          text: 'Students spend hours a day on screens, and many are fluent users. That isn’t the same as knowing how any of it works.',
         },
         {
           title: 'AI changes the ground under all of it',

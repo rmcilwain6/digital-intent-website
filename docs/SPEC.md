@@ -329,7 +329,7 @@ Fixed regardless of stack:
   - Animate transform and opacity only, unless a recorded decision allows otherwise.
   - Heavy visuals (map, canvas, WebGL) load only on routes that use them and have their own performance budget.
 - Two worlds instead of dark mode (record 0005): pages are Analog, the header, footer, phone menu and 404 are Digital. No theme toggle, and the system theme setting does not change the world.
-- Photography: original images shot by Reed in fall 2026. Layouts define image slots with fixed aspect ratios and a short art-direction note per slot.
+- Photography: original images shot by Reed. Layouts define image slots with fixed aspect ratios and a short art-direction note per slot.
 
 ## 9. Quality bars
 

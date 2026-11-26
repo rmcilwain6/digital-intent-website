@@ -1,5 +1,5 @@
 ---
-title: Our team
+title: Our Team
 description: 'Who is on our team, what each of us does and the perspective we bring.'
 ---
 

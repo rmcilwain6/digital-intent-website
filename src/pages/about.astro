@@ -18,7 +18,7 @@ const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
   brand.regions,
 );
 
-// Caption specs for the original photo. Dimensions come from the image;
+// Caption specs for the original photo, under the line naming where it was taken. Dimensions come from the image;
 // file size and date from content/about.ts.
 const { photo } = about;
 const photoSpecs = [
@@ -117,6 +117,7 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
           loading="eager"
         />
         <figcaption>
+          <span class="place">{photo.place}</span>
           <span>{photo.file}</span>
           <span>{photoSpecs}</span>
         </figcaption>
@@ -237,6 +238,12 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
     color: var(--color-text-muted);
     font-family: var(--font-mono);
     font-size: 0.8125rem;
+  }
+
+  /* Where the photo was taken: its own line, above the file name and specs. */
+  figcaption .place {
+    flex-basis: 100%;
+    color: var(--color-text);
   }
 
   /* The 4:5 frame holds its space while the photo loads. */
