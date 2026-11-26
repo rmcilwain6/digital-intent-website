@@ -100,9 +100,10 @@ Outside the classroom, he enjoys spending time outdoors, playing tabletop games,
     },
     role: 'Board Member',
     place: 'Kamloops',
-    // Draft from Reed's notes, Nov 26, 2026: needs Keaton's approval.
+    // Bio worked through with Reed, Nov 26, 2026: needs Keaton's approval,
+    // including the personal story and the wording about First Nations.
     focus:
-      'Looks after the Valleyview Grant, which backs Grade 12 students at Valleyview Secondary with money and mentorship.',
+      'Looks after the Valleyview Grant and helps guide our outreach to First Nations in the Kamloops area.',
     work: [
       {
         title: 'Natural Resources Manager',
@@ -121,11 +122,15 @@ Outside the classroom, he enjoys spending time outdoors, playing tabletop games,
         },
       },
     ],
-    // Bio as supplied by Reed, Nov 26, 2026, lightly edited: needs Keaton's
-    // approval.
-    bio: `Keaton graduated from Valleyview Secondary in 2016. He studied natural resource sciences at Thompson Rivers University from 2016 to 2020.
+    bio: `Keaton has called Kamloops home for most of his life. He graduated from Valleyview Secondary in 2016 and went on to study natural resource sciences at Thompson Rivers University. Out of high school, he wasn’t sure what he wanted to do, and it took some trial and error to find his path.
 
-In his career, Keaton has blended environmental services, operational excellence and meaningful Indigenous consultation within resource extraction industries. He now works as Natural Resources Manager at K’en T’em Limited Partnership.`,
+Today he is Natural Resources Manager at K’en T’em Limited Partnership, an Indigenous-owned organization that works with many First Nations across the Thompson-Okanagan. In his career, Keaton has blended environmental services, operational excellence and meaningful Indigenous consultation within resource extraction industries. Along the way, he works with many young people just starting out.
+
+Keaton and Reed started the Valleyview Grant together, as a way to give back to the school where they both began. Remembering his own search, Keaton wants to help young people experiment, try things and find what they love, without needing to have it all figured out first.
+
+As a board member, Keaton looks after the Valleyview Grant and mentors the students it supports. He also brings deep experience in Indigenous consultation, and relationships he has built with First Nations in the region. He will help guide our outreach to those communities.
+
+Outside of work, Keaton loves to stay active, whether he’s working out, running or playing basketball. He’s also a gamer and a big fan of live music.`,
   },
   {
     name: 'Carolyn Dahl',
