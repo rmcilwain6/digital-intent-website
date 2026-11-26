@@ -16,6 +16,13 @@ const hostService = z.strictObject({
   name: z.string().min(1),
   role: z.string().min(1),
   based: z.string().min(1),
+  /** The service's own privacy notice, linked after `role`. */
+  notice: z
+    .strictObject({
+      label: z.string().min(1),
+      href: z.url(),
+    })
+    .optional(),
 });
 
 /**
@@ -77,6 +84,11 @@ export const privacySchema = z.strictObject({
     heading: z.string().min(1),
     /** Text before the organization email, which comes from brand config. */
     lead: z.string().min(1),
+    /**
+     * Names the person responsible for privacy by role (BC PIPA), before the
+     * privacy email from brand config.
+     */
+    officer: z.string().min(1),
   }),
 });
 

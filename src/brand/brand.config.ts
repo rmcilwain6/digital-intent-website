@@ -17,6 +17,8 @@ export interface Brand {
   /** Bare domain, no protocol. */
   domain: string;
   email: string;
+  /** Address of the privacy officer (a role, not a person), named on the Privacy page as BC's PIPA asks. */
+  privacyEmail: string;
   social: readonly SocialLink[];
   /** Where we start, not our boundary (SPEC section 2). */
   regions: readonly string[];
@@ -51,6 +53,8 @@ export const brand = {
   tagline: '[TK: tagline, from the brand work]',
   domain: 'digitalintent.ca',
   email: 'helloworld@digitalintent.ca',
+  // An alias for the privacy officer. Create it before launch.
+  privacyEmail: 'privacy@digitalintent.ca',
   social: [],
   regions: ['Kamloops', 'Victoria', 'Vancouver'],
   logo: {

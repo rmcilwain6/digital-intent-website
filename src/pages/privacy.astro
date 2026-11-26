@@ -87,7 +87,18 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
             {services.items.map((item) => (
               <tr>
                 <th scope="row">{item.name}</th>
-                <td>{item.role}</td>
+                <td>
+                  {item.role}
+                  {item.notice && (
+                    <>
+                      {' '}
+                      <a href={item.notice.href}>
+                        {item.notice.label}
+                        <span class="visually-hidden">: {item.name}</span>
+                      </a>
+                    </>
+                  )}
+                </td>
                 <td>{item.based}</td>
               </tr>
             ))}
@@ -138,6 +149,9 @@ const number = (i: number) => String(i + 1).padStart(2, '0');
         <h2 id="questions-heading">{questions.heading}</h2>
         <p>
           {questions.lead} <EmailLink />.
+        </p>
+        <p>
+          {questions.officer} <EmailLink address="privacyEmail" />.
         </p>
       </section>
     </div>

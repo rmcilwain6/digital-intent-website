@@ -4,10 +4,15 @@
 // personal information: the host (every visitor's IP address and browser
 // details) and our email provider (messages people send us). The page says
 // both plainly. Facts not confirmed yet are visible [TK] notes, never left
-// off: the approval date, where Cloudflare is based and what it keeps, the
-// Cloudflare error reports (NEL), and the email provider and how long we keep
-// mail. How Valleyview applications are collected waits on a board decision
-// (D5).
+// off: the approval date, the Cloudflare error reports (NEL), and the email
+// provider, who reads mail and how long we keep it. How Valleyview
+// applications are collected waits on a board decision (D5); update this page
+// alongside the application form.
+//
+// BC's PIPA: the page says why we use email, that we never sell or share it,
+// how to see, correct or delete it, and names a privacy officer by role, at
+// the privacy alias in brand config (not a person's address: the repo is
+// public). Every outside service the site links to is listed under linked.
 //
 // Page view counting (D7) is a stretch goal and not built, so it is not
 // mentioned. If it ships (#17), add it here before it goes live: the tool and
@@ -44,8 +49,13 @@ export const privacy = privacySchema.parse({
     items: [
       {
         name: 'Cloudflare Workers',
-        role: 'Hosts the site and sends pages to your browser. To send you pages, Cloudflare receives your IP address and basic details about your browser. [TK: what Cloudflare keeps, and for how long]',
-        based: '[TK: where Cloudflare is based and processes data]',
+        role: 'Hosts the site and sends pages to your browser. To send you pages, Cloudflare receives your IP address and basic details about your browser. Cloudflare keeps some of this to protect and run its network, as its own privacy policy explains.',
+        based:
+          'Cloudflare, Inc., in the United States. Pages are sent from Cloudflare data centres around the world, usually the one nearest you.',
+        notice: {
+          label: 'Cloudflare privacy policy',
+          href: 'https://www.cloudflare.com/privacypolicy/',
+        },
       },
     ],
     notes: [
@@ -73,9 +83,14 @@ export const privacy = privacySchema.parse({
         value: '[TK: how long we keep messages]',
       },
       {
-        label: 'Seeing or correcting it',
+        label: 'What we use it for',
         value:
-          'You can ask to see the personal information we hold from your emails, or ask us to correct it. Email us to ask.',
+          'To reply to you and keep in touch about what you wrote. We never sell your email or share it. We will only add you to a mailing list, like a newsletter, if you say yes.',
+      },
+      {
+        label: 'Seeing, correcting or deleting it',
+        value:
+          'You can ask to see the personal information we hold from your emails, ask us to correct it, or ask us to delete it from our records. Email us to ask.',
       },
     ],
   },
@@ -84,6 +99,17 @@ export const privacy = privacySchema.parse({
     intro:
       'Some links take you to other services. Once you are there, their privacy notice applies, not this one. Each one stores your information in its own place.',
     items: [
+      {
+        when: 'If you open our code',
+        name: 'GitHub',
+        description:
+          'Our “See the code” link goes to the code for this site on GitHub, which is owned by Microsoft. You do not need an account to read it.',
+        stored: 'GitHub, Inc., in the United States.',
+        notice: {
+          label: 'Privacy notice',
+          href: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement',
+        },
+      },
       {
         when: 'If you apply for the grant',
         name: 'Valleyview applications',
@@ -110,5 +136,7 @@ export const privacy = privacySchema.parse({
   questions: {
     heading: 'Questions',
     lead: 'Email us at',
+    officer:
+      'Our privacy officer is responsible for how we handle personal information. You can reach them at',
   },
 });
