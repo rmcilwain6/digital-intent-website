@@ -35,19 +35,21 @@ const slug = (name: string) =>
 
 const members = team.map((member) => {
   const id = slug(member.name);
-  const point = placePoint(member.place);
-  // The school districts around the member's city, outlined on the map.
-  const districts = (regionDistricts[member.place] ?? []).map((n) =>
-    district(n),
+  // Home city first, then any other region the member also calls home.
+  const homes = [member.place, ...(member.alsoIn ?? [])];
+  const points = homes.map((name) => ({ name, point: placePoint(name) }));
+  // The school districts around each of those cities, outlined on the map.
+  const districts = homes.flatMap((name) =>
+    (regionDistricts[name] ?? []).map((n) => district(n)),
   );
-  return { member, id, point, districts };
+  return { member, id, homes, points, districts };
 });
 
 // One marker per place, shared by everyone who lives there.
 const places: MapPlace[] = [];
 for (const m of members) {
-  if (!places.some((p) => p.name === m.member.place)) {
-    places.push({ name: m.member.place, point: m.point });
+  for (const p of m.points) {
+    if (!places.some((q) => q.name === p.name)) places.push(p);
   }
 }
 
@@ -73,17 +75,17 @@ const keepInside = (box: typeof bcFrame, outer: typeof bcFrame) => {
 };
 
 const views: MapView[] = members.map((m) => {
-  const isClose = inside(m.point, map.detail.frame);
+  const isClose = m.points.every((p) => inside(p.point, map.detail.frame));
   const box = sheetFor(
     union(
       m.districts.map((d) => pathBounds(d.d)),
-      [m.point],
+      m.points.map((p) => p.point),
     ),
     isClose ? close : gentle,
   );
   return {
     member: m.id,
-    place: m.member.place,
+    places: m.homes,
     box: isClose ? keepInside(box, map.detail.frame) : box,
     districts: m.districts.map((d) => ({
       number: d.number,
@@ -103,17 +105,22 @@ const views: MapView[] = members.map((m) => {
   <div class="layout" data-team>
     <div class="text">
       <header class="intro">
-        <p class="tk-marker">
-          [TK: fictional placeholder team members for the map prototype. Real
-          details are added only with each member's agreement.]
-        </p>
         <h1>{page.data.heading ?? page.data.title}</h1>
         <Content />
       </header>
 
       <ol class="members">
         {members.map(({ member, id }) => (
-          <li class="entry" id={id} data-entry data-member={id}>
+          <li
+            class="entry"
+            id={id}
+            data-entry
+            data-member={id}
+            data-places={JSON.stringify([
+              member.place,
+              ...(member.alsoIn ?? []),
+            ])}
+          >
             <div class="entry-head">
               <div class="photo">
                 {'placeholder' in member.photo ? (
@@ -168,7 +175,9 @@ const views: MapView[] = members.map((m) => {
                         )}
                         <span>
                           <span class="org-name">{org.name}</span>
-                          {what && <span class="org-what">{what}</span>}
+                          {[what ?? []].flat().map((line) => (
+                            <span class="org-what">{line}</span>
+                          ))}
                         </span>
                       </li>
                     ))}
@@ -250,10 +259,10 @@ const views: MapView[] = members.map((m) => {
     const entries = [...root.querySelectorAll<HTMLElement>('[data-entry]')];
     const pins = [...mapRoot.querySelectorAll<SVGGElement>('.pin')];
     const leads = [...mapRoot.querySelectorAll<SVGPathElement>('.lead')];
-    const placeOf = new Map(
+    const placesOf = new Map<string, string[]>(
       entries.map((entry) => [
         entry.dataset.member ?? '',
-        entry.querySelector('.meta')?.textContent?.split(' · ').pop() ?? '',
+        JSON.parse(entry.dataset.places ?? '[]'),
       ]),
     );
 
@@ -267,7 +276,7 @@ const views: MapView[] = members.map((m) => {
       camera!.style.transform = `translate(${tx}px, ${ty}px) scale(${k})`;
       detail!.classList.toggle('is-on', close);
       province!.classList.toggle('is-off', close);
-      const place = id ? placeOf.get(id) : null;
+      const here = (id && placesOf.get(id)) || [];
       for (const pin of pins) {
         const x = tx + k * Number(pin.dataset.x);
         const y = ty + k * Number(pin.dataset.y);
@@ -280,7 +289,10 @@ const views: MapView[] = members.map((m) => {
           );
           pin.classList.toggle('is-hidden', hide?.includes(number) ?? false);
         } else {
-          pin.classList.toggle('is-here', pin.dataset.place === place);
+          pin.classList.toggle(
+            'is-here',
+            here.includes(pin.dataset.place ?? ''),
+          );
         }
       }
       for (const lead of leads) {
@@ -515,16 +527,6 @@ const views: MapView[] = members.map((m) => {
     padding-block: var(--space-6) var(--space-5);
   }
 
-  .tk-marker {
-    display: inline-block;
-    margin-block: 0 var(--space-2);
-    padding: var(--space-1) var(--space-2);
-    border: var(--border-width) dashed var(--color-border);
-    border-radius: var(--radius-sm);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-  }
-
   .members {
     margin: 0;
     padding: 0;
@@ -549,9 +551,22 @@ const views: MapView[] = members.map((m) => {
   }
 
   /* The portrait leads the entry, large enough to recognize someone. */
+  /*
+   * Like a print laid on the page: a card-coloured border, a hairline edge
+   * and the same soft shadow as the home page's index cards. Still, so
+   * there is nothing to reduce for reduced motion.
+   */
   .photo {
     flex: none;
     inline-size: clamp(6.5rem, 24vw, 9rem);
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    background: var(--color-card);
+    box-shadow:
+      0 0 0 var(--border-width)
+        color-mix(in srgb, var(--color-text) 12%, transparent),
+      0 0.5rem 1rem -0.5rem
+        color-mix(in srgb, var(--color-text) 45%, transparent);
   }
 
   h2 {
@@ -597,9 +612,10 @@ const views: MapView[] = members.map((m) => {
     gap: var(--space-3);
   }
 
+  /* Wide enough for a wordmark: most logos are wider than they are tall. */
   .logo {
     flex: none;
-    inline-size: var(--space-7);
+    inline-size: calc(var(--space-7) * 2);
     block-size: var(--space-7);
     object-fit: contain;
   }
@@ -643,7 +659,6 @@ const views: MapView[] = members.map((m) => {
     inline-size: 100%;
     aspect-ratio: 4 / 5;
     object-fit: cover;
-    border-radius: var(--radius-sm);
   }
 
   .credits {

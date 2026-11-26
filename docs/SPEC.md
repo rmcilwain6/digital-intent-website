@@ -192,6 +192,7 @@ Called "Our team" rather than "Board" while the board's official designation is 
 An entry per person beside a map of BC, with data in `content/team.ts`, schema-validated. The map is the main visual; entries are plain text beside it, not cards:
 
 - Required: name, photo, role (Executive Director or Board Member), home city (one of the starting regions) and a one-sentence focus.
+- A member who also calls other starting regions home can list them. The map marks and outlines every region they list, while the line under their name shows the home city only, so their bio says why.
 - Optional, under "More about": where they work and what they do, where they went to school (each with the organization's logo, self-hosted and used with permission), a short bio and one external link.
 - The map outlines the school districts around each starting region (SD 73 for Kamloops; SD 61, 62 and 63 for Victoria; SD 39 for Vancouver), kept to the districts we can reasonably reach.
 - Not shown: personal email, phone, or regional lead designation (pending board decision D14).
