@@ -187,7 +187,8 @@ const { lessons, label, soon } = Astro.props;
     outline-offset: calc(-1 * var(--focus-width) - var(--focus-offset));
   }
 
-  .tab:hover {
+  /* Only the lesson tabs are links; the Coming soon tab never reacts. */
+  a.tab:hover {
     background: var(--color-card);
   }
 
@@ -201,6 +202,7 @@ const { lessons, label, soon } = Astro.props;
     min-inline-size: 0;
     border-style: dashed;
     background: transparent;
+    cursor: default;
     color: var(--color-text-muted);
     font-weight: var(--font-weight-regular);
   }
