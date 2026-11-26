@@ -1,12 +1,10 @@
-// Team member entries (SPEC 7.3). FICTIONAL PLACEHOLDERS ONLY: the names,
-// work, schools and bios below are invented. A member's real details are
-// committed only after that member has agreed to them, because git history
-// is public and permanent.
+// Team member entries (SPEC 7.3). A member's details are committed only after
+// that member has agreed to them, because git history is public and
+// permanent. Anything still pending is marked [TK: ...].
 import { brand } from '../src/brand/brand.config';
 import { regionDistrictsSchema, teamSchema } from '../src/schemas/team';
 
 const portraitNote = 'Head-and-shoulders portrait, original photography.';
-const logo = { placeholder: true } as const;
 
 // The school districts outlined on the map around each starting region.
 // Modest on purpose: the districts nearest each city.
@@ -18,103 +16,44 @@ export const regionDistricts = regionDistrictsSchema.parse({
 
 export const team = teamSchema.parse([
   {
-    name: 'Avery Example',
+    name: 'Reed McIlwain',
     photo: { placeholder: true, note: portraitNote },
+    // [TK: confirm role and home city with Reed]
     role: 'Executive Director',
     place: 'Kamloops',
-    focus:
-      'Runs our day-to-day work and supports teachers, from Pro-D sessions to classroom visits.',
-    work: [
-      {
-        title: 'Secondary science teacher',
-        organization: { name: 'Example Secondary School (fictional)', logo },
-      },
-    ],
-    education: [
-      {
-        program: 'Bachelor of Education',
-        school: { name: 'Example University (fictional)', logo },
-      },
-    ],
-    bio: 'Avery is a made-up person who stands in for a real team member. In this placeholder story, Avery taught high school science for fifteen years and now helps teachers plan units that mix hands-on work with computing.',
+    focus: '[TK: one-sentence focus for Reed]',
   },
   {
-    name: 'Jordan Sample',
+    name: 'Carter Recchi',
     photo: { placeholder: true, note: portraitNote },
+    // [TK: confirm role and home city with Carter]
     role: 'Board Member',
     place: 'Vancouver',
-    focus:
-      'Builds partnerships with people and companies in tech who want to help their local schools.',
-    work: [
-      {
-        title: 'Software developer',
-        organization: { name: 'Sample Software Co. (fictional)', logo },
-      },
-    ],
-    education: [
-      {
-        program: 'Bachelor of Computer Science',
-        school: { name: 'Sample University (fictional)', logo },
-      },
-    ],
-    bio: 'Jordan is a made-up team member. In this placeholder story, Jordan builds web apps for a living and volunteers with a coding club at a local elementary school.',
+    focus: '[TK: one-sentence focus for Carter]',
   },
   {
-    name: 'Riley Placeholder',
+    name: 'Keaton Allan',
     photo: { placeholder: true, note: portraitNote },
+    // [TK: confirm role and home city with Keaton]
     role: 'Board Member',
     place: 'Victoria',
-    focus:
-      'Looks after our finances and runs the Valleyview Grant, from the call for applications to follow-up.',
-    work: [
-      {
-        title: 'Accountant',
-        organization: { name: 'Placeholder Accounting (fictional)', logo },
-      },
-    ],
-    education: [
-      {
-        program: 'Bachelor of Commerce',
-        school: { name: 'Placeholder University (fictional)', logo },
-      },
-    ],
-    bio: 'Riley is a made-up team member. In this placeholder story, Riley grew up on Vancouver Island and keeps the books for small nonprofits.',
+    focus: '[TK: one-sentence focus for Keaton]',
   },
   {
-    name: 'Morgan Mockup',
+    name: 'Carolyn Dahl',
     photo: { placeholder: true, note: portraitNote },
+    // [TK: confirm role and home city with Carolyn]
     role: 'Board Member',
     place: 'Victoria',
-    focus:
-      'Keeps our writing plain and clear, and looks after how we share our work.',
-    work: [
-      {
-        title: 'School librarian',
-        organization: { name: 'Mockup Elementary (fictional)', logo },
-      },
-    ],
-    education: [
-      {
-        program: 'Master of Library Science',
-        school: { name: 'Mockup College (fictional)', logo },
-      },
-    ],
-    bio: 'Morgan is a made-up team member. In this placeholder story, Morgan teaches students how to judge what they read online.',
+    focus: '[TK: one-sentence focus for Carolyn]',
   },
   {
-    name: 'Sydney Sketch',
+    name: 'Nicole Peverley',
     photo: { placeholder: true, note: portraitNote },
+    // [TK: confirm role and home city with Nicole]
     role: 'Board Member',
     place: 'Kamloops',
-    focus:
-      'Brings the student view to the team and helps shape how we talk with young people.',
-    education: [
-      {
-        program: 'Computer science student',
-        school: { name: 'Sketch University (fictional)', logo },
-      },
-    ],
-    bio: 'Sydney is a made-up team member. In this placeholder story, Sydney won a small grant in Grade 12 and now helps younger students start their own projects.',
+    focus: '[TK: one-sentence focus for Nicole]',
   },
 ]);
 
