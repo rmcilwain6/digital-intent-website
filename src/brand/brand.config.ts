@@ -64,7 +64,7 @@ export const brand = {
   favicon: '/brand/favicon.svg',
   socialImage: {
     src: '/brand/og-default.png',
-    alt: 'Placeholder brand',
+    alt: 'Every student learns how the natural world works. What about the digital one? Digital Intent, digitalintent.ca.',
     width: 1200,
     height: 630,
   },

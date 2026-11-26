@@ -2,7 +2,7 @@
 
 Everything that makes the site look and sound like the organization lives here and in `public/brand/`. Brand values stay in these two folders; brand expression such as signature visuals and layout can reach the shared layouts and named components (SPEC section 6). Components read from this layer and never hard-code a name, colour, font, duration, logo or contact detail.
 
-Colours, type, spacing, radius and the cursor come from the **Digital Intent design system** (v1.3, November 21, 2026). The logo files are the design system's outlined SVGs. The social image (`og-default.png`) is still a placeholder.
+Colours, type, spacing, radius and the cursor come from the **Digital Intent design system** (v1.3, November 21, 2026). The logo files are the design system's outlined SVGs. The social image (`og-default.png`) is drawn from the brand tokens in `tools/og/` and rendered with `node tools/og/render.mjs`; re-render it whenever the tokens or logo change.
 
 Changes here need approval from a person (AGENTS.md).
 
