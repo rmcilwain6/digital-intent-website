@@ -185,9 +185,13 @@ const formatDate = (iso: string) => dateFormat.format(new Date(iso));
     font-size: var(--text-sm);
   }
 
+  /*
+   * minmax(0, 1fr) so a long word or address in a value wraps instead of
+   * pushing the sheet wider than a 320px screen (WCAG 1.4.10, 1.4.12).
+   */
   .specs div {
     display: grid;
-    grid-template-columns: 5rem 1fr;
+    grid-template-columns: 5rem minmax(0, 1fr);
     gap: var(--space-2);
   }
 
@@ -200,6 +204,7 @@ const formatDate = (iso: string) => dateFormat.format(new Date(iso));
 
   dd {
     margin: 0;
+    overflow-wrap: anywhere;
   }
 
   .notes {
