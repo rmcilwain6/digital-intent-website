@@ -10,7 +10,8 @@ import { aboutSchema } from '../src/schemas/about';
 export const about = aboutSchema.parse({
   photo: {
     src: campusAvenue,
-    alt: 'A student reads at a table under a long avenue of trees in autumn, on the quad at the University of Victoria.',
+    alt: 'A student reads at a table under a long avenue of trees in autumn.',
+    // Shown in the caption, so the alt text does not repeat it.
     place: 'The quad at the University of Victoria',
     file: 'campus-avenue-autumn.jpg',
     size: '859 kb',

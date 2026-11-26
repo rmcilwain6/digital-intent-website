@@ -85,7 +85,7 @@ export const home = homeSchema.parse({
       ],
       questions: {
         heading: 'Could you answer these?',
-        lede: 'We think every student should graduate able to answer questions like these. Have a guess before you look.',
+        lede: 'We think every student should graduate able to answer questions like these.',
         anchor: 'questions',
         copyLink: 'Share',
         copied: 'Link copied',

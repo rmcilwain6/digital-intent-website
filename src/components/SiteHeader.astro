@@ -358,7 +358,8 @@ const privacy = site.footerNav.find((item) => item.href === '/privacy/');
     color: var(--color-text-muted);
   }
 
-  .featured .page-path {
+  /* The current page's path is the one in signal green. */
+  .page-key[aria-current='page'] .page-path {
     color: var(--color-signal);
   }
 
