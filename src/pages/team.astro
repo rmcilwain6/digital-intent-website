@@ -176,7 +176,9 @@ const views: MapView[] = members.map((m) => {
                         )}
                         <span>
                           <span class="org-name">{org.name}</span>
-                          {what && <span class="org-what">{what}</span>}
+                          {[what ?? []].flat().map((line) => (
+                            <span class="org-what">{line}</span>
+                          ))}
                         </span>
                       </li>
                     ))}

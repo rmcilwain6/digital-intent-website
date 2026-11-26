@@ -70,8 +70,13 @@ export const teamMemberSchema = z.strictObject({
   education: z
     .array(
       z.strictObject({
-        /** What they studied, e.g. "Bachelor of Education". */
-        program: z.string().min(1).optional(),
+        /**
+         * What they studied, e.g. "Bachelor of Education". A list for more
+         * than one program at the same school, each shown on its own line.
+         */
+        program: z
+          .union([z.string().min(1), z.array(z.string().min(1)).min(2)])
+          .optional(),
         school: organization,
       }),
     )

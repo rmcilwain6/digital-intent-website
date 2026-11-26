@@ -26,14 +26,14 @@ export const team = teamSchema.parse([
     role: 'Executive Director',
     place: 'Vancouver',
     alsoIn: ['Kamloops', 'Victoria'],
-    // Draft copy from Reed's notes, Nov 26, 2026: needs Reed's approval.
+    // Bio approved by Reed as a first version, Nov 26, 2026.
     focus:
       'Leads our day-to-day work and is building our community in Vancouver, Victoria and Kamloops.',
     work: [
       {
         title: 'Photographer and owner',
         organization: {
-          name: 'Everyday Archive Co.',
+          name: 'Evryday Archive Co',
           logo: { src: '/team/logos/everyday-archive.webp' },
         },
       },
@@ -47,11 +47,13 @@ export const team = teamSchema.parse([
         },
       },
     ],
-    bio: `Reed grew up in Kamloops and graduated from Valleyview Secondary in 2016, where he was valedictorian. He then spent about ten years in Victoria, starting with a software engineering degree at the University of Victoria. Today he lives in Vancouver and is often in Kamloops and Victoria. He thinks of all three cities as home, which is why they are where we are building our community first.
+    bio: `Reed grew up in Kamloops and studied software engineering at the University of Victoria. After graduating, he worked as a software developer at Shift, a tech company in Victoria. Through school and his career, he has mixed roles across technology and education: technology coordinator for the EUReKA! Science Program, helping deliver material for UVic courses, and mentoring students and building a co-op program at Shift. He later left software to start Evryday Archive Co, his photography business.
 
-Reed has always liked wearing many hats. He was the technology coordinator at EUReKA! in 2017 and 2019, and spent three and a half years as a software developer at Shift, a tech company in Victoria. He helped deliver material for a software engineering course at UVic, and spent three years volunteering with TEDxVictoria as volunteer lead and community engagement lead.
+Before founding Digital Intent, Reed volunteered and did contract work at the Big Little Science Centre in Kamloops. Working with kids there, he saw firsthand the power of hands-on, interactive learning, and where technology does and does not belong in teaching. He also saw a gap. Kids today are growing up inundated with technology, yet their digital literacy and skills are not rising with that exposure. From his own experience teaching technology, Reed knows how hard it is to teach well, especially in stretched classrooms where students have very different needs.
 
-He left software to do more of that mix. He started a photography business and did contract work for the Big Little Science Centre in Kamloops, then founded Digital Intent. Each of those roles taught him something he now uses as executive director.`,
+As executive director, Reed wants to bridge the worlds of technology and education. That means helping teachers decide when technology makes sense in their classroom, when it doesn’t, and when their own instincts about how kids learn are right. Sometimes the best choice is to keep technology out. Most of all, it means helping teachers become stronger, more confident technology users themselves, so they can bring digital skills into the lessons they already teach.
+
+Outside of work, Reed loves photography and travel. He splits his time between Vancouver, Victoria and Kamloops, the three places he calls home and where we are building our community first. He tries never to take for granted how lucky he is to live somewhere so beautiful.`,
   },
   {
     name: 'Carter Recchi',
@@ -75,14 +77,10 @@ He left software to do more of that mix. He started a photography business and d
     ],
     education: [
       {
-        program: 'Bachelor of Science in Chemical Biology',
-        school: {
-          name: 'Thompson Rivers University',
-          logo: { src: '/team/logos/tru.webp' },
-        },
-      },
-      {
-        program: 'Bachelor of Education in STEM Education',
+        program: [
+          'Bachelor of Science in Chemical Biology',
+          'Bachelor of Education in STEM Education',
+        ],
         school: {
           name: 'Thompson Rivers University',
           logo: { src: '/team/logos/tru.webp' },
