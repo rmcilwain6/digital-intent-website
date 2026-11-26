@@ -32,7 +32,10 @@ export const team = teamSchema.parse([
     work: [
       {
         title: 'Photographer and owner',
-        organization: { name: 'Everyday Archive Co.', logo },
+        organization: {
+          name: 'Everyday Archive Co.',
+          logo: { src: '/team/logos/everyday-archive.webp' },
+        },
       },
     ],
     education: [
@@ -74,7 +77,10 @@ He left software to do more of that mix. He started a photography business and d
     work: [
       {
         title: 'Natural Resources Manager',
-        organization: { name: 'K’en T’em Limited Partnership', logo },
+        organization: {
+          name: 'K’en T’em Limited Partnership',
+          logo: { src: '/team/logos/ken-tem.webp' },
+        },
       },
     ],
     education: [
@@ -106,7 +112,10 @@ In his career, Keaton has blended environmental services, operational excellence
     work: [
       {
         title: 'Teacher on call',
-        organization: { name: 'Vancouver School Board', logo },
+        organization: {
+          name: 'Vancouver School Board',
+          logo: { src: '/team/logos/vsb.webp' },
+        },
       },
     ],
     education: [
@@ -134,7 +143,10 @@ In his career, Keaton has blended environmental services, operational excellence
     work: [
       {
         title: 'Senior Software Developer',
-        organization: { name: 'Shift', logo },
+        organization: {
+          name: 'Shift',
+          logo: { src: '/team/logos/shift.webp' },
+        },
       },
     ],
     education: [
