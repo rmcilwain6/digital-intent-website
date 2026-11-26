@@ -49,7 +49,7 @@ export const team = teamSchema.parse([
     ],
     bio: `Reed grew up in Kamloops and graduated from Valleyview Secondary in 2016, where he was valedictorian. He then spent about ten years in Victoria, starting with a software engineering degree at the University of Victoria. Today he lives in Vancouver and is often in Kamloops and Victoria. He thinks of all three cities as home, which is why they are where we are building our community first.
 
-Reed has always liked wearing many hats. He was the technology coordinator at Eureka in 2017 and 2019, and spent three and a half years as a software developer at Shift, a tech company in Victoria. He helped deliver material for a software engineering course at UVic, and spent three years volunteering with TEDxVictoria as volunteer lead and community engagement lead.
+Reed has always liked wearing many hats. He was the technology coordinator at EUReKA! in 2017 and 2019, and spent three and a half years as a software developer at Shift, a tech company in Victoria. He helped deliver material for a software engineering course at UVic, and spent three years volunteering with TEDxVictoria as volunteer lead and community engagement lead.
 
 He left software to do more of that mix. He started a photography business and did contract work for the Big Little Science Centre in Kamloops, then founded Digital Intent. Each of those roles taught him something he now uses as executive director.`,
   },
@@ -61,7 +61,42 @@ He left software to do more of that mix. He started a photography business and d
     },
     role: 'Board Member',
     place: 'Kamloops',
-    focus: '[TK: one-sentence focus for Carter]',
+    // Focus drafted from Carter's bio, Nov 26, 2026: needs Carter's approval.
+    focus:
+      'Brings a classroom teacher’s view, connecting our technology experts with the realities of teaching and learning.',
+    work: [
+      {
+        title: 'Science and chemistry teacher',
+        organization: {
+          name: 'School District No. 73 (Kamloops/Thompson)',
+          logo: { src: '/team/logos/sd73.webp' },
+        },
+      },
+    ],
+    education: [
+      {
+        program: 'Bachelor of Science in Chemical Biology',
+        school: {
+          name: 'Thompson Rivers University',
+          logo: { src: '/team/logos/tru.webp' },
+        },
+      },
+      {
+        program: 'Bachelor of Education in STEM Education',
+        school: {
+          name: 'Thompson Rivers University',
+          logo: { src: '/team/logos/tru.webp' },
+        },
+      },
+    ],
+    // Carter's own bio, supplied by Reed, Nov 26, 2026.
+    bio: `With a background in chemical biology, Carter is a science and chemistry teacher in Kamloops, where he teaches junior science, chemistry, and IB Chemistry. He brings five years of teaching experience to our board in both rural and urban schools. Before becoming a teacher, Carter was the Director of the EUReKA! Science Program at TRU where he oversaw a team of university students to create, organize, and run the science-based summer camp, reaching students from communities in and around Kamloops.
+
+Through his experience in education, he has seen firsthand the growing gap between students’ access to technology and their ability to understand, use, and troubleshoot it effectively. He believes technology should be more than a means of consumption; it should be a tool for problem-solving, creativity, and discovery.
+
+As a board member of Digital Intent, Carter brings the perspective of a classroom educator, helping bridge the gap between our technology experts and the realities of teaching and learning. He believes teachers shouldn’t have to become technology experts to provide meaningful technology education. Instead, they need accessible resources, practical guidance, and opportunities to learn that empower them to bring these skills into their classrooms. He hopes to help Digital Intent make that possible, supporting educators so they can better prepare students for an increasingly digital world.
+
+Outside the classroom, he enjoys spending time outdoors, playing tabletop games, listening to music, and cooking.`,
   },
   {
     name: 'Keaton Allan',
