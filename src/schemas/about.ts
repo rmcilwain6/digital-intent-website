@@ -1,6 +1,7 @@
 // Schema for the About page sections (content/about.ts, SPEC 7.2). The mission
 // statement is Markdown in content/pages/about.md.
 import { z } from 'astro/zod';
+import { importedImageSchema } from './image';
 
 /**
  * A paragraph with an optional highlighted phrase (the lime highlighter) and
@@ -40,22 +41,11 @@ const sectionSchema = z.strictObject({
   paragraphs: z.array(paragraphSchema).min(1),
 });
 
-/** An image imported from src/assets/, so the build can resize it. */
-const imageSchema = z.custom<ImageMetadata>(
-  (value) =>
-    typeof value === 'object' &&
-    value !== null &&
-    'src' in value &&
-    'width' in value &&
-    'height' in value,
-  { message: 'photo.src must be an imported image from src/assets/' },
-);
-
 export const aboutSchema = z.strictObject({
   /** Original photography only (SPEC rule 8), shown at 4:5 beside the text. */
   photo: z
     .strictObject({
-      src: imageSchema,
+      src: importedImageSchema,
       alt: z.string().min(1),
       /** File name under src/assets/photos/, shown in the caption. */
       file: z.string().regex(/^[a-z0-9-]+\.(jpg|jpeg|png|webp)$/),

@@ -1,6 +1,9 @@
 // Home page sections (SPEC 7.1, record 0004). Copy marked `draft: true` is an
 // agent draft built only from ideas in the spec. It shows a visible [TK]
 // marker until a human approves it and sets `draft: false`.
+import johnsonStreetBridge from '../src/assets/photos/johnson-street-bridge-victoria.jpg';
+import kamloopsBridge from '../src/assets/photos/thompson-river-bridge-kamloops.jpg';
+import skyBridge from '../src/assets/photos/skybridge-new-westminster.jpg';
 import { brand } from '../src/brand/brand.config';
 import { homeSchema } from '../src/schemas/home';
 import { valleyview } from './valleyview';
@@ -27,25 +30,30 @@ export const home = homeSchema.parse({
       detailLabels: { who: 'who', what: 'what', asks: 'asks', when: 'when' },
     },
     // Original photography (SPEC 8.2): a bridge from each starting region,
-    // as prints on the whiteboard. Kamloops first, where we started.
+    // as prints on the whiteboard. Victoria is featured: the largest print.
     images: [
       {
-        place: 'Kamloops',
-        label: 'Overlanders Bridge',
-        note: '3:2. Over the Thompson River, under a storm sky.',
-        taken: '[TK: date taken]',
-      },
-      {
+        src: johnsonStreetBridge,
+        alt: 'The white Johnson Street Bridge in Victoria, lit by low sun under heavy cloud, with people crossing on foot.',
         place: 'Victoria',
         label: 'Johnson Street Bridge',
-        note: '4:5. From the harbour.',
-        taken: '[TK: date taken]',
+        taken: 'February 6, 2026',
       },
       {
-        place: 'Vancouver',
-        label: 'Burrard or Lions Gate Bridge',
-        note: '3:2. Deck across the frame, at dusk.',
-        taken: '[TK: date taken]',
+        src: kamloopsBridge,
+        alt: 'A bridge over the Thompson River in Kamloops, under a storm sky, with sun breaking through the trees.',
+        place: 'Kamloops',
+        // Name as given by Reed, November 26, 2026.
+        label: 'Landsdown Bridge',
+        taken: 'May 18, 2025',
+      },
+      {
+        src: skyBridge,
+        alt: 'A SkyTrain crosses the SkyBridge over the Fraser River, with the Pattullo Bridge and snowy North Shore mountains behind.',
+        place: 'New Westminster',
+        label: 'SkyBridge',
+        taken: 'March 17, 2023',
+        aside: 'The new bridge behind it was still being built then.',
       },
     ],
   },
