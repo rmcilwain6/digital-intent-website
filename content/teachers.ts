@@ -29,6 +29,8 @@ export const teachers = teachersSchema.parse({
     heading: 'Teacher Library',
     intro:
       'Lessons we have written for teachers. Download them, use them, change them to fit your class. They are free, and shared under CC BY 4.0. When we improve a lesson we publish a new version, and earlier versions stay here.',
+    comingSoon:
+      'More lessons are coming soon. We are writing new ones now and will add them here as they are ready, so check back.',
     items: [
       {
         // From the v1.0 printer-friendly PDF (Nov 23, 2026).
@@ -59,5 +61,13 @@ export const teachers = teachersSchema.parse({
         ],
       },
     ],
+  },
+
+  contact: {
+    heading: 'Talk to us',
+    intro:
+      'Questions about a lesson, an idea for a new one, or want us to work with your school? Email us.',
+    emailLabel: 'Email',
+    subject: 'Teacher inquiry',
   },
 });
