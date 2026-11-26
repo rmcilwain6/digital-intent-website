@@ -53,7 +53,6 @@ He left software to do more of that mix. He started a photography business and d
       src: '/team/carter-recchi.webp',
       alt: 'Carter Recchi smiling on a rocky shoreline, with the ocean in the background.',
     },
-    // [TK: confirm role with Carter]
     role: 'Board Member',
     place: 'Kamloops',
     focus: '[TK: one-sentence focus for Carter]',
@@ -64,10 +63,11 @@ He left software to do more of that mix. He started a photography business and d
       src: '/team/keaton-allan.webp',
       alt: 'Keaton Allan smiling in a suit and tie, in front of a grey backdrop.',
     },
-    // [TK: confirm role with Keaton]
     role: 'Board Member',
     place: 'Kamloops',
-    focus: '[TK: one-sentence focus for Keaton]',
+    // Draft from Reed's notes, Nov 26, 2026: needs Keaton's approval.
+    focus:
+      'Looks after the Valleyview Grant, which backs Grade 12 students at Valleyview Secondary with money and mentorship.',
     work: [
       {
         title: 'Natural Resources Manager',
@@ -92,7 +92,6 @@ In his career, Keaton has blended environmental services, operational excellence
       src: '/team/carolyn-dahl.webp',
       alt: 'Carolyn Dahl smiling in a graduation gown, with the water in the background.',
     },
-    // [TK: confirm role with Carolyn]
     role: 'Board Member',
     place: 'Vancouver',
     // Draft copy from Reed's notes, Nov 26, 2026: needs Carolyn's approval.
@@ -101,7 +100,7 @@ In his career, Keaton has blended environmental services, operational excellence
     work: [
       {
         title: 'Teacher on call',
-        organization: { name: 'Vancouver School District', logo },
+        organization: { name: 'Vancouver School Board', logo },
       },
     ],
     education: [
@@ -110,7 +109,7 @@ In his career, Keaton has blended environmental services, operational excellence
         school: { name: 'Vancouver Island University', logo },
       },
     ],
-    bio: `Carolyn is a primary teacher who focuses on kindergarten to Grade 3. She earned her Bachelor of Education at Vancouver Island University and lived in Nanaimo for several years. She now lives in Vancouver, where she is a teacher on call in the Vancouver School District.`,
+    bio: `Carolyn is a primary teacher who focuses on kindergarten to Grade 3. She earned her Bachelor of Education at Vancouver Island University and lived in Nanaimo for several years. She now lives in Vancouver, where she is a teacher on call with the Vancouver School Board (School District 39).`,
   },
   {
     name: 'Nicole Peverley',
@@ -118,25 +117,24 @@ In his career, Keaton has blended environmental services, operational excellence
       src: '/team/nicole-peverley.webp',
       alt: 'Nicole Peverley smiling in front of a red brick wall.',
     },
-    // [TK: confirm role with Nicole]
     role: 'Board Member',
     place: 'Victoria',
     // Draft copy from Reed's notes, Nov 26, 2026: needs Nicole's approval.
     focus:
-      'Brings her love of building software and of teaching to our work with kids.',
+      'Builds the software and tools we use, and looks after the software side of our work.',
     work: [
       {
-        title: '[TK: job title at Shift]',
+        title: 'Senior Software Developer',
         organization: { name: 'Shift', logo },
       },
     ],
     education: [
       {
-        program: 'Software Engineering',
+        program: 'Bachelor of Software Engineering',
         school: { name: 'University of Victoria', logo },
       },
     ],
-    bio: `Nicole lives in Victoria and works at Shift, a software company in the city. She studied software engineering at the University of Victoria.
+    bio: `Nicole lives in Victoria, where she is a senior software developer at Shift, a software company. She studied software engineering at the University of Victoria.
 
 She has always been drawn to teaching as well as software development. She is excited to build software, and to teach it, in ways that help kids.`,
   },
