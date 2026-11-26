@@ -12,7 +12,8 @@ export const questions = questionBankSchema.parse([
     slug: 'restart',
     category: 'Memory and state',
     concept: 'memory and state',
-    question: 'Why does turning it off and on again fix so many problems?',
+    question:
+      'Why does turning something off and on again fix so many problems?',
     answer:
       'A running computer keeps a lot in its short-term memory: open programs, half-finished tasks, and small mistakes that pile up. Turning it off clears all of that. When it starts again, everything begins from a clean, known state, the one its makers tested.',
     draft: false,
