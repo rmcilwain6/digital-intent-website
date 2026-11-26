@@ -105,7 +105,6 @@ const views: MapView[] = members.map((m) => {
   <div class="layout" data-team>
     <div class="text">
       <header class="intro">
-        <p class="tk-marker">[TK: Each member is confirming their entry.]</p>
         <h1>{page.data.heading ?? page.data.title}</h1>
         <Content />
       </header>
@@ -526,16 +525,6 @@ const views: MapView[] = members.map((m) => {
 
   .intro {
     padding-block: var(--space-6) var(--space-5);
-  }
-
-  .tk-marker {
-    display: inline-block;
-    margin-block: 0 var(--space-2);
-    padding: var(--space-1) var(--space-2);
-    border: var(--border-width) dashed var(--color-border);
-    border-radius: var(--radius-sm);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
   }
 
   .members {
