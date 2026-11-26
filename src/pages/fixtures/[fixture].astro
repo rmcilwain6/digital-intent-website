@@ -1,8 +1,15 @@
 ---
 // Orthography fixture (SPEC section 6). Renders Indigenous place names and
 // orthographies in every font weight in use, so a person can check the brand
-// fonts before launch.
+// fonts before launch. Dev server only: production builds leave it out
+// (SPEC 13), so open it at /fixtures/orthography/ under `npm run dev`.
+import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export const getStaticPaths = (() =>
+  import.meta.env.DEV
+    ? [{ params: { fixture: 'orthography' } }]
+    : []) satisfies GetStaticPaths;
 
 const samples = [
   'Secwépemc',

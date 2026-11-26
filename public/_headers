@@ -4,8 +4,6 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  # Remove at launch (SPEC section 13).
-  X-Robots-Tag: noindex
 
 # Built CSS, JS and fonts have a content hash in their names, so a changed
 # file always gets a new URL. Cache them for a year without re-checking, so
