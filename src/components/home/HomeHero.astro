@@ -169,17 +169,14 @@ const printSizes = [
    * The board: a near-white whiteboard in a grey frame, with faint ghosts of
    * old marker. Below wide screens it runs full width, at most a set height.
    * On wide screens it is exactly as tall as the text beside it, from the top
-   * of the headline to the bottom of the Valleyview window, and bleeds off
-   * the right edge. Either way it grows and shrinks with the text, zoom
-   * included.
+   * of the headline to the bottom of the Valleyview window, and runs off the
+   * right edge of the screen, up to a maximum width: zoomed far out, its
+   * right edge comes into view. Either way it grows and shrinks with the
+   * text, zoom included.
    */
   .board {
-    /* The shape the prints are laid out in; the pins keep it at any size. */
-    --pins-w: 16;
-    --pins-h: 15;
     position: relative;
-    container-type: size;
-    block-size: min(100vw * var(--pins-h) / var(--pins-w), 34rem);
+    block-size: min(100vw * 15 / 16, 34rem);
     margin-inline: calc(-1 * var(--space-gutter));
     border-block: 0.5rem solid var(--color-border);
     background:
@@ -202,16 +199,12 @@ const printSizes = [
       color-mix(in srgb, var(--color-text) 8%, transparent);
   }
 
-  /* Everything pinned to the board, in a box of a fixed shape that fits the
-     board's height (or width, if that is smaller). Centred below wide
-     screens. */
+  /* Everything pinned to the board. Print sizes use its width and height
+     (cqw, cqh), so the prints fill the board whatever its shape. */
   .pins {
     position: absolute;
-    inset-block-start: 50%;
-    inset-inline-start: 50%;
-    inline-size: min(100cqw, 100cqh * var(--pins-w) / var(--pins-h));
-    aspect-ratio: var(--pins-w) / var(--pins-h);
-    translate: -50% -50%;
+    inset: 0;
+    container-type: size;
   }
 
   /* Prints: the photo fills the paper; a slight tilt and a soft shadow. */
@@ -316,21 +309,23 @@ const printSizes = [
     aspect-ratio: 3 / 2;
   }
 
+  /* Each print is as wide as the board allows without running out of
+     height: a 3:2 print 72cqh wide is 48% of the board tall. */
   .print-1 {
-    inline-size: 60%;
-    inset: 7% auto auto 6%;
+    inline-size: min(62cqw, 72cqh);
+    inset: 5% auto auto 4%;
     rotate: -1.5deg;
   }
 
   .print-2 {
-    inline-size: 42%;
-    inset: 52% 5% auto auto;
+    inline-size: min(45cqw, 60cqh);
+    inset: 51% 3% auto auto;
     rotate: 2deg;
   }
 
   .print-3 {
-    inline-size: 42%;
-    inset: auto auto 5% 8%;
+    inline-size: min(43cqw, 57cqh);
+    inset: auto auto 4% 6%;
     rotate: -1deg;
   }
 
@@ -443,9 +438,7 @@ const printSizes = [
     /* A taller board and bigger prints, so the photos read on a small
        screen. */
     .board {
-      --pins-w: 8;
-      --pins-h: 9;
-      block-size: min(100vw * var(--pins-h) / var(--pins-w), 30rem);
+      block-size: min(100vw * 9 / 8, 30rem);
     }
 
     .print-1 {
@@ -502,20 +495,26 @@ const printSizes = [
       );
     }
 
+    /*
+     * Wide enough to reach past the right edge of the screen, so its right
+     * frame sits just off screen, but never wider than 64rem. Zoomed far
+     * out, the board stops and its right frame shows.
+     */
     .board {
+      --bleed: max(var(--space-gutter), (100vw - var(--width-page)) / 2);
       align-self: stretch;
+      justify-self: start;
+      inline-size: calc(100% + var(--bleed) + 1rem);
+      max-inline-size: 64rem;
       block-size: auto;
-      margin-inline: 0
-        calc(-1 * max(var(--space-gutter), (100vw - var(--width-page)) / 2));
+      margin-inline: 0;
       border: 0.625rem solid var(--color-border);
-      border-inline-end: 0;
-      border-start-start-radius: var(--radius-md);
-      border-end-start-radius: var(--radius-md);
+      border-radius: var(--radius-md);
     }
 
+    /* Keep the prints clear of the part of the board past the screen edge. */
     .pins {
-      inset-inline-start: 0;
-      translate: 0 -50%;
+      inset-inline-end: 1rem;
     }
   }
 

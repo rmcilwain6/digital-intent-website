@@ -60,11 +60,11 @@ export const valleyview = valleyviewSchema.parse({
       },
       {
         title: 'Hear back',
-        text: 'We read every application and invite a shortlist to the next step.',
+        text: 'We read every application, get back to every applicant with some feedback, and invite a shortlist to the next step.',
       },
       {
         title: 'Have a conversation with us',
-        text: 'Shortlisted students meet with us at Valleyview. Take about 15 minutes to walk us through your answers, then we’ll ask questions. We send a template beforehand. Slides are optional.',
+        text: 'Shortlisted students meet with us at Valleyview. It’s a conversation, not a formal pitch: we want to understand who you are, why this problem matters to you and what made you apply. Come ready to talk about your idea. We’ll tell you what to expect ahead of time, and we’re there to help you do well.',
       },
       {
         title: 'The award',
@@ -127,7 +127,7 @@ export const valleyview = valleyviewSchema.parse({
       {
         question: 'Do I have to give a pitch?',
         answer:
-          'Not a formal one. If you’re shortlisted, you’ll walk us through your answers to the three questions and then we’ll talk. We’ll send a template ahead of time so you know what to prepare.',
+          'Not a formal one. If you’re shortlisted, we’ll have a conversation about you, your idea and why it matters to you. We’ll tell you what to expect ahead of time so you can prepare.',
       },
       {
         question: 'Do I need my transcript?',

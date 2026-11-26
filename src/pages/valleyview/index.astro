@@ -7,6 +7,7 @@ import { getCollection, render } from 'astro:content';
 import { valleyview } from '../../../content/valleyview';
 import { brand } from '../../brand/brand.config';
 import EmailLink from '../../components/EmailLink.astro';
+import RichText, { type Segment } from '../../components/RichText.astro';
 import ImagePlaceholder from '../../components/ImagePlaceholder.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPage } from '../../lib/pages';
@@ -18,6 +19,17 @@ const { hero, pillar, current } = valleyview;
 const recipients = (await getCollection('recipients')).sort(
   (a, b) => b.data.year - a.data.year,
 );
+
+// A recipient's dek, with its highlighted phrase (if any) marked.
+function dekSegments(dek: string, highlight?: string): Segment[] {
+  if (!highlight) return [{ text: dek }];
+  const [before, ...rest] = dek.split(highlight);
+  return [
+    { text: before },
+    { text: highlight, mark: true },
+    { text: rest.join(highlight) },
+  ];
+}
 
 const dateFormat = new Intl.DateTimeFormat('en-CA', {
   dateStyle: 'long',
@@ -93,7 +105,14 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
             <div class="teaser-text">
               <p class="label">{recipient.data.cohort}</p>
               <h3>Meet {recipient.data.name}</h3>
-              <p>{recipient.data.dek}</p>
+              <p>
+                <RichText
+                  segments={dekSegments(
+                    recipient.data.dek,
+                    recipient.data.dekHighlight,
+                  )}
+                />
+              </p>
               {recipient.data.published ? (
                 <>
                   <blockquote>
@@ -410,8 +429,10 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
   }
 
   @media (width >= 48rem) {
+    /* The text at reading width, with the portrait right beside it. */
     .teaser {
-      grid-template-columns: minmax(0, 1fr) 22rem;
+      grid-template-columns: minmax(0, var(--width-prose)) 22rem;
+      justify-content: start;
       gap: var(--space-7);
     }
   }
