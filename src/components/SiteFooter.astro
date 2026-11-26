@@ -75,7 +75,14 @@ const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
           <ul>
             {site.footerNav.map((item) => (
               <li>
-                <a href={item.href}>{item.label}</a>
+                <a
+                  href={item.href}
+                  aria-current={
+                    trim(item.href) === currentPath ? 'page' : undefined
+                  }
+                >
+                  {item.label}
+                </a>
               </li>
             ))}
           </ul>

@@ -73,7 +73,10 @@ const privacy = site.footerNav.find((item) => item.href === '/privacy/');
                   aria-current={isCurrent(item.href) ? 'page' : undefined}
                 >
                   <span class="page-name">{item.label}</span>
-                  <span class="page-path">{trim(item.href)}</span>
+                  {/* Decoration: screen readers announce the page name only. */}
+                  <span class="page-path" aria-hidden="true">
+                    {trim(item.href)}
+                  </span>
                 </a>
               </li>
             ))}
@@ -188,6 +191,19 @@ const privacy = site.footerNav.find((item) => item.href === '/privacy/');
   .nav-wide [aria-current='page'] {
     background: var(--color-highlight);
     color: var(--color-on-highlight);
+  }
+
+  /*
+   * Forced colours (Windows High Contrast) drop the highlight background, which
+   * would leave the current page looking like every other link. Use the
+   * system's own selected-text colours so it still reads as selected.
+   */
+  @media (forced-colors: active) {
+    .nav-wide [aria-current='page'] {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
   }
 
   /* Phone menu */

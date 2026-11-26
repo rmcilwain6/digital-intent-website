@@ -112,11 +112,16 @@ const formatMonth = (date: string) =>
         </ol>
       </div>
 
-      <aside class="pillar" aria-label={commitments.pillar.label}>
+      {/*
+        Part of the commitments, not a sidebar to the page, so a plain block
+        rather than an aside (a nested complementary landmark). Its visible
+        label is enough.
+      */}
+      <div class="pillar">
         <p class="pillar-label">{commitments.pillar.label}</p>
         <p class="pillar-title">{pillar}</p>
         <p>{commitments.foundation}</p>
-      </aside>
+      </div>
     </section>
   </article>
 </BaseLayout>
