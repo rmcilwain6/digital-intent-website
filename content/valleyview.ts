@@ -89,8 +89,6 @@ export const valleyview = valleyviewSchema.parse({
       'Why are you the right person to work on it?',
       'How would the grant help you make progress?',
     ],
-    tipsIntro:
-      'These aren’t requirements. They’re what we look for when we read.',
     tips: [
       {
         title: 'Start with why it matters to you.',
@@ -114,8 +112,8 @@ export const valleyview = valleyviewSchema.parse({
       },
     ],
     apply: {
-      heading: 'Applications open December 1 to early March',
-      text: 'Applications open online on December 1, 2026 and close in early March. A rough idea is enough to start.',
+      heading: 'Applications open December 1',
+      text: 'Applications are open from December 1, 2026 to early March. We read them as they come in and get back to each applicant with feedback, so applying early means hearing from us sooner, with time to make your application stronger. A rough idea is enough to start.',
       pending: 'The link to the application will be here when it opens.',
     },
     faq: [

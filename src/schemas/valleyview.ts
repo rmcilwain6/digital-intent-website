@@ -56,7 +56,6 @@ export const valleyviewSchema = z.strictObject({
       .min(1),
     /** What's the idea, why are you the right person, how will this help. */
     questions: z.array(text).length(3),
-    tipsIntro: text,
     tips: z.array(point).min(1),
     /** How and when to apply. `pending` holds the link's place until it opens. */
     apply: z.strictObject({ heading: text, text, pending: text }),
