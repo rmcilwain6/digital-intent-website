@@ -14,6 +14,11 @@ const internalLink = z.strictObject({
 const navLink = internalLink.extend({
   /** Takes the full-width key in the phone menu. One item at most. */
   featured: z.boolean().optional(),
+  /**
+   * Shown in the phone menu (and the 404 page's list) but not in the
+   * wide-screen header, which has room for only a few pages.
+   */
+  phoneOnly: z.boolean().optional(),
 });
 
 const nextStop = internalLink.extend({
@@ -34,12 +39,23 @@ export const siteSchema = z.strictObject({
   footerNav: z.array(internalLink).min(1),
   /** Footer links that continue the reader's path. The current page is left out. */
   nextStops: z.array(nextStop).min(1),
+  /**
+   * Short land acknowledgement on every page, linking to the Indigenous
+   * outreach page, which holds the full one (decision record 0007). Needs
+   * human approval (SPEC 12.5).
+   */
+  acknowledgement: z.strictObject({
+    text: z.string().min(1),
+    link: internalLink,
+  }),
   /** Footer sentence before the list of starting regions. */
   regionsIntro: z.string().min(1),
   /** Short licence line at the foot of every page. */
   licence: z.string().min(1),
   /** Credit for the map data drawn in the header and footer (data/map/README.md). */
   districtMapCredit: z.string().min(1),
+  /** Credit for the site's photography, shown in the footer on every page. */
+  photoCredit: z.string().min(1),
   mapCredit: z.string().min(1),
 });
 

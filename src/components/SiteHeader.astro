@@ -16,6 +16,7 @@ const trim = (path: string) => path.replace(/\/+$/, '') || '/';
 const currentPath = trim(Astro.url.pathname);
 const isCurrent = (href: string) => trim(href) === currentPath;
 const menuItems = [site.home, ...site.primaryNav];
+const wideNav = site.primaryNav.filter((item) => !item.phoneOnly);
 const privacy = site.footerNav.find((item) => item.href === '/privacy/');
 ---
 
@@ -33,7 +34,7 @@ const privacy = site.footerNav.find((item) => item.href === '/privacy/');
 
       <nav class="nav-wide" aria-label="Primary">
         <ul>
-          {site.primaryNav.map((item) => (
+          {wideNav.map((item) => (
             <li>
               <a
                 href={item.href}
@@ -290,10 +291,11 @@ const privacy = site.footerNav.find((item) => item.href === '/privacy/');
     }
   }
 
+  /* Keys in a row share a height, so a two-line name keeps the row even. */
   .page-keys {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
+    align-items: stretch;
     gap: var(--space-3);
     margin: 0;
     padding: 0;
@@ -302,6 +304,14 @@ const privacy = site.footerNav.find((item) => item.href === '/privacy/');
 
   .page-keys .featured {
     grid-column: 1 / -1;
+  }
+
+  .page-keys li {
+    display: flex;
+  }
+
+  .page-keys .page-key {
+    flex: 1;
   }
 
   .page-key {

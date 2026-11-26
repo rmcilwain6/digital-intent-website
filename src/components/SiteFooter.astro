@@ -1,7 +1,8 @@
 ---
 // Site footer, Digital world (design system: website frame). "Next stops"
 // continue the reader's path, then the organization, its starting regions,
-// contact and links. The page receipt comes in its own pull request (SPEC 8.2).
+// contact and links, then a short land acknowledgement that links to the
+// Indigenous outreach page (decision record 0007). The page receipt comes in its own pull request (SPEC 8.2).
 import { site } from '../../content/site';
 import { brand } from '../brand/brand.config';
 import BcOutline from './BcOutline.astro';
@@ -66,9 +67,17 @@ const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
       </nav>
     </div>
 
+    <p class="acknowledgement">
+      {site.acknowledgement.text}{' '}
+      <a href={site.acknowledgement.link.href}>
+        {site.acknowledgement.link.label}
+      </a>
+    </p>
+
     <p class="fine-print">
       {brand.name} · {site.licence}
     </p>
+    <p class="fine-print">{site.photoCredit}</p>
     <p class="fine-print">{site.mapCredit}</p>
   </div>
 </footer>
@@ -184,6 +193,17 @@ const regions = new Intl.ListFormat('en-CA', { type: 'conjunction' }).format(
 
   .footer-nav a:hover {
     text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .acknowledgement {
+    margin: var(--space-7) 0 0;
+    max-inline-size: var(--width-prose);
+    font-size: var(--text-code);
+  }
+
+  .acknowledgement a {
+    color: var(--color-text);
     text-underline-offset: 0.2em;
   }
 

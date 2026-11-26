@@ -8,6 +8,11 @@ export const site = siteSchema.parse({
     { label: 'About', href: '/about/' },
     { label: 'Our team', href: '/team/' },
     { label: 'Valleyview Grant', href: '/valleyview/', featured: true },
+    {
+      label: 'Indigenous outreach',
+      href: '/indigenous-outreach/',
+      phoneOnly: true,
+    },
     { label: 'Contact', href: '/contact/' },
   ],
   footerNav: [
@@ -15,6 +20,7 @@ export const site = siteSchema.parse({
     { label: 'About', href: '/about/' },
     { label: 'Our team', href: '/team/' },
     { label: 'Valleyview Grant', href: '/valleyview/' },
+    { label: 'Indigenous outreach', href: '/indigenous-outreach/' },
     { label: 'Contact', href: '/contact/' },
     { label: 'Privacy', href: '/privacy/' },
   ],
@@ -35,12 +41,23 @@ export const site = siteSchema.parse({
       description: 'Pro-D, school visits, partnerships and media.',
     },
   ],
+  // Draft wording, pending approval by the outreach lead (decision record 0007).
+  acknowledgement: {
+    // Matches the opening of the outreach page's acknowledgement.
+    text: 'We are grateful to live, work and play in British Columbia, the land of many First Nations who have cared for it since time immemorial.',
+    link: {
+      label: 'Our land acknowledgement and commitments',
+      href: '/indigenous-outreach/',
+    },
+  },
   regionsIntro: 'We work across British Columbia. We are starting in',
   licence: 'Code MIT · writing CC BY 4.0',
   // Credit for maps that draw school districts (Home, Team). The footer
   // carries mapCredit on every page.
   districtMapCredit:
     'Map data: Natural Earth (public domain). School district boundaries and the close-up coastline: DataBC. Contains information licensed under the Open Government Licence – British Columbia.',
+  // Every photo on the site is original (SPEC rule 8) and by the same person.
+  photoCredit: 'All photography by Reed McIlwain.',
   mapCredit:
     'Map: Natural Earth. Elevation: Copernicus DEM, © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA.',
 });

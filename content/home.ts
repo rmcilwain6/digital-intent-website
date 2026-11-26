@@ -228,12 +228,16 @@ export const home = homeSchema.parse({
       draft: false,
     },
 
+    // Kept plain on purpose: the last band on Home, after Partnerships.
+    // Copy follows the outreach page
+    // (content/outreach.ts) and needs the same approval (SPEC 12.5).
     outreach: {
       heading: 'Indigenous outreach',
       body: [
-        '[TK: commitment to Indigenous outreach, copy from the team member leading this work]',
+        'Our outreach with Indigenous schools and communities starts with face-to-face relationships, built in good faith, beginning where we live.',
+        'Read our land acknowledgement, what we are committing to, and how we will report on it.',
       ],
-      // No link until the outreach page exists (#36).
+      cta: { label: 'Our commitments', href: '/indigenous-outreach/' },
       draft: false,
     },
 
@@ -274,7 +278,7 @@ export const home = homeSchema.parse({
     'map',
     'library',
     'valleyview',
-    'outreach',
     'partnerships',
+    'outreach',
   ],
 });
