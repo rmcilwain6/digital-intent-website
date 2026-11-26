@@ -178,20 +178,28 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
         </div>
       </div>
 
-      <h3>The three questions</h3>
-      <ol class="questions">
-        {current.questions.map((question) => (
-          <li>{question}</li>
-        ))}
-      </ol>
-      <p class="muted">{current.tipsIntro}</p>
-      <ul class="tips">
-        {current.tips.map((tip) => (
-          <li>
-            <strong>{tip.title}</strong> {tip.text}
-          </li>
-        ))}
-      </ul>
+      {/* What a good application looks like: the questions, then our advice. */}
+      <div class="split">
+        <div>
+          <h3>A good application answers three questions</h3>
+          <ol class="questions">
+            {current.questions.map((question) => (
+              <li>{question}</li>
+            ))}
+          </ol>
+        </div>
+        <div>
+          <h3>Our advice</h3>
+          <p class="muted">{current.tipsIntro}</p>
+          <ul class="tips">
+            {current.tips.map((tip) => (
+              <li>
+                <strong>{tip.title}</strong> {tip.text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
       <div class="band apply" data-theme="digital">
         <h3>{current.apply.heading}</h3>
@@ -199,17 +207,19 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
         <p class="apply-slot">{current.apply.pending}</p>
       </div>
 
-      <h3>Questions</h3>
-      <div class="faq">
-        {current.faq.map((item) => (
-          <details>
-            <summary>{item.question}</summary>
-            <p>{item.answer}</p>
-          </details>
-        ))}
-      </div>
-
+      {/* Questions on the left; who runs it and how to reach us on the right. */}
       <div class="split">
+        <div>
+          <h3>Questions</h3>
+          <div class="faq">
+            {current.faq.map((item) => (
+              <details>
+                <summary>{item.question}</summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
         <div>
           <h3>Who’s behind it</h3>
           <p>
@@ -219,8 +229,6 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
             </a>
             .
           </p>
-        </div>
-        <div>
           <h3>Contact and privacy</h3>
           <p>
             Questions? Email us at <EmailLink />.
@@ -357,6 +365,11 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
     align-items: center;
   }
 
+  /* The text first and the portrait on the right, on wider screens. */
+  .teaser-text {
+    grid-row: 1;
+  }
+
   /* The portrait is always 4:5, whatever the photo's own shape. */
   .portrait {
     inline-size: min(100%, 22rem);
@@ -398,7 +411,7 @@ const dateFormat = new Intl.DateTimeFormat('en-CA', {
 
   @media (width >= 48rem) {
     .teaser {
-      grid-template-columns: 22rem minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) 22rem;
       gap: var(--space-7);
     }
   }

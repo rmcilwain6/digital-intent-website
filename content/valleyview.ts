@@ -56,7 +56,7 @@ export const valleyview = valleyviewSchema.parse({
     steps: [
       {
         title: 'Apply online',
-        text: 'Answer the three questions below and attach anything that helps us see your idea: sketches, screenshots, writing, a prototype, a letter from someone who knows you. No transcript needed.',
+        text: 'Fill out the online application and attach anything that helps us see your idea: sketches, screenshots, writing, a prototype, a letter from someone who knows you. No transcript needed.',
       },
       {
         title: 'Hear back',
@@ -69,6 +69,11 @@ export const valleyview = valleyviewSchema.parse({
       {
         title: 'The award',
         text: 'We tell the recipient in May and present the grant at the Valleyview Awards Banquet in June.',
+      },
+      {
+        // Reed, November 26, 2026: what we offer through the year.
+        title: 'We get to work',
+        text: 'Through the following year, we introduce you to people in our network, connect you with mentors and help where we can with the problems you run into.',
       },
     ],
     timeline: [
