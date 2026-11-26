@@ -35,19 +35,21 @@ const slug = (name: string) =>
 
 const members = team.map((member) => {
   const id = slug(member.name);
-  const point = placePoint(member.place);
-  // The school districts around the member's city, outlined on the map.
-  const districts = (regionDistricts[member.place] ?? []).map((n) =>
-    district(n),
+  // Home city first, then any other region the member also calls home.
+  const homes = [member.place, ...(member.alsoIn ?? [])];
+  const points = homes.map((name) => ({ name, point: placePoint(name) }));
+  // The school districts around each of those cities, outlined on the map.
+  const districts = homes.flatMap((name) =>
+    (regionDistricts[name] ?? []).map((n) => district(n)),
   );
-  return { member, id, point, districts };
+  return { member, id, homes, points, districts };
 });
 
 // One marker per place, shared by everyone who lives there.
 const places: MapPlace[] = [];
 for (const m of members) {
-  if (!places.some((p) => p.name === m.member.place)) {
-    places.push({ name: m.member.place, point: m.point });
+  for (const p of m.points) {
+    if (!places.some((q) => q.name === p.name)) places.push(p);
   }
 }
 
@@ -73,17 +75,17 @@ const keepInside = (box: typeof bcFrame, outer: typeof bcFrame) => {
 };
 
 const views: MapView[] = members.map((m) => {
-  const isClose = inside(m.point, map.detail.frame);
+  const isClose = m.points.every((p) => inside(p.point, map.detail.frame));
   const box = sheetFor(
     union(
       m.districts.map((d) => pathBounds(d.d)),
-      [m.point],
+      m.points.map((p) => p.point),
     ),
     isClose ? close : gentle,
   );
   return {
     member: m.id,
-    place: m.member.place,
+    places: m.homes,
     box: isClose ? keepInside(box, map.detail.frame) : box,
     districts: m.districts.map((d) => ({
       number: d.number,
@@ -113,7 +115,16 @@ const views: MapView[] = members.map((m) => {
 
       <ol class="members">
         {members.map(({ member, id }) => (
-          <li class="entry" id={id} data-entry data-member={id}>
+          <li
+            class="entry"
+            id={id}
+            data-entry
+            data-member={id}
+            data-places={JSON.stringify([
+              member.place,
+              ...(member.alsoIn ?? []),
+            ])}
+          >
             <div class="entry-head">
               <div class="photo">
                 {'placeholder' in member.photo ? (
@@ -250,10 +261,10 @@ const views: MapView[] = members.map((m) => {
     const entries = [...root.querySelectorAll<HTMLElement>('[data-entry]')];
     const pins = [...mapRoot.querySelectorAll<SVGGElement>('.pin')];
     const leads = [...mapRoot.querySelectorAll<SVGPathElement>('.lead')];
-    const placeOf = new Map(
+    const placesOf = new Map<string, string[]>(
       entries.map((entry) => [
         entry.dataset.member ?? '',
-        entry.querySelector('.meta')?.textContent?.split(' · ').pop() ?? '',
+        JSON.parse(entry.dataset.places ?? '[]'),
       ]),
     );
 
@@ -267,7 +278,7 @@ const views: MapView[] = members.map((m) => {
       camera!.style.transform = `translate(${tx}px, ${ty}px) scale(${k})`;
       detail!.classList.toggle('is-on', close);
       province!.classList.toggle('is-off', close);
-      const place = id ? placeOf.get(id) : null;
+      const here = (id && placesOf.get(id)) || [];
       for (const pin of pins) {
         const x = tx + k * Number(pin.dataset.x);
         const y = ty + k * Number(pin.dataset.y);
@@ -280,7 +291,10 @@ const views: MapView[] = members.map((m) => {
           );
           pin.classList.toggle('is-hidden', hide?.includes(number) ?? false);
         } else {
-          pin.classList.toggle('is-here', pin.dataset.place === place);
+          pin.classList.toggle(
+            'is-here',
+            here.includes(pin.dataset.place ?? ''),
+          );
         }
       }
       for (const lead of leads) {

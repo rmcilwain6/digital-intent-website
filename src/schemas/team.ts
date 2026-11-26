@@ -46,6 +46,12 @@ export const teamMemberSchema = z.strictObject({
    * around it (`regionDistricts` in content/team.ts).
    */
   place: z.string().min(1),
+  /**
+   * Other starting regions the member also calls home and spends real time
+   * in. The map marks and outlines these along with `place`; the line under
+   * the name shows `place` only, so the bio should say why.
+   */
+  alsoIn: z.array(z.string().min(1)).min(1).optional(),
   /** What this member handles for the team, in a sentence or two. */
   focus: z.string().min(1),
   /** Where they work and what they do there. Shown with the logo. */

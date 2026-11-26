@@ -4,6 +4,10 @@
 import { brand } from '../src/brand/brand.config';
 import { regionDistrictsSchema, teamSchema } from '../src/schemas/team';
 
+// Logos stay placeholders until each organization's logo is provided, with
+// permission to use it.
+const logo = { placeholder: true } as const;
+
 // The school districts outlined on the map around each starting region.
 // Modest on purpose: the districts nearest each city.
 export const regionDistricts = regionDistrictsSchema.parse({
@@ -19,10 +23,29 @@ export const team = teamSchema.parse([
       src: '/team/reed-mcilwain.webp',
       alt: 'Reed McIlwain smiling on a snowy riverside path, with mountains in the background.',
     },
-    // [TK: confirm role and home city with Reed]
     role: 'Executive Director',
-    place: 'Kamloops',
-    focus: '[TK: one-sentence focus for Reed]',
+    place: 'Vancouver',
+    alsoIn: ['Kamloops', 'Victoria'],
+    // Draft copy from Reed's notes, Nov 26, 2026: needs Reed's approval.
+    focus:
+      'Leads our day-to-day work and is building our community in Vancouver, Victoria and Kamloops.',
+    work: [
+      {
+        title: 'Photographer and owner',
+        organization: { name: '[TK: photography business name]', logo },
+      },
+    ],
+    education: [
+      {
+        program: 'Bachelor of Software Engineering',
+        school: { name: 'University of Victoria', logo },
+      },
+    ],
+    bio: `Reed grew up in Kamloops and graduated from Valleyview Secondary in 2016, where he was valedictorian. He then spent about ten years in Victoria, starting with a software engineering degree at the University of Victoria. Today he lives in Vancouver and is often in Kamloops and Victoria. He thinks of all three cities as home, which is why they are where we are building our community first.
+
+Reed has always liked wearing many hats. He was the technology coordinator at Eureka in 2017 and 2019, and spent three and a half years as a software developer at Shift, a tech company in Victoria. He helped deliver material for a software engineering course at UVic, and spent three years volunteering with TEDxVictoria as volunteer lead and community engagement lead.
+
+He left software to do more of that mix. He started a photography business and did contract work for the Big Little Science Centre in Kamloops, then founded Digital Intent. Each of those roles taught him something he now uses as executive director.`,
   },
   {
     name: 'Carter Recchi',
@@ -30,9 +53,9 @@ export const team = teamSchema.parse([
       src: '/team/carter-recchi.webp',
       alt: 'Carter Recchi smiling on a rocky shoreline, with the ocean in the background.',
     },
-    // [TK: confirm role and home city with Carter]
+    // [TK: confirm role with Carter]
     role: 'Board Member',
-    place: 'Vancouver',
+    place: 'Kamloops',
     focus: '[TK: one-sentence focus for Carter]',
   },
   {
@@ -45,6 +68,23 @@ export const team = teamSchema.parse([
     role: 'Board Member',
     place: 'Victoria',
     focus: '[TK: one-sentence focus for Keaton]',
+    work: [
+      {
+        title: 'Natural Resources Manager',
+        organization: { name: 'K’en T’em Limited Partnership', logo },
+      },
+    ],
+    education: [
+      {
+        program: 'Natural Resource Sciences',
+        school: { name: 'Thompson Rivers University', logo },
+      },
+    ],
+    // Bio as supplied by Reed, Nov 26, 2026, lightly edited: needs Keaton's
+    // approval.
+    bio: `Keaton graduated from Valleyview Secondary in 2016. He studied natural resource sciences at Thompson Rivers University from 2016 to 2020.
+
+In his career, Keaton has blended environmental services, operational excellence and meaningful Indigenous consultation within resource extraction industries. He now works as Natural Resources Manager at K’en T’em Limited Partnership.`,
   },
   {
     name: 'Carolyn Dahl',
@@ -70,14 +110,17 @@ export const team = teamSchema.parse([
   },
 ]);
 
-// Every member is based in a starting region that has districts to outline.
+// Every place a member calls home is a starting region with districts to
+// outline.
 for (const member of team) {
-  if (
-    !(brand.regions as readonly string[]).includes(member.place) ||
-    !regionDistricts[member.place]
-  ) {
-    throw new Error(
-      `${member.name}: place "${member.place}" must be one of ${brand.regions.join(', ')}, with districts in regionDistricts.`,
-    );
+  for (const place of [member.place, ...(member.alsoIn ?? [])]) {
+    if (
+      !(brand.regions as readonly string[]).includes(place) ||
+      !regionDistricts[place]
+    ) {
+      throw new Error(
+        `${member.name}: place "${place}" must be one of ${brand.regions.join(', ')}, with districts in regionDistricts.`,
+      );
+    }
   }
 }
