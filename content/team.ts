@@ -25,7 +25,10 @@ export const team = teamSchema.parse([
   },
   {
     name: 'Carter Recchi',
-    photo: { placeholder: true, note: portraitNote },
+    photo: {
+      src: '/team/carter-recchi.webp',
+      alt: 'Carter Recchi smiling on a rocky shoreline, with the ocean in the background.',
+    },
     // [TK: confirm role and home city with Carter]
     role: 'Board Member',
     place: 'Vancouver',
@@ -33,7 +36,10 @@ export const team = teamSchema.parse([
   },
   {
     name: 'Keaton Allan',
-    photo: { placeholder: true, note: portraitNote },
+    photo: {
+      src: '/team/keaton-allan.webp',
+      alt: 'Keaton Allan smiling in a suit and tie, in front of a grey backdrop.',
+    },
     // [TK: confirm role and home city with Keaton]
     role: 'Board Member',
     place: 'Victoria',
